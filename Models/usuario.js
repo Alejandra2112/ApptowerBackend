@@ -77,24 +77,23 @@ Usuario.belongsTo(Roles, { //muchos usuarios a un rol o si no es hasmany
     targetKey: 'idrol', // Debe coincidir con el campo en la tabla Roles
   });
 
-  Usuario.afterCreate(async (usuario) => {
-    if (usuario.idrol === 3) {
-      // Crea un registro en la tabla de Vigilantes asociado a este usuario
-      await Vigilante.create({
-        nombrevigilante: usuario.nombre,
-        apellidovigilante: usuario.apellido,
-        tipodocumento: usuario.tipodocumento,
-        documento: usuario.documento,
-        telefono: usuario.telefono,
-        correo: usuario.correo,
-        entrada: null, 
-        salida: null,
-        fechanacimiento: null,
-        estado: 'ACTIVO',
-      }, {
-      
-        timestamps: false, // Deshabilita los timestamps para esta operación de creación
-      });
-    }
-  });
-  
+Usuario.afterCreate(async (usuario) => {
+  if (usuario.idrol === 3) {
+    // Crea un registro en la tabla de Vigilantes asociado a este usuario
+    await Vigilante.create({
+      nombrevigilante: usuario.nombre,
+      apellidovigilante: usuario.apellido,
+      tipodocumento: usuario.tipodocumento,
+      documento: usuario.documento,
+      telefono: usuario.telefono,
+      correo: usuario.correo,
+      entrada: null, 
+      salida: null,
+      fechanacimiento: null,
+      estado: 'ACTIVO',
+    }, {
+    
+      timestamps: false, // Deshabilita los timestamps para esta operación de creación
+    });
+  }
+});
