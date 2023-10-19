@@ -11,12 +11,13 @@ const Vigilante = sequelizeVigilante.define('vigilantes',{
       nombrevigilante: {
         type: DataTypes.STRING,
         field: 'nombrevigilante',
-        allowNull: false, 
+       
+       
       },
       apellidovigilante: {
         type: DataTypes.STRING,
         field: 'apellidovigilante', 
-        allowNull: false, 
+        
       },
       tipodocumento: {
         type: DataTypes.STRING,
@@ -26,7 +27,7 @@ const Vigilante = sequelizeVigilante.define('vigilantes',{
         type: DataTypes.STRING,
         field: 'documento',
         unique: true, 
-        allowNull: false, 
+    
       },
       telefono: {
         type: DataTypes.STRING,
@@ -35,18 +36,6 @@ const Vigilante = sequelizeVigilante.define('vigilantes',{
       correo: {
         type: DataTypes.STRING,
         field: 'correo', 
-      },
-      entrada: {
-        type: DataTypes.DATE,
-        field: 'entrada',
-        allowNull: true,
-        
-      },
-      salida: {
-        type: DataTypes.DATE,
-        field: 'salida',
-        allowNull: true,
-        
       },
       fechanacimiento: {
         type: DataTypes.DATE,
@@ -64,5 +53,6 @@ const Vigilante = sequelizeVigilante.define('vigilantes',{
       timestamps: false, 
     });
 
+    
 
 module.exports = Vigilante

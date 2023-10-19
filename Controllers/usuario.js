@@ -26,7 +26,7 @@ const postUsuario = async (req, res) => {
   let mensaje = '';
   const body = req.query; 
   try {
-    await Usuario.create(body); 
+    await Usuario.create(body);
     mensaje = 'Usuario Registrado Exitosamente';
   } catch (e) {
     mensaje = e.message;

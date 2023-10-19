@@ -5,7 +5,7 @@ const Vigilantes = require('../Models/vigilantes');
 const getVigilantes = async (req, res = response) => {
     try {
       const vigilante = await Vigilantes.findAll();
-
+      
       console.log('vigilantes obtenidos correctamente:', vigilante);
   
       res.json({
@@ -13,10 +13,10 @@ const getVigilantes = async (req, res = response) => {
       });
     } catch (error) {
 
-      console.error('Error al obtener roles:', error);
+      console.error('Error al obtener vigilantes:', error);
   
       res.status(500).json({
-        error: 'Error al obtener roles',
+        error: 'Error al obtener vigilantes',
       });
     }  
 };

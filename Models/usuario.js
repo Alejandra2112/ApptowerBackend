@@ -3,7 +3,6 @@ const sequelizeUser = require('../Database/config');
 const Roles = require('../Models/roles');
 const Vigilante = require('../Models/vigilantes'); 
 
-
 const Usuario = sequelizeUser.define('usuarios', {
   idusuario: {
     type: DataTypes.INTEGER,
@@ -14,28 +13,29 @@ const Usuario = sequelizeUser.define('usuarios', {
   tipodocumento: {
     type: DataTypes.STRING,
     field: 'tipodocumento', 
-    allowNull: false, 
+     
   },
   documento: {
     type: DataTypes.STRING,
     field: 'documento',
     unique: true, 
-    allowNull: false, 
+    allowNull: true, 
+    
   },
   nombre: {
     type: DataTypes.STRING,
     field: 'nombre',
-    allowNull: false, 
+    
   },
   apellido: {
     type: DataTypes.STRING,
     field: 'apellido', 
-    allowNull: false, 
+    
   },
   idrol: {
     type: DataTypes.INTEGER,
     field: 'idrol',
-    allowNull: false,  
+      
   },
   correo: {
     type: DataTypes.STRING,
@@ -56,7 +56,7 @@ const Usuario = sequelizeUser.define('usuarios', {
     validate: {
       len: [8, 12], 
     },
-    allowNull: false, 
+   
   },
   estado: {
     type: DataTypes.STRING,
@@ -72,10 +72,12 @@ const Usuario = sequelizeUser.define('usuarios', {
 
 module.exports = Usuario;
 
+
 Usuario.belongsTo(Roles, { //muchos usuarios a un rol o si no es hasmany
     foreignKey: 'idrol', // Debe coincidir con el campo en la tabla Usuarios
     targetKey: 'idrol', // Debe coincidir con el campo en la tabla Roles
   });
+
 
 Usuario.afterCreate(async (usuario) => {
   if (usuario.idrol === 3) {
@@ -86,9 +88,6 @@ Usuario.afterCreate(async (usuario) => {
       tipodocumento: usuario.tipodocumento,
       documento: usuario.documento,
       telefono: usuario.telefono,
-      correo: usuario.correo,
-      entrada: null, 
-      salida: null,
       fechanacimiento: null,
       estado: 'ACTIVO',
     }, {
