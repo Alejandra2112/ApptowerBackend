@@ -11,9 +11,21 @@ class Server {
     this.PermisoRolPath = '/api/permisorol';
     this.TurnosPath = '/api/turnosv';
     this.LoginPath = '/api/login';
+
+    // Residents process 
+
+    this.residentsPath = '/api/residents';
+    // this.OwnersPath = '/api/owners';
+
+    // Spaces process
+
+    // this.SpacesPath = '/api/spaces';
+    // this.ParkingSpacesPath = '/api/parkingSpaces'
+
+
     this.routes();
     this.db_connect();
-    this.app.use(express.json()); 
+    this.app.use(express.json());
   }
 
   routes() {
@@ -23,11 +35,25 @@ class Server {
     this.app.use(this.PermisoRolPath, require('../Routes/permisosRol'));
     this.app.use(this.TurnosPath, require('../Routes/turnosVigilantes'))
     this.app.use(this.LoginPath, require('../Routes/login'));
+
+    // routes for spaces process
+
+    // this.app.use(this.spacesPath, require('../Routes/spaces'))
+    // this.app.use(this.ParkingSpacesPath, require('../Routes/parkingSpaces'))
+
+    // routes for residents process 
+
+    this.app.use(this.residentsPath, require('../Routes/residents'))
+    // this.app.use(this.OwnersPath, require('../Routes/owners'))
   }
 
   async db_connect() {
     try {
       await sequelize.authenticate();
+      // Sincroniza los modelos con la base de datos
+      sequelize.sync({ force: false }).then(() => {
+        console.log('Modelos sincronizados con la base de datos');
+      });
       console.log('Conexión exitosa a PostgreSQL');
     } catch (err) {
       console.error('Error al conectar a PostgreSQL:', err);

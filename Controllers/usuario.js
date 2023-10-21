@@ -23,6 +23,8 @@ const getUsuario = async (req, res = response) => {
 
 
 const postUsuario = async (req, res) => {
+
+  
   let mensaje = '';
   const body = req.query; 
   try {
