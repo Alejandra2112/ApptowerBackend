@@ -1,58 +1,54 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelizeVigilante = require('../Database/config'); 
+const sequelize = require('../Database/config'); 
 
-const Vigilante = sequelizeVigilante.define('vigilantes',{
-    idvigilante: {
+const Watchman = sequelize.define('vigilantes',{
+    idwatchman: {
         type: DataTypes.INTEGER,
         primaryKey: true, 
         autoIncrement: true,
         field: 'idvigilante', 
       },
-      nombrevigilante: {
+      namewatchman: {
         type: DataTypes.STRING,
         field: 'nombrevigilante',
-       
-       
       },
-      apellidovigilante: {
+      lastnamewatchman: {
         type: DataTypes.STRING,
         field: 'apellidovigilante', 
         
       },
-      tipodocumento: {
+      documentType: {
         type: DataTypes.STRING,
         field: 'tipodocumento', 
       },
-      documento: {
+      document: {
         type: DataTypes.STRING,
         field: 'documento',
         unique: true, 
     
       },
-      telefono: {
+      phone: {
         type: DataTypes.STRING,
         field: 'telefono', 
       },
-      correo: {
+      email: {
         type: DataTypes.STRING,
         field: 'correo', 
       },
-      fechanacimiento: {
+      dateOfbirth: {
         type: DataTypes.DATE,
         field: 'fechanacimiento',
       },
-      estado: {
+      state: {
         type: DataTypes.STRING,
         field: 'estado', 
         validate: {
-          isIn: [['ACTIVO', 'INACTIVO']], 
+          isIn: [['Activo', 'Inactivo']], 
         },
-        defaultValue: 'ACTIVO', 
+        defaultValue: 'Activo', 
       },
-    }, {
-      timestamps: false, 
     });
 
     
 
-module.exports = Vigilante
+module.exports = Watchman

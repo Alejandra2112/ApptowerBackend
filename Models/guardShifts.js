@@ -1,25 +1,25 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../Database/config'); 
-const Vigilante = require('../Models/vigilantes'); 
+const Watchman = require('./watchman'); 
 
 
-const Turnos = sequelize.define('turnos', {
-  idturno: {
+const guardShifts = sequelize.define('turnos', {
+  idshifts: {
     type: DataTypes.INTEGER,
     primaryKey: true, 
     autoIncrement: true,
     field: 'idturno', 
   },
-  idvigilante: {
+  idwatchman: {
     type: DataTypes.INTEGER,
     field: 'idvigilante',
     allowNull: false,  
   },
-  inicio: {
+  start: {
     type: DataTypes.DATE,
     field: 'inicio', 
   },
-  fin: {
+  end: {
     type: DataTypes.DATE,
     field: 'fin', 
   },
@@ -27,10 +27,10 @@ const Turnos = sequelize.define('turnos', {
   timestamps: false, 
 });
 
-Turnos.belongsTo(Vigilante, { 
-    foreignKey: 'idvigilante', // Debe coincidir con el campo en la tabla Usuarios
-    targetKey: 'idvigilante', // Debe coincidir con el campo en la tabla Roles
+guardShifts.belongsTo(Watchman, { 
+    foreignKey: 'idwatchman', // Debe coincidir con el campo en la tabla Usuarios
+    targetKey: 'idwatchman', // Debe coincidir con el campo en la tabla Roles
   });
   
-module.exports = Turnos;
+module.exports = guardShifts;
 

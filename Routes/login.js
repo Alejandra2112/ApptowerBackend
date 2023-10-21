@@ -1,14 +1,14 @@
 const {Router} = require ('express')
 const route = Router()
-const {iniciarSesion} = require ('../Controllers/login')
-const verificarToken = require('../middlewares/verificarToken')
-const Usuario = require('../Models/usuario')
+const {logIn} = require ('../Controllers/login')
+const verifityToken = require('../Middlewares/verifityToken')
+const User = require('../Models/user')
 
-route.post('/', iniciarSesion)
+route.post('/', logIn)
 
-route.get('/acceso', verificarToken, (req, res) => {
-    const usuario = req.usuario;
-    const rol = usuario.rol;
+route.get('/access', verifityToken, (req, res) => {
+    const user = req.user;
+    const rol = user.rol;
   
     if (rol == 1) {
       console.log("Es administrador");
@@ -18,7 +18,5 @@ route.get('/acceso', verificarToken, (req, res) => {
       console.log("Es vigilante");
     }
   });
-  
-
-
+ 
 module.exports = route

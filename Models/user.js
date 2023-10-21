@@ -1,33 +1,33 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelizeUser = require('../Database/config'); 
-const Roles = require('../Models/roles');
-const Vigilante = require('../Models/vigilantes'); 
+const Rols = require('./rols');
+const Watchman = require('./watchman'); 
 
-const Usuario = sequelizeUser.define('usuarios', {
-  idusuario: {
+const User = sequelizeUser.define('usuarios', {
+  iduser: {
     type: DataTypes.INTEGER,
     primaryKey: true, 
     autoIncrement: true,
     field: 'idusuario', 
   },
-  tipodocumento: {
+  documentType: {
     type: DataTypes.STRING,
     field: 'tipodocumento', 
      
   },
-  documento: {
+  document: {
     type: DataTypes.STRING,
     field: 'documento',
     unique: true, 
     allowNull: true, 
     
   },
-  nombre: {
+  name: {
     type: DataTypes.STRING,
     field: 'nombre',
     
   },
-  apellido: {
+  lastname: {
     type: DataTypes.STRING,
     field: 'apellido', 
     
@@ -37,20 +37,15 @@ const Usuario = sequelizeUser.define('usuarios', {
     field: 'idrol',
       
   },
-  correo: {
+  email: {
     type: DataTypes.STRING,
     field: 'correo', 
   },
-  telefono: {
+  phone: {
     type: DataTypes.STRING,
     field: 'telefono', 
   },
-  fechacreacion: {
-    type: DataTypes.DATE,
-    field: 'fechacreacion', 
-    defaultValue: Sequelize.literal('CURRENT_DATE'), 
-  },
-  contrasena: {
+  password: {
     type: DataTypes.STRING,
     field: 'contrasena', 
     validate: {
@@ -58,41 +53,37 @@ const Usuario = sequelizeUser.define('usuarios', {
     },
    
   },
-  estado: {
+  state: {
     type: DataTypes.STRING,
     field: 'estado', 
     validate: {
-      isIn: [['ACTIVO', 'INACTIVO']], 
+      isIn: [['Activo', 'Inactivo']], 
     },
-    defaultValue: 'ACTIVO', 
+    defaultValue: 'Activo', 
   },
-}, {
-  timestamps: false, 
 });
 
-module.exports = Usuario;
+module.exports = User;
 
 
-Usuario.belongsTo(Roles, { //muchos usuarios a un rol o si no es hasmany
+User.belongsTo(Rols, { //muchos usuarios a un rol o si no es hasmany
     foreignKey: 'idrol', // Debe coincidir con el campo en la tabla Usuarios
     targetKey: 'idrol', // Debe coincidir con el campo en la tabla Roles
   });
 
 
-Usuario.afterCreate(async (usuario) => {
-  if (usuario.idrol === 3) {
+User.afterCreate(async (user) => {
+  if (user.idrol === 3) {
     // Crea un registro en la tabla de Vigilantes asociado a este usuario
-    await Vigilante.create({
-      nombrevigilante: usuario.nombre,
-      apellidovigilante: usuario.apellido,
-      tipodocumento: usuario.tipodocumento,
-      documento: usuario.documento,
-      telefono: usuario.telefono,
+    await Watchman.create({
+      nombrevigilante: user.name,
+      apellidovigilante: user.lastname,
+      tipodocumento: user.documentType,
+      documento: user.document,
+      telefono: user.phone,
+      correo: user.email,
       fechanacimiento: null,
-      estado: 'ACTIVO',
-    }, {
-    
-      timestamps: false, // Deshabilita los timestamps para esta operación de creación
+      state: 'Activo',
     });
   }
 });

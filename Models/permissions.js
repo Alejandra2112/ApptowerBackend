@@ -1,14 +1,14 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
 
-const Permisos = sequelize.define('permisos', {
-  idpermiso: {
+const Permissions = sequelize.define('permisos', {
+  idpermission: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
     field: 'idpermiso', 
   },
-  permiso: {
+  permission: {
     type: DataTypes.STRING,
     field: 'permiso', 
   },
@@ -17,4 +17,4 @@ const Permisos = sequelize.define('permisos', {
 });
 
 
-module.exports = Permisos;
+module.exports = Permissions;

@@ -1,22 +1,22 @@
 const jwt = require('jsonwebtoken');
-const Usuario = require('../Models/usuario');
+const User = require('../Models/user');
 
-const iniciarSesion = async (req, res) => {
-  const { documento, contrasena } = req.query;
+const logIn = async (req, res) => {
+  const { document, password } = req.body;
 
   try {
-    const usuario = await Usuario.findOne({ where: { documento } });
+    const user = await User.findOne({ where: { document } });
 
-    if (!usuario) {
-      return res.status(401).json({ mensaje: 'Usuario no encontrado' });
+    if (!user) {
+      return res.status(401).json({ message: 'user no encontrado' });
     }
-    if (contrasena !== usuario.contrasena) {
-      return res.status(401).json({ mensaje: 'Contraseña incorrecta' });
+    if (password !== user.password) {
+      return res.status(401).json({ message: 'Contraseña incorrecta' });
     }
 
     const tokenPayload = {
-      idusuario: usuario.idusuario,
-      rol: usuario.idrol, 
+      iduser: user.iduser,
+      rol: user.idrol, 
     };
 
     const token = jwt.sign(tokenPayload, process.env.MISECRETKEY, {
@@ -24,15 +24,15 @@ const iniciarSesion = async (req, res) => {
     });
 
     res.json({
-      mensaje: 'Inicio de sesión exitoso',
+      message: 'Inicio de sesión exitoso',
       token,
     });
   } catch (error) {
     console.error('Error al iniciar sesión:', error);
-    res.status(500).json({ mensaje: 'Error en el servidor' });
+    res.status(500).json({ message: 'Error en el servidor' });
   }
 };
 
 module.exports = {
-  iniciarSesion,
+  logIn,
 };

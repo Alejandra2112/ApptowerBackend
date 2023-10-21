@@ -1,42 +1,36 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../Database/config'); 
-const RolPermiso = require('../Models/rol_permiso');
-const Permisos = require('../Models/permisos');
+const rolsPermissions = require('./rols_permissions');
+const Permissions = require('./permissions');
 
 
-const Roles = sequelize.define('roles', {
+const Rols = sequelize.define('roles', {
     idrol: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
       field: 'idrol', 
     },
-    nombrerol: {
+    namerol: {
       type: DataTypes.STRING,
       field: 'nombrerol',
     },
-    descripcion: {
+    description: {
       type: DataTypes.STRING,
       field: 'descripcion', 
     },
-    estado: {
+    state: {
       type: DataTypes.STRING,
       field: 'estado', 
       validate: {
-        isIn: [['ACTIVO', 'INACTIVO']], 
+        isIn: [['Activo', 'Inactivo']], 
       },
-      defaultValue: 'ACTIVO', 
+      defaultValue: 'Activo', 
     },
   },
-  {
-    timestamps: false, 
-  });
+  );
 
-  Roles.belongsToMany(Permisos, { through: RolPermiso, foreignKey: 'idrol', otherKey: 'idpermiso' });
+  Rols.belongsToMany(Permissions, { through: rolsPermissions, foreignKey: 'idrol', otherKey: 'idpermiso' });
 
-
-
-
-  
-  module.exports = Roles;
+  module.exports = Rols;
   

@@ -1,9 +1,8 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
 
-
-const RolPermiso = sequelize.define('rol_permiso', { 
-  idrol_permiso: {
+const rolsPermissions = sequelize.define('rol_permiso', { 
+  idrol_permission: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
@@ -12,8 +11,9 @@ const RolPermiso = sequelize.define('rol_permiso', {
   idrol: {
     type: DataTypes.INTEGER,
   },
-  idpermiso: {
+  idpermission: {
     type: DataTypes.INTEGER,
+    field: 'idpermiso',
   },
 }, {
   timestamps: false,
@@ -21,4 +21,4 @@ const RolPermiso = sequelize.define('rol_permiso', {
 });
 
 
-module.exports = RolPermiso;
+module.exports = rolsPermissions;
