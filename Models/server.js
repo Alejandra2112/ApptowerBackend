@@ -11,6 +11,8 @@ class Server {
     this.permissionsRolsPath = '/api/permissionsrols';
     this.guardShiftsPath = '/api/guardshifts';
     this.LoginPath = '/api/login';
+    this.bookingPath = '/api/booking';
+    this.vehiclePath = '/api/vehicle';
     this.middlewares();
     this.routes();
     this.db_connect();
@@ -36,7 +38,8 @@ class Server {
     this.app.use(this.permissionsRolsPath, require('../Routes/permissionsRols'));
     this.app.use(this.guardShiftsPath, require('../Routes/guardShifts'))
     this.app.use(this.LoginPath, require('../Routes/login'));
-
+    this.app.use(this.bookingPath, require('../Routes/booking'));
+    this.app.use(this.vehiclePath, require('../Routes/vehicle'));
     // routes for spaces process
 
     // this.app.use(this.spacesPath, require('../Routes/spaces'))
