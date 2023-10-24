@@ -11,6 +11,15 @@ class Server {
     this.permissionsRolsPath = '/api/permissionsrols';
     this.guardShiftsPath = '/api/guardshifts';
     this.LoginPath = '/api/login';
+
+    // Spaces process path
+
+    this.spacesPath = '/api/spaces';
+    this.ParkingSpacesPath = '/api/parkingSpaces';
+    this.AssignedParkingPath = '/api/assignedParkingSpaces';
+
+
+
     this.middlewares();
     this.routes();
     this.db_connect();
@@ -39,12 +48,14 @@ class Server {
 
     // routes for spaces process
 
-    // this.app.use(this.spacesPath, require('../Routes/spaces'))
-    // this.app.use(this.ParkingSpacesPath, require('../Routes/parkingSpaces'))
+    this.app.use(this.spacesPath, require('../Routes/spaces.routes'))
+    this.app.use(this.ParkingSpacesPath, require('../Routes/parking.spaces.routes'))
+    this.app.use(this.AssignedParkingPath, require('../Routes/assigned.parking.routes'))
+
 
     // routes for residents process 
 
-    this.app.use(this.residentsPath, require('../Routes/residents'))
+    // this.app.use(this.residentsPath, require('../Routes/residents'))
     // this.app.use(this.OwnersPath, require('../Routes/owners'))
   }
 
@@ -55,15 +66,15 @@ class Server {
       sequelize.sync({ force: false }).then(() => {
         console.log('Modelos sincronizados con la base de datos');
       });
-      console.log('Conexión exitosa a PostgreSQL');
+      console.log('PostgreSQL connection ok');
     } catch (err) {
-      console.error('Error al conectar a PostgreSQL:', err);
+      console.error('Error to connect PostgreSQL:', err);
     }
   }
 
   listen() {
     this.app.listen(this.port, () => {
-      console.log(`Escuchando en el puerto ${this.port}`);
+      console.log(`Listening port ${this.port}`);
     });
   }
 }
