@@ -2,7 +2,7 @@ const { Sequelize, DataTypes } = require('sequelize');
 const sequelizeUser = require('../Database/config'); 
 const Rols = require('./rols.model');
 const Watchman = require('./watchmans.model'); 
-const Residents = require('./residents');
+// const Residents = require('./residents');
 const usersforWatchmans = require('./user.watchman.model');
 
 const User = sequelizeUser.define('users', {
