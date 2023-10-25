@@ -1,6 +1,6 @@
 const { response } = require('express');
 
-const Notification = require('../Models/notification');
+const Notification = require('../Models/notification.model');
 
 const getNotification = async (req, res = response) => {
     try {

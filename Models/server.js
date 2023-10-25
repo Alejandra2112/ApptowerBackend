@@ -56,9 +56,9 @@ class Server {
     this.app.use(this.permissionsRolsPath, require('../Routes/permissions.route'));
     this.app.use(this.guardShiftsPath, require('../Routes/guardShifts.route'))
    
-    this.app.use(this.bookingPath, require('../Routes/booking'));
-    this.app.use(this.vehiclePath, require('../Routes/vehicle'));
-    this.app.use(this.notificationPath, require('../Routes/notification'));
+    this.app.use(this.bookingPath, require('../Routes/booking.routes'));
+    this.app.use(this.vehiclePath, require('../Routes/vehicle.routes'));
+    this.app.use(this.notificationPath, require('../Routes/notification.routes'));
     // routes for spaces process
 
     this.app.use(this.SpacesPath, require('../Routes/spaces.routes'))

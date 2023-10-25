@@ -1,9 +1,9 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../Database/config'); 
-const User = require('./user');
-const Residents = require('./residents');
-const Booking = require('./booking');
-const Spaces = require('./spaces');
+const User = require('./users.model');
+const Residents = require('./space.residents.model');
+const Booking = require('./booking.model');
+const Spaces = require('./spaces.model');
 
 const Bookingspaces = sequelize.define('bookingspaces', {
   idbookingspaces: {

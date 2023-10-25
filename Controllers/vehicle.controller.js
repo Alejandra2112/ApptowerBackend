@@ -1,5 +1,5 @@
 const {response} = require('express');
-const Vehicle = require('../Models/vehicle');
+const Vehicle = require('../Models/vehicle.model');
 
 const getVehicle = async (req, res = response) => {
     try {

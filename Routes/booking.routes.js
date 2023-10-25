@@ -1,6 +1,6 @@
 const {Router} = require('express');
 const route = Router();
-const {getBooking, postBooking, putBooking} = require('../Controllers/booking');
+const {getBooking, postBooking, putBooking} = require('../Controllers/booking.controller');
 
 route.get('/', getBooking);
 route.post('/', postBooking);
