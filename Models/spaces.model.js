@@ -2,6 +2,10 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
 const ParkingSpaceModel = require('../Models/parking.spaces.model')
 const AssignedParkingModel = require('../Models/assigned.parking.model')
+const SpaceOwnerModel = require('../Models/space.owners.model')
+const OwnersModel = require('../Models/owners.model')
+
+
 
 const SpacesModel = sequelize.define('Spaces', {
 
@@ -59,6 +63,7 @@ const SpacesModel = sequelize.define('Spaces', {
 );
 
 SpacesModel.belongsToMany(ParkingSpaceModel, { through: AssignedParkingModel, foreignKey: 'idSpace', otherKey: 'idParkingSpace' });
+SpacesModel.belongsToMany(OwnersModel, { through: SpaceOwnerModel, foreignKey: 'idSpace', otherKey: 'idOwner' });
 
 
 module.exports = SpacesModel;

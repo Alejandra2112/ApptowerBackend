@@ -63,10 +63,10 @@ const OwnersModel = sequelize.define('Owners', {
 
     },
 
-    phoneNumer: {
+    phoneNumber: {
 
         type: DataTypes.STRING(15),
-        field: 'phoneNumer',
+        field: 'phoneNumber',
 
     },
 

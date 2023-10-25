@@ -21,6 +21,8 @@ class Server {
     // Residents process path
 
     this.OwnersPath = '/api/owners';
+    this.SpaceOwnersPath = '/api/spacesOwners';
+
 
     this.middlewares();
     this.routes();
@@ -59,18 +61,28 @@ class Server {
 
     // this.app.use(this.residentsPath, require('../Routes/residents'))
     this.app.use(this.OwnersPath, require('../Routes/owners.routes'))
+    this.app.use(this.SpaceOwnersPath, require('../Routes/space.owner.routes'))
+
   }
 
   async db_connect() {
+
     try {
+
       await sequelize.authenticate();
+
       // Sincroniza los modelos con la base de datos
       sequelize.sync({ force: false }).then(() => {
         console.log('Modelos sincronizados con la base de datos');
+
       });
+
       console.log('PostgreSQL connection ok');
+
     } catch (err) {
+
       console.error('Error to connect PostgreSQL:', err);
+
     }
   }
 
