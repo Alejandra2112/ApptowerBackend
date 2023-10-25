@@ -41,7 +41,7 @@ class Server {
     this.app.use(this.LoginPath, require('../Routes/login'));
     this.app.use(this.bookingPath, require('../Routes/booking'));
     this.app.use(this.vehiclePath, require('../Routes/vehicle'));
-    this
+    this.app.use(this.notificationPath, require('../Routes/notification'));
     // routes for spaces process
 
     // this.app.use(this.spacesPath, require('../Routes/spaces'))
