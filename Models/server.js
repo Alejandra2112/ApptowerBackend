@@ -21,7 +21,10 @@ class Server {
     // Residents process path
 
     this.OwnersPath = '/api/owners';
+    this.ResidentsPath = '/api/residents';
     this.SpaceOwnersPath = '/api/spacesOwners';
+    this.SpaceResidentsPath = '/api/spaceResidents';
+
 
 
     this.middlewares();
@@ -59,9 +62,11 @@ class Server {
 
     // routes for residents process 
 
-    // this.app.use(this.residentsPath, require('../Routes/residents'))
+    this.app.use(this.ResidentsPath, require('../Routes/residents.routes'))
     this.app.use(this.OwnersPath, require('../Routes/owners.routes'))
     this.app.use(this.SpaceOwnersPath, require('../Routes/space.owner.routes'))
+    this.app.use(this.SpaceResidentsPath, require('../Routes/space.residents.routes'))
+
 
   }
 
@@ -72,7 +77,7 @@ class Server {
       await sequelize.authenticate();
 
       // Sincroniza los modelos con la base de datos
-      sequelize.sync({ force: false }).then(() => {
+      sequelize.sync({ force: true }).then(() => {
         console.log('Modelos sincronizados con la base de datos');
 
       });
