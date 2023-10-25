@@ -42,4 +42,5 @@ const ParkingSpacesModel = sequelize.define('ParkingSpaces', {
     }
 );
 
+
 module.exports = ParkingSpacesModel;

@@ -1,5 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
+const ParkingSpaceModel = require('../Models/parking.spaces.model')
+const AssignedParkingModel = require('../Models/assigned.parking.model')
 
 const SpacesModel = sequelize.define('Spaces', {
 
@@ -55,5 +57,8 @@ const SpacesModel = sequelize.define('Spaces', {
         timestamps: false,
     }
 );
+
+SpacesModel.belongsToMany(ParkingSpaceModel, { through: AssignedParkingModel, foreignKey: 'idSpace', otherKey: 'idParkingSpace' });
+
 
 module.exports = SpacesModel;

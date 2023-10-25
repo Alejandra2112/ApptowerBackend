@@ -3,47 +3,46 @@ const AssignedParkingModel = require('../Models/assigned.parking.model');
 const ParkingSpaceModel = require('../Models/parking.spaces.model');
 const SpaceModel = require('../Models/spaces.model');
 
+const getAssignedParking = async (req, res) => {
 
-const getAssignedParking = async (req, res = response) => {
     try {
-        const assignedParkings = await AssignedParkingModel.findAll({
+  
+      const assignedParkings = await AssignedParkingModel.findAll();
+  
+      const spaces = await SpaceModel.findAll({
+        attributes: ['idSpace', 'spaceType', 'spaceName', 'status']
+    });
+  
+      const parkingSpaces = await ParkingSpaceModel.findAll({
+        attributes: ['idParkingSpace', 'parkingName', 'parkingType', 'status'],
+    });
+      
+    const data = assignedParkings.map(ap => {
+        
+        const space = spaces.find(space => space.idSpace === ap.idSpace);
+        const parkingSpace = parkingSpaces.find(ps => ps.idParkingSpace === ap.idParkingSpace);
+    
+        return {
+           ...ap.dataValues,
+           space,
+           parkingSpace
+        }
+    })
+  
+      res.json({
 
-            include: [
+        parkingSpaces: data
 
-                {
-                    model: SpaceModel,
-                    attributes: ['idSpace', 'spaceType', 'spaceName', 'status']
-
-                },
-
-                {
-                    model: ParkingSpaceModel,
-                    attributes: ['idParkingSpace', 'parkingName', 'parkingType', 'status']
-                }
-            ]
-
-        });
-
-        console.log('Assigned parkings', assignedParkings);
-
-        res.status(200).json({
-
-            assignedParkings,
-
-        });
-
+    });
+  
     } catch (error) {
-
-        console.error('Error to get assignamed parking', error);
-
-        res.status(500).json({
-
-            error: 'Error to get assignamed parking 500',
-
-        })
-    };
-
-}
+  
+      console.error(error);
+      res.status(500).json({ error: 'Error getting assigned parkings' });
+  
+    }
+  
+  }
 
 
 const postAssignedParking = async (req, res) => {
@@ -53,7 +52,7 @@ const postAssignedParking = async (req, res) => {
     const body = req.body;
 
     console.log(body)
-    
+
     try {
 
         await AssignedParkingModel.create(body);

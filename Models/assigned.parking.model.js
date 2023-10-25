@@ -31,7 +31,5 @@ const AssignedParking = sequelize.define('AssignedParking', {
   timestamps: false,
 });
 
-AssignedParking.belongsTo(SpaceModel, { foreignKey: 'idSpace' });
-AssignedParking.belongsTo(ParkingSpaceModel, { foreignKey: 'idParkingSpace' }); 
 
 module.exports = AssignedParking;
