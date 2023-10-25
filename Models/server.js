@@ -50,9 +50,9 @@ class Server {
 
   async db_connect() {
     try {
-      await sequelize.authenticate();
+      // await sequelize.authenticate();
       // Sincroniza los modelos con la base de datos
-      sequelize.sync({ force: false }).then(() => {
+      await sequelize.sync({ force: true }).then(() => {
         console.log('Modelos sincronizados con la base de datos');
       });
       console.log('Conexión exitosa a PostgreSQL');
