@@ -32,14 +32,13 @@ class Server {
     this.app.use(express.json());
 }
   routes() {
-    this.app.use(this.UserPath, require('../Routes/user'));
-    this.app.use(this.RolsPath, require('../Routes/rols'));
-    this.app.use(this.WatchmanPath, require('../Routes/watchman'));
-    this.app.use(this.permissionsRolsPath, require('../Routes/permissionsRols'));
-    this.app.use(this.guardShiftsPath, require('../Routes/guardShifts'))
-    this.app.use(this.LoginPath, require('../Routes/login'));
-    this.app.use(this.bookingPath, require('../Routes/booking'));
-    this.app.use(this.vehiclePath, require('../Routes/vehicle'));
+    // this.app.use(this.UserPath, require('../Routes/user'));
+    // this.app.use(this.RolsPath, require('../Routes/rols'));
+    // this.app.use(this.WatchmanPath, require('../Routes/watchman'));
+    // this.app.use(this.permissionsRolsPath, require('../Routes/permissionsRols'));
+    // this.app.use(this.guardShiftsPath, require('../Routes/guardShifts'))
+    // this.app.use(this.LoginPath, require('../Routes/login'));
+
     // routes for spaces process
 
     // this.app.use(this.spacesPath, require('../Routes/spaces'))
@@ -47,7 +46,7 @@ class Server {
 
     // routes for residents process 
 
-    this.app.use(this.residentsPath, require('../Routes/residents'))
+    // this.app.use(this.residentsPath, require('../Routes/residents'))
     // this.app.use(this.OwnersPath, require('../Routes/owners'))
   }
 
