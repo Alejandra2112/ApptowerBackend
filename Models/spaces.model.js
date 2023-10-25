@@ -64,9 +64,24 @@ const SpacesModel = sequelize.define('Spaces', {
     }
 );
 
-SpacesModel.belongsToMany(ParkingSpaceModel, { through: AssignedParkingModel, foreignKey: 'idSpace', otherKey: 'idParkingSpace' });
-SpacesModel.belongsToMany(OwnersModel, { through: SpaceOwnerModel, foreignKey: 'idSpace', otherKey: 'idOwner' });
-SpacesModel.belongsToMany(ResidentModel, { through: SpaceResidentModel, foreignKey: 'idSpace', otherKey: 'idResident' });
+SpacesModel.belongsToMany(
+    ParkingSpaceModel, {
+         through: AssignedParkingModel, 
+         foreignKey: 'idSpace', 
+         otherKey: 'idParkingSpace' });
+         
+SpacesModel.belongsToMany(
+    OwnersModel, {
+         through: SpaceOwnerModel, 
+         foreignKey: 'idSpace', 
+         otherKey: 'idOwner' });
+         
+SpacesModel.belongsToMany(
+    ResidentModel, {
+         through: SpaceResidentModel, 
+         foreignKey: 'idSpace', 
+         otherKey: 'idResident' });
+         
 
 
 module.exports = SpacesModel;
