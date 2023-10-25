@@ -14,11 +14,13 @@ class Server {
 
     // Spaces process path
 
-    this.spacesPath = '/api/spaces';
+    this.SpacesPath = '/api/spaces';
     this.ParkingSpacesPath = '/api/parkingSpaces';
     this.AssignedParkingPath = '/api/assignedParkingSpaces';
 
+    // Residents process path
 
+    this.OwnersPath = '/api/owners';
 
     this.middlewares();
     this.routes();
@@ -48,7 +50,7 @@ class Server {
 
     // routes for spaces process
 
-    this.app.use(this.spacesPath, require('../Routes/spaces.routes'))
+    this.app.use(this.SpacesPath, require('../Routes/spaces.routes'))
     this.app.use(this.ParkingSpacesPath, require('../Routes/parking.spaces.routes'))
     this.app.use(this.AssignedParkingPath, require('../Routes/assigned.parking.routes'))
 
@@ -56,7 +58,7 @@ class Server {
     // routes for residents process 
 
     // this.app.use(this.residentsPath, require('../Routes/residents'))
-    // this.app.use(this.OwnersPath, require('../Routes/owners'))
+    this.app.use(this.OwnersPath, require('../Routes/owners.routes'))
   }
 
   async db_connect() {
