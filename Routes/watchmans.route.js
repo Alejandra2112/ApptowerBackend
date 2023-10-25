@@ -1,6 +1,6 @@
 const {Router} = require ('express')
 const route = Router()
-const {getWatchman, postWatchman, putWatchman, deleteWatchman} = require ('../Controllers/watchman')
+const {getWatchman, postWatchman, putWatchman, deleteWatchman} = require ('../Controllers/watchmans.controller')
 
 route.get('/', getWatchman)
 route.post('/', postWatchman)

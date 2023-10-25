@@ -8,7 +8,7 @@ class Server {
     this.UserPath = '/api/users';
     this.RolsPath = '/api/rols';
     this.WatchmanPath = '/api/watchman';
-    this.permissionsRolsPath = '/api/permissionsrols';
+    this.permissionsRolsPath = '/api/permissions';
     this.guardShiftsPath = '/api/guardshifts';
     this.LoginPath = '/api/login';
 
@@ -46,12 +46,13 @@ class Server {
     this.app.use(express.json());
 }
   routes() {
-    this.app.use(this.UserPath, require('../Routes/user'));
-    this.app.use(this.RolsPath, require('../Routes/rols'));
-    this.app.use(this.WatchmanPath, require('../Routes/watchman'));
-    this.app.use(this.permissionsRolsPath, require('../Routes/permissionsRols'));
-    this.app.use(this.guardShiftsPath, require('../Routes/guardShifts'))
-    this.app.use(this.LoginPath, require('../Routes/login'));
+    this.app.use(this.UserPath, require('../Routes/users.route'));
+    this.app.use(this.RolsPath, require('../Routes/rols.route'));
+    this.app.use(this.LoginPath, require('../Routes/logIn.route'))
+    this.app.use(this.WatchmanPath, require('../Routes/watchmans.route'));
+    this.app.use(this.permissionsRolsPath, require('../Routes/permissions.route'));
+    this.app.use(this.guardShiftsPath, require('../Routes/guardShifts.route'))
+   
 
     // routes for spaces process
 
@@ -77,7 +78,7 @@ class Server {
       await sequelize.authenticate();
 
       // Sincroniza los modelos con la base de datos
-      sequelize.sync({ force: true }).then(() => {
+      sequelize.sync({ force: false }).then(() => {
         console.log('Modelos sincronizados con la base de datos');
 
       });

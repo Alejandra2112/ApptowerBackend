@@ -1,5 +1,5 @@
 const { response } = require('express');
-const Shifts = require('../Models/guardShifts');
+const Shifts = require('../Models/guardShifts.model');
 
 const getShifts = async (req, res = response) => {
   

@@ -1,5 +1,5 @@
 const { response } = require('express');
-const User = require('../Models/user');
+const User = require('../Models/users.model');
 
 
 const getUser = async (req, res = response) => {
@@ -42,20 +42,21 @@ const putUser = async (req, res = response) => {
   let message = '';
 
   try {
-    const { iduser, ...update } = body;
+    const { iduser, idrole, state, ...update } = body;
 
-    const [updatedRows] = await User.update(update, {
-      where: { iduser: iduser },
-    });
+    const user = await User.findOne({ where: { iduser: iduser } });
 
-    if (updatedRows > 0) {
-      message = 'Usuario modificado exitosamente.';
-    } else {
+    if (!user) {
       message = 'No se encontró un usuario con ese ID';
+    } else {
+      await user.update({ idrole, state, ...update }, { force: true });
+
+      message = 'Usuario modificado exitosamente.';
     }
   } catch (error) {
     message = 'Error al modificar usuario: ' + error.message;
   }
+
   res.json({
     user: message,
   });
