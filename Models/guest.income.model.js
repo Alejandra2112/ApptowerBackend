@@ -61,15 +61,15 @@ Guest_income.associate = (models) => {
     Guest_income.belongsTo(models.Visitors, {
         foreignKey: 'idVisitor',
     });
-    Guest_income.belongsTo(models.Spaces, {
-        foreignKey: 'idSpace',
-    });
-    Guest_income.belongsTo(models.Vehicles, {
-        foreignKey: 'idVehicle',
-    });
-    Guest_income.belongsTo(models.Parking, {
-        foreignKey: 'idParking',
-    });
+    // Guest_income.belongsTo(models.Spaces, {
+    //     foreignKey: 'idSpace',
+    // });
+    // Guest_income.belongsTo(models.Vehicles, {
+    //     foreignKey: 'idVehicle',
+    // });
+    // Guest_income.belongsTo(models.Parking, {
+    //     foreignKey: 'idParking',
+    // });
 };
 
 

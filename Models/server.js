@@ -11,6 +11,7 @@ class Server {
     this.permissionsRolsPath = '/api/permissionsrols';
     this.guardShiftsPath = '/api/guardshifts';
     this.LoginPath = '/api/login';
+    this.VisitorsPath = '/api/visitors';
     this.middlewares();
     this.routes();
     this.db_connect();
@@ -46,13 +47,14 @@ class Server {
 
     // this.app.use(this.residentsPath, require('../Routes/residents'))
     // this.app.use(this.OwnersPath, require('../Routes/owners'))
+    this.app.use(this.VisitorsPath, require('../Routes/visitors'))
   }
 
   async db_connect() {
     try {
-      await sequelize.authenticate();
+      // await sequelize.authenticate();
       // Sincroniza los modelos con la base de datos
-      sequelize.sync({ force: false }).then(() => {
+      await sequelize.sync({ force: true }).then(() => {
         console.log('Modelos sincronizados con la base de datos');
       });
       console.log('Conexión exitosa a PostgreSQL');

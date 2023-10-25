@@ -3,7 +3,7 @@ const Visitors = require('../Models/visitors');
 
 const getVisitors = async (req, res = response) => {
     try {
-      const visitors = await visitors.findAll();
+      const visitors = await Visitors.findAll();
 
       console.log('visitantes obtenidos correctamente:', visitors);
   
@@ -24,7 +24,7 @@ const postVisitors = async (req, res) => {
     let message = '';
     const body = req.body; 
     try {
-        await visitors.create(body); 
+        await Visitors.create(body); 
         message = 'Visitante Registrado Exitosamente';
     } catch (e) {
         message = e.message;
@@ -41,7 +41,7 @@ const putVisitors = async (req, res = response) => {
     try {
         const { idVisitor, ...update } = body;
 
-        const [updatedRows] = await visitors.update(update, {
+        const [updatedRows] = await Visitors.update(update, {
             where: { idVisitor: idVisitor },
         });
 
@@ -65,7 +65,7 @@ const deleteVisitors = async (req, res = response) => {
     try {
         const { idVisitor } = body;
 
-        const destroy = await visitors.destroy({
+        const destroy = await Visitors.destroy({
             where: { idVisitor: idVisitor },
         });
 

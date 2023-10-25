@@ -55,7 +55,7 @@ const Fines = sequelize.define('multas', {
     },
 });
 
-Fines.belongsTo(Spaces, { foreignKey: 'idSpace' });
+// Fines.belongsTo(Spaces, { foreignKey: 'idSpace' });
 
 module.exports = Fines;
 
