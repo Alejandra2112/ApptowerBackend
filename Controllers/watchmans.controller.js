@@ -1,5 +1,5 @@
 const { response } = require('express');
-const Watchman = require('../Models/watchman');
+const Watchman = require('../Models/watchmans.model');
 
 
 const getWatchman = async (req, res = response) => {
@@ -36,27 +36,38 @@ const postWatchman = async (req, res) => {
     watchman: message,
   });
 };
-
-
 const putWatchman = async (req, res = response) => {
   const body = req.body;
   let message = '';
 
   try {
-    const { idwatchman, ...update } = body;
+    const { idwatchman, document, ...update } = body;
+    console.log(document)
 
-    const [updatedRows] = await Watchman.update(update, {
-      where: { idwatchman: idwatchman },
-    });
+    const existingWatchman = await Watchman.findByPk(idwatchman);
 
-    if (updatedRows > 0) {
-      message = 'Vigilante modificado exitosamente.';
-    } else {
+    if (!existingWatchman) {
       message = 'No se encontró un vigilante con ese ID';
+    } else {
+        if (document !== existingWatchman.toJSON().document) {
+          message = 'No puedes modificar el número de documento.';
+        } 
+        else {
+        const [updatedRows] = await Watchman.update(update, {
+          where: { idwatchman: idwatchman },
+        });
+
+        if (updatedRows > 0) {
+          message = 'Vigilante modificado exitosamente.';
+        } else {
+          message = 'No se encontró un vigilante con ese ID';
+        }
+      }
     }
   } catch (error) {
     message = 'Error al modificar vigilante: ' + error.message;
   }
+
   res.json({
     watchman: message,
   });
@@ -67,7 +78,7 @@ const deleteWatchman = async (req, res) => {
   const { idwatchman } = req.body;
   let message = '';
   try {
-    const rowsDeleted = await Watchman.destroy({ where: { idwatchman: idwatchman } });
+    const rowsDeleted = await Watchman.destroy({ where: { idwatchman: idwatchman },  });
 
     if (rowsDeleted > 0) {
       message = 'Vigilante eliminado exitosamente';

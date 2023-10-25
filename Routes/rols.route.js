@@ -1,6 +1,6 @@
 const {Router} = require ('express')
 const route = Router()
-const {getRols, postRols, putRols, deleteRols} = require ('../Controllers/rols')
+const {getRols, postRols, putRols, deleteRols} = require ('../Controllers/rols.controller')
 
 route.get('/', getRols)
 route.post('/', postRols)
