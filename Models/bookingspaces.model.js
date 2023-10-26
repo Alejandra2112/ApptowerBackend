@@ -1,7 +1,7 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../Database/config'); 
 const User = require('./users.model');
-const Residents = require('./space.residents.model');
+const Residents = require('./resident.model');
 const Booking = require('./booking.model');
 const Spaces = require('./spaces.model');
 
@@ -25,14 +25,14 @@ const Bookingspaces = sequelize.define('bookingspaces', {
     field: 'iduser',
   },
 
-  idspaces: {
+  idSpace: {
       type: DataTypes.INTEGER,
-      field: 'idspaces',
+      field: 'idSpace',
   },
 
-  idresidents: {
+  idResident: {
       type: DataTypes.INTEGER,
-      field: 'idresidents',
+      field: 'idResident',
   },
 },
 {
@@ -45,15 +45,15 @@ foreignKey: 'iduser',
 targetKey: 'iduser',
 }); 
 Bookingspaces.belongsTo(Residents, { 
-foreignKey: 'idresidents', 
-targetKey: 'idresidents', 
+foreignKey: 'idResident', 
+targetKey: 'idResident', 
 });
 Bookingspaces.belongsTo(Booking,{
 foreignKey: 'idbooking',
 targetKey: 'idbooking',
 });
 Bookingspaces.belongsTo(Spaces,{
-foreignKey: 'idspaces',
-targetKey: 'idspaces',
+foreignKey: 'idSpace',
+targetKey: 'idSpace',
 });
 module.exports = Bookingspaces;

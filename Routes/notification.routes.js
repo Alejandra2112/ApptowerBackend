@@ -1,5 +1,5 @@
-const {Route} = require('express');
-const route = Route();
+const {Router} = require('express');
+const route = Router();
 
 const {getNotification, postNotification, deleteNotification} = require('../Controllers/notification.controller');
 
