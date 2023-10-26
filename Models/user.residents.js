@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
 
-const usersforWatchmans = sequelize.define('usersforWatchmans', { 
-  idusersforWatchmans: {
+const usersforResidents = sequelize.define('usersforResidents', { 
+  idusersforResidents: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
@@ -13,11 +13,11 @@ const usersforWatchmans = sequelize.define('usersforWatchmans', {
     field: 'iduser'
     
   },
-  idwatchman: {
+  idResident: {
     type: DataTypes.INTEGER,
-    field: 'idwatchman',
+    field: 'idResident',
   },
 });
-    
-module.exports = usersforWatchmans;
+
+module.exports = usersforResidents;
 

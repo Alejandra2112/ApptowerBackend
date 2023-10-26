@@ -36,38 +36,27 @@ const postWatchman = async (req, res) => {
     watchman: message,
   });
 };
+
+
 const putWatchman = async (req, res = response) => {
   const body = req.body;
   let message = '';
 
   try {
-    const { idwatchman, document, ...update } = body;
-    console.log(document)
+    const { idwatchman, ...update } = body;
 
-    const existingWatchman = await Watchman.findByPk(idwatchman);
+    const [updatedRows] = await Watchman.update(update, {
+      where: { idwatchman: idwatchman },
+    });
 
-    if (!existingWatchman) {
-      message = 'No se encontró un vigilante con ese ID';
+    if (updatedRows > 0) {
+      message = 'Vigilante modificado exitosamente.';
     } else {
-        if (document !== existingWatchman.toJSON().document) {
-          message = 'No puedes modificar el número de documento.';
-        } 
-        else {
-        const [updatedRows] = await Watchman.update(update, {
-          where: { idwatchman: idwatchman },
-        });
-
-        if (updatedRows > 0) {
-          message = 'Vigilante modificado exitosamente.';
-        } else {
-          message = 'No se encontró un vigilante con ese ID';
-        }
-      }
+      message = 'No se encontró un vigilante con ese ID';
     }
   } catch (error) {
     message = 'Error al modificar vigilante: ' + error.message;
   }
-
   res.json({
     watchman: message,
   });
