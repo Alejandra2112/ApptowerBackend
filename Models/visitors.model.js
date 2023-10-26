@@ -1,40 +1,36 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
 
-const Visitors = sequelize.define('visitantes', {
+const Visitors = sequelize.define('visitors', {
     idVisitor: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-        field: 'idvisitante',
+        field: 'idvisitor',
     },
     name: {
         type: DataTypes.STRING,
-        field: 'nombre',
+        field: 'name',
     },
     lastname: {
         type: DataTypes.STRING,
-        field: 'apellidos',
+        field: 'lastname',
     },
     documentType: {
         type: DataTypes.STRING,
-        field: 'tipo_documento',
+        field: 'document_type',
     },
     documentNumber: {
         type: DataTypes.STRING,
-        field: 'numero_documento',
+        field: 'document_number',
     },
     genre: {
         type: DataTypes.STRING,
-        field: 'sexo',
-    },
-    createDate: {
-        type: DataTypes.DATE,
-        field: 'fecha_creacion',
+        field: 'genre',
     },
     access: {
         type: DataTypes.BOOLEAN,
-        field: 'acceso',
+        field: 'access',
     },
 });
 

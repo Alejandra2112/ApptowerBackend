@@ -17,7 +17,10 @@ class Server {
     //Watchman process path
     this.WatchmanPath = '/api/watchman';
     this.guardShiftsPath = '/api/guardshifts';
-   
+    this.LoginPath = '/api/login';
+    this.VisitorsPath = '/api/visitors';
+    this.GuestIncomePath = '/api/guestincome';
+    this.FinesPath = '/api/fines';
 
     // Spaces process path
     this.SpacesPath = '/api/spaces';
@@ -30,6 +33,9 @@ class Server {
     this.SpaceOwnersPath = '/api/spacesOwners';
     this.SpaceResidentsPath = '/api/spaceResidents';
 
+    this.bookingPath = '/api/booking';
+    this.vehiclePath = '/api/vehicle';
+    this.notificationPath = '/api/notification';
     this.middlewares();
     this.routes();
     this.db_connect();
@@ -56,7 +62,9 @@ class Server {
     this.app.use(this.permissionsRolsPath, require('../Routes/permissions.route'));
     this.app.use(this.guardShiftsPath, require('../Routes/guardShifts.route'))
    
-
+    this.app.use(this.bookingPath, require('../Routes/booking.routes'));
+    this.app.use(this.vehiclePath, require('../Routes/vehicle.routes'));
+    this.app.use(this.notificationPath, require('../Routes/notification.routes'));
     // routes for spaces process
 
     this.app.use(this.SpacesPath, require('../Routes/spaces.routes'))
@@ -72,16 +80,17 @@ class Server {
     this.app.use(this.SpaceResidentsPath, require('../Routes/space.residents.routes'))
 
 
+    this.app.use(this.VisitorsPath, require('../Routes/visitors'))
+    this.app.use(this.GuestIncomePath, require('../Routes/guest.income.route'))
+    this.app.use(this.FinesPath, require('../Routes/fines.routes'))
   }
 
   async db_connect() {
 
     try {
-
-      await sequelize.authenticate();
-
+      // await sequelize.authenticate();
       // Sincroniza los modelos con la base de datos
-      sequelize.sync({ force: true }).then(() => {
+      await sequelize.sync({ force: true }).then(() => {
         console.log('Modelos sincronizados con la base de datos');
 
       });
