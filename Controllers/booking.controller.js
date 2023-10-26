@@ -1,6 +1,7 @@
 const { response } = require('express');
 
 const Booking = require('../Models/booking.model');
+const e = require('express');
 
 const getBooking = async (req, res = response) => {
     try {
@@ -50,4 +51,9 @@ const putBooking = async (req, res = response) => {
     res.json({
         booking: message,
     });
+}
+module.exports = {
+    getBooking,
+    postBooking,
+    putBooking,
 }

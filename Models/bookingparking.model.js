@@ -2,6 +2,8 @@ const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../Database/config'); 
 const User = require('./users.model');
 const Booking = require('./booking.model');
+const Parking = require('./parking.spaces.model');
+const Vehicle = require('./vehicle.model');
 
 const Bookingparking = sequelize.define('reservasparqueadero', {
 
@@ -24,9 +26,9 @@ const Bookingparking = sequelize.define('reservasparqueadero', {
       field: 'iduser',
     },
 
-    idparking: {
+    idParkingSpace: {
         type: DataTypes.INTEGER,
-        field: 'idparking',
+        field: 'idParkingSpace',
     },
 
     idvehicle: {
