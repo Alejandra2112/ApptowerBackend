@@ -1,5 +1,5 @@
 const { response } = require('express');
-const Visitors = require('../Models/visitors');
+const Visitors = require('../Models/visitors.model');
 
 const getVisitors = async (req, res = response) => {
     try {

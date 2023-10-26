@@ -2,56 +2,52 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
 
 
-const Fines = sequelize.define('multas', {
+const Fines = sequelize.define('fines', {
     idFines: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-        field: 'idmulta',
+        field: 'idfines',
     },
-    taxeType: {
+    fineType: {
         type: DataTypes.STRING,
-        field: 'tipo_multa',
+        field: 'fine_type',
     },
     incidentDate:{
         type: DataTypes.DATE,
-        field: 'fecha_incidente',
-    },
-    createDate: {
-        type: DataTypes.DATE,
-        field: 'fecha_creacion',
+        field: 'incident_date',
     },
     paymentDate: {
         type: DataTypes.DATE,
-        field: 'fecha_pago',
+        field: 'payment_date',
     },
     amount: {
         type: DataTypes.INTEGER,
-        field: 'monto',
+        field: 'amount',
     },
     details: {
         type: DataTypes.STRING,
-        field: 'detalles',
+        field: 'details',
     },
     idSpace: {
         type: DataTypes.INTEGER,
-        field: 'idespacio',
+        field: 'id_space',
     },
     apartmentNumber: {
         type: DataTypes.INTEGER,
-        field: 'numero_apartamento',
+        field: 'apartment_number',
     },
     state: {
         type: DataTypes.STRING,
-        field: 'estado',
+        field: 'state',
     },
     evidenceFiles: {
         type: DataTypes.TEXT,
-        field: 'archivos_evidencia',
+        field: 'evidence_files',
     },
     paymentproof: {
         type: DataTypes.TEXT,
-        field: 'comprobante_pago',
+        field: 'payment_proof',
     },
 });
 

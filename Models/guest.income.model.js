@@ -3,48 +3,44 @@ const sequelize = require('../Database/config');
 const Visitors = require('./visitors.model');
 
 
-const Guest_income = sequelize.define('ingresos', {
+const Guest_income = sequelize.define('guest_income', {
     idGuest_income: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-        field: 'idingreso',
+        field: 'idguest_income',
     },
     startingDate: {
-        type: DataTypes.Date,
-        field: 'fechaIngreso',
+        type: DataTypes.DATE,
+        field: 'starting_date',
     },
     departureDate: {
-        type: DataTypes.Date,
-        field: 'fechaSalida',
+        type: DataTypes.DATE,
+        field: 'departure_date',
     },
     personAllowsAccess: {
         type: DataTypes.STRING,
-        field: 'personaPermiteAcceso',
+        field: 'person_allows_access',
     },
-    states:{
+    state:{
         type: DataTypes.STRING,
-        field: 'estado',	
+        field: 'state',	
     },
     observations:{
         type: DataTypes.STRING,
-        field: 'observaciones',
+        field: 'observations',
     },
     idVisitor: {
         type: DataTypes.INTEGER,
-        field: 'idvisitante',
+        field: 'idvisitor',
     },
     idSpace: {
         type: DataTypes.INTEGER,
-        field: 'idespacio',
+        field: 'idspace',
     },
     idVehicle: {
         type: DataTypes.INTEGER,
-        field: 'idvehiculo',
-    },
-    phoneNumber: {
-        type: DataTypes.STRING,
-        field: 'telefono',
+        field: 'idvehicle',
     },
     documentNumber: {
         type: DataTypes.STRING,

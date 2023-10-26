@@ -12,6 +12,8 @@ class Server {
     this.guardShiftsPath = '/api/guardshifts';
     this.LoginPath = '/api/login';
     this.VisitorsPath = '/api/visitors';
+    this.GuestIncomePath = '/api/guestincome';
+    this.FinesPath = '/api/fines';
     this.middlewares();
     this.routes();
     this.db_connect();
@@ -48,6 +50,8 @@ class Server {
     // this.app.use(this.residentsPath, require('../Routes/residents'))
     // this.app.use(this.OwnersPath, require('../Routes/owners'))
     this.app.use(this.VisitorsPath, require('../Routes/visitors'))
+    this.app.use(this.GuestIncomePath, require('../Routes/guest.income.route'))
+    this.app.use(this.FinesPath, require('../Routes/fines.routes'))
   }
 
   async db_connect() {
