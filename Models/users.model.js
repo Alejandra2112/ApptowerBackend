@@ -1,9 +1,10 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelizeUser = require('../Database/config'); 
 const Rols = require('./rols.model');
-const Watchman = require('./watchmans.model'); 
-// const Residents = require('./residents');
+const Watchmans = require('./watchmans.model'); 
 const usersforWatchmans = require('./user.watchman.model');
+const usersforResidents = require('./user.residents');
+const Resident = require('../Models/resident.model');
 
 const User = sequelizeUser.define('users', {
   iduser: {
@@ -65,60 +66,50 @@ const User = sequelizeUser.define('users', {
   },
 });
 
-module.exports = User;
-
-
+//Relations
 User.belongsTo(Rols, { 
     foreignKey: 'idrole', 
     targetKey: 'idrole', 
   });
 
-  User.belongsToMany(Watchman, {
+  User.belongsToMany(Watchmans, {
     through: usersforWatchmans, 
     foreignKey: 'iduser',
     otherKey: 'idwatchman',
   });
-     
+    
+  User.belongsToMany(Resident, {
+    through: usersforResidents, 
+    foreignKey: 'iduser',
+    otherKey: 'idResident',
+  });
 
+//Hooks
+User.afterCreate(async(user) => {
+  if(user.idrole === 2 && user.state === 'Activo'){
+    const cretedResident = await Resident.create({
+      name: user.name,
+      lastName: user.lastname,
+      docType: user.documentType,
+      docNumber: user.document,
+      phoneNumber: user.phone,
+      email: user.email,
+      birthday: null,
+      sex: null,
+      residentType: null,
+      status: 'Active',
+    });
 
-// User.afterCreate(async(user) => {
-//   if(user.idrol === 2 && user.state === 'Activo'){
-//     await Residents.create({
-//       residentName: user.name,
-//       resdeintLastName: user.lastname,
-//       residentDocType: user.documentType,
-//       resdentDocNumber: user.document,
-//       residentPhoneNumber: user.phone,
-//       residentEmail: user.email,
-//       dateBirthDay: null,
-//       residenType: null, 
-//       currentResident: null,
-//       residencyStartDate: null,
-//       residencyEndDate: null,
-//       residentStatus: 'Activo',
-//     });
-//   }
-  
-//   else if(user.idrol === 3 && user.state === 'Activo'){
-//     await Watchman.create({
-//       namewatchman: user.name,
-//       lastnamewatchman: user.lastname,
-//       documentType: user.documentType,
-//       document: user.document,
-//       phone: user.phone,
-//       email: user.email,
-//       dateOfbirth: null,
-//       state: 'Activo',
-//     });
-//   }
-// })
+    const residentId = cretedResident.idResident
 
+    await usersforResidents.create({
+      iduser: user.iduser,
+      idResident: residentId,
+    });
 
-
-
-User.afterCreate(async (user) => {
-  if (user.idrole === 3 && user.state === 'Activo') {
-    const createdwatchman = await Watchman.create({
+  }
+  else if(user.idrole === 3 && user.state === 'Activo'){
+    const createdwatchman = await Watchmans.create({
       namewatchman: user.name,
       lastnamewatchman: user.lastname,
       documentType: user.documentType,
@@ -128,7 +119,7 @@ User.afterCreate(async (user) => {
       dateOfbirth: null,
       state: 'Activo',
     });
-    
+
     const watchmanId = createdwatchman.idwatchman
 
     await usersforWatchmans.create({
@@ -136,13 +127,13 @@ User.afterCreate(async (user) => {
       idwatchman: watchmanId,
     });
   }
-});
+})
+
+
 
 User.afterUpdate(async (user) => {
-  console.log('Aqui estoy creando  jejeje');
   if (user.idrole === 3 && user.state === 'Activo') {
-
-    const existingWatchman = await Watchman.findOne({ where: { document: user.document } });
+    const existingWatchman = await Watchmans.findOne({ where: { document: user.document } });
     if (existingWatchman) {
       await existingWatchman.update({
         namewatchman: user.name,
@@ -154,7 +145,7 @@ User.afterUpdate(async (user) => {
         state: user.state,
       });
     } else {
-      const changesUserW = await Watchman.create({
+      const changesUserW = await Watchmans.create({
         namewatchman: user.name,
         lastnamewatchman: user.lastname,
         documentType: user.documentType,
@@ -171,9 +162,57 @@ User.afterUpdate(async (user) => {
         idwatchman: watchmanId,
       });
     }
-  } else {
-    await Watchman.destroy({ where: { document: user.document } });
-    await usersforWatchmans.destroy({ where: { iduser: user.iduser } });
+  } 
+  else {
+      await Watchmans.destroy({ where: { document: user.document } });
+      await usersforWatchmans.destroy({ where: { iduser: user.iduser } });
   }
 });
+
+
+
+User.afterUpdate(async(user) => {
+  if(user.idrole === 2 && user.state === 'Activo'){
+    const existingResidents = await Resident.findOne({ where: { docType: user.document } });
+    if (existingResidents) {
+      await existingResidents.update({
+        name: user.name,
+        lastName: user.lastname,
+        docType: user.documentType,
+        docNumber: user.document,
+        phoneNumber: user.phone,
+        email: user.email,
+        birthday: null,
+        sex: null,
+        residentType: null,
+        status: user.state ? 'Active': 'Inactive',
+      });
+    } else {
+      const changesUserR = await Resident.create({ 
+        name: user.name,
+        lastName: user.lastname,
+        docType: user.documentType,
+        docNumber: user.document,
+        phoneNumber: user.phone,
+        email: user.email,
+        birthday: null,
+        sex: null,
+        residentType: null,
+        status: 'Active',
+      });
+      const ResidentId = changesUserR.idResident
+
+      await usersforResidents.create({
+        iduser: user.iduser,
+        idResident: ResidentId,
+      });
+    }
+  }
+  else{
+      await Resident.destroy({ where: { docNumber: user.document } });
+      await usersforResidents.destroy({ where: { iduser: user.iduser } });
+  }
+});
+
+module.exports = User;
 

@@ -30,7 +30,7 @@ const rolsPermissions = require('./rolsPermissions.model');
     },
     );
 
-
+//Relations
 Rols.belongsToMany(Permissions, {
   through: rolsPermissions, 
   foreignKey: 'idrole',

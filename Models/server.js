@@ -5,27 +5,30 @@ class Server {
   constructor() {
     this.app = express();
     this.port = 3000;
+     
+    //Users process path
     this.UserPath = '/api/users';
-    this.RolsPath = '/api/rols';
-    this.WatchmanPath = '/api/watchman';
-    this.permissionsRolsPath = '/api/permissions';
-    this.guardShiftsPath = '/api/guardshifts';
     this.LoginPath = '/api/login';
 
-    // Spaces process path
+    //Rols process path
+    this.RolsPath = '/api/rols';
+    this.permissionsRolsPath = '/api/permissions';
 
+    //Watchman process path
+    this.WatchmanPath = '/api/watchman';
+    this.guardShiftsPath = '/api/guardshifts';
+   
+
+    // Spaces process path
     this.SpacesPath = '/api/spaces';
     this.ParkingSpacesPath = '/api/parkingSpaces';
     this.AssignedParkingPath = '/api/assignedParkingSpaces';
 
     // Residents process path
-
     this.OwnersPath = '/api/owners';
     this.ResidentsPath = '/api/residents';
     this.SpaceOwnersPath = '/api/spacesOwners';
     this.SpaceResidentsPath = '/api/spaceResidents';
-
-
 
     this.middlewares();
     this.routes();
