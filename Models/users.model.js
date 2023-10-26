@@ -51,9 +51,9 @@ const User = sequelizeUser.define('users', {
   password: {
     type: DataTypes.STRING,
     field: 'password', 
-    validate: {
-      len: [8, 12], 
-    },
+    // validate: {
+    //   len: [8, 12], 
+    // },
    
   },
   state: {

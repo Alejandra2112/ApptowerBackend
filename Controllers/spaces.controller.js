@@ -2,14 +2,14 @@ const { response } = require('express');
 const SpacesModel = require('../Models/spaces.model');
 
 const getSpace = async (req, res = response) => {
+
     try {
+
         const spaces = await SpacesModel.findAll();
 
         console.log('Space get ok', spaces);
 
-        res.json({
-            spaces,
-        });
+        res.json({ spaces });
 
     } catch (error) {
 
@@ -24,7 +24,6 @@ const getSpace = async (req, res = response) => {
 
 
 const postSpace = async (req, res) => {
-
 
     let message = '';
     const body = req.body;

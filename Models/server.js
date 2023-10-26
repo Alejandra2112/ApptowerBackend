@@ -90,7 +90,7 @@ class Server {
     try {
       // await sequelize.authenticate();
       // Sincroniza los modelos con la base de datos
-      await sequelize.sync({ force: true }).then(() => {
+      await sequelize.sync({ force: false }).then(() => {
         console.log('Modelos sincronizados con la base de datos');
 
       });

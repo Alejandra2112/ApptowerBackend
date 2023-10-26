@@ -1,33 +1,43 @@
 const { response } = require('express');
+const bcryptjs = require('bcryptjs')
 const User = require('../Models/users.model');
 
 
 const getUser = async (req, res = response) => {
-    try {
-      const user = await User.findAll();
+  try {
 
-      console.log('usuarios obtenidos correctamente:', user);
-  
-      res.json({
-        user,
-      });
-    } catch (error) {
+    const user = await User.findAll();
+    console.log('usuarios obtenidos correctamente:', user);
 
-      console.error('Error al obtener usuarios:', error);
-  
-      res.status(500).json({
-        error: 'Error al obtener usuarios',
-      });
-    }  
+    res.json({
+      user,
+    });
+  } catch (error) {
+
+    console.error('Error al obtener usuarios:', error);
+
+    res.status(500).json({
+      error: 'Error al obtener usuarios',
+    });
+  }
 };
 
 
 const postUser = async (req, res) => {
+
   let message = '';
-  const body = req.body; 
+  const body = req.body;
+
   try {
+
+    // Password encryption
+
+    const salt = bcryptjs.genSaltSync();
+    body.password = bcryptjs.hashSync(body.password, salt)
+
     await User.create(body);
     message = 'Usuario Registrado Exitosamente';
+
   } catch (e) {
     message = e.message;
   }
