@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
+const SpacesModel = require('./spaces.model');
 
 
 const Fines = sequelize.define('fines', {
@@ -31,7 +32,7 @@ const Fines = sequelize.define('fines', {
     },
     idSpace: {
         type: DataTypes.INTEGER,
-        field: 'id_space',
+        field: 'idspace',
     },
     apartmentNumber: {
         type: DataTypes.INTEGER,
@@ -51,7 +52,9 @@ const Fines = sequelize.define('fines', {
     },
 });
 
-// Fines.belongsTo(Spaces, { foreignKey: 'idSpace' });
+Fines.belongsTo(SpacesModel, {
+    foreignKey: 'idspace', as:'space'
+});
 
 module.exports = Fines;
 

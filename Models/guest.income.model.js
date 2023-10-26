@@ -1,6 +1,9 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
 const Visitors = require('./visitors.model');
+const SpacesModel = require('./spaces.model');
+const Vehicle = require('./vehicle.model');
+const ParkingSpacesModel = require('./parking.spaces.model');
 
 
 const Guest_income = sequelize.define('guest_income', {
@@ -42,31 +45,26 @@ const Guest_income = sequelize.define('guest_income', {
         type: DataTypes.INTEGER,
         field: 'idvehicle',
     },
-    documentNumber: {
-        type: DataTypes.STRING,
-        field: 'numero_documento',
-    },
     idParking: {
         type: DataTypes.INTEGER,
-        field: 'idparqueadero',
+        field: 'idparking',
     },
 
 });
 
-Guest_income.associate = (models) => {
-    Guest_income.belongsTo(models.Visitors, {
-        foreignKey: 'idVisitor',
+    Guest_income.belongsTo(Visitors, {
+        foreignKey: 'idvisitor',as:'visitor'
     });
-    // Guest_income.belongsTo(models.Spaces, {
-    //     foreignKey: 'idSpace',
-    // });
-    // Guest_income.belongsTo(models.Vehicles, {
-    //     foreignKey: 'idVehicle',
-    // });
-    // Guest_income.belongsTo(models.Parking, {
-    //     foreignKey: 'idParking',
-    // });
-};
+    Guest_income.belongsTo(SpacesModel, {
+        foreignKey: 'idspace', as:'space'
+    });
+    Guest_income.belongsTo(Vehicle, {
+        foreignKey: 'idvehicle', as:'vehicle', allowNull: true
+    });
+    Guest_income.belongsTo(ParkingSpacesModel, {
+        foreignKey: 'idparking', as:'parking', allowNull: true
+    });
+
 
 
 module.exports = Guest_income;

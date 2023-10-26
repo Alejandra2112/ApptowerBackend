@@ -77,7 +77,7 @@ class Server {
     this.app.use(this.SpaceResidentsPath, require('../Routes/space.residents.routes'))
 
 
-    this.app.use(this.VisitorsPath, require('../Routes/visitors'))
+    this.app.use(this.VisitorsPath, require('../Routes/visitors.route'))
     this.app.use(this.GuestIncomePath, require('../Routes/guest.income.route'))
     this.app.use(this.FinesPath, require('../Routes/fines.routes'))
   }
