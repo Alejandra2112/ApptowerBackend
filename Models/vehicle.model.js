@@ -28,10 +28,10 @@ const Vehicle = sequelize.define('vehicle', {
 },
 {
     timestamps: false,
-}
+},
 );
 Vehicle.belongsTo(Users, { 
     foreignKey: 'iduser', 
     targetKey: 'iduser',
-  }) 
+});
 module.exports = Vehicle;

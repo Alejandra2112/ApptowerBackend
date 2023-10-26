@@ -4,6 +4,7 @@ const User = require('./users.model');
 const Booking = require('./booking.model');
 const Parking = require('./parking.spaces.model');
 const Vehicle = require('./vehicle.model');
+
 const Bookingparking = sequelize.define('reservasparqueadero', {
 
     idbookingparking: {

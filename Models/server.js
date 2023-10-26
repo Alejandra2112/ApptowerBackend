@@ -11,6 +11,9 @@ class Server {
     this.permissionsRolsPath = '/api/permissions';
     this.guardShiftsPath = '/api/guardshifts';
     this.LoginPath = '/api/login';
+    this.VisitorsPath = '/api/visitors';
+    this.GuestIncomePath = '/api/guestincome';
+    this.FinesPath = '/api/fines';
 
     // Spaces process path
 
@@ -74,16 +77,17 @@ class Server {
     this.app.use(this.SpaceResidentsPath, require('../Routes/space.residents.routes'))
 
 
+    this.app.use(this.VisitorsPath, require('../Routes/visitors'))
+    this.app.use(this.GuestIncomePath, require('../Routes/guest.income.route'))
+    this.app.use(this.FinesPath, require('../Routes/fines.routes'))
   }
 
   async db_connect() {
 
     try {
-
-      await sequelize.authenticate();
-
+      // await sequelize.authenticate();
       // Sincroniza los modelos con la base de datos
-      sequelize.sync({ force: true }).then(() => {
+      await sequelize.sync({ force: true }).then(() => {
         console.log('Modelos sincronizados con la base de datos');
 
       });

@@ -1,7 +1,7 @@
 const Taxe = require('../Models/fines.model');
 const { response } = require('express');
 
-const getTaxes = async (req, res = response) => {
+const getFines = async (req, res = response) => {
     try {
         const taxes = await Taxe.findAll();
 
@@ -20,7 +20,7 @@ const getTaxes = async (req, res = response) => {
     }
 };
 
-const postTaxes = async (req, res) => {
+const postFines = async (req, res) => {
     let message = '';
     const body = req.body;
     try {
@@ -34,7 +34,7 @@ const postTaxes = async (req, res) => {
     });
 };
 
-const putTaxes = async (req, res = response) => {
+const putFines = async (req, res = response) => {
     const body = req.body;
     let message = '';
 
@@ -58,7 +58,7 @@ const putTaxes = async (req, res = response) => {
     });
 };
 
-const deleteTaxes = async (req, res = response) => {
+const deleteFines = async (req, res = response) => {
     const body = req.body;
     let message = '';
 
@@ -83,8 +83,8 @@ const deleteTaxes = async (req, res = response) => {
 };
 
 module.exports = {
-    getTaxes,
-    postTaxes,
-    putTaxes,
-    deleteTaxes,
+    getFines,
+    postFines,
+    putFines,
+    deleteFines,
 };

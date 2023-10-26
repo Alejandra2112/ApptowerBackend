@@ -52,9 +52,8 @@ const putBooking = async (req, res = response) => {
         booking: message,
     });
 }
-
 module.exports = {
     getBooking,
     postBooking,
     putBooking,
-};
+}
