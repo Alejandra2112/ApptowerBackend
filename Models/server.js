@@ -8,12 +8,31 @@ class Server {
     this.UserPath = '/api/users';
     this.RolsPath = '/api/rols';
     this.WatchmanPath = '/api/watchman';
-    this.permissionsRolsPath = '/api/permissionsrols';
+    this.permissionsRolsPath = '/api/permissions';
     this.guardShiftsPath = '/api/guardshifts';
     this.LoginPath = '/api/login';
     this.VisitorsPath = '/api/visitors';
     this.GuestIncomePath = '/api/guestincome';
     this.FinesPath = '/api/fines';
+
+    // Spaces process path
+
+    this.SpacesPath = '/api/spaces';
+    this.ParkingSpacesPath = '/api/parkingSpaces';
+    this.AssignedParkingPath = '/api/assignedParkingSpaces';
+
+    // Residents process path
+
+    this.OwnersPath = '/api/owners';
+    this.ResidentsPath = '/api/residents';
+    this.SpaceOwnersPath = '/api/spacesOwners';
+    this.SpaceResidentsPath = '/api/spaceResidents';
+
+
+
+    this.bookingPath = '/api/booking';
+    this.vehiclePath = '/api/vehicle';
+    this.notificationPath = '/api/notification';
     this.middlewares();
     this.routes();
     this.db_connect();
@@ -33,43 +52,58 @@ class Server {
     this.app.use(express.json());
 }
   routes() {
-    // this.app.use(this.UserPath, require('../Routes/user'));
-    // this.app.use(this.RolsPath, require('../Routes/rols'));
-    // this.app.use(this.WatchmanPath, require('../Routes/watchman'));
-    // this.app.use(this.permissionsRolsPath, require('../Routes/permissionsRols'));
-    // this.app.use(this.guardShiftsPath, require('../Routes/guardShifts'))
-    // this.app.use(this.LoginPath, require('../Routes/login'));
-
+    this.app.use(this.UserPath, require('../Routes/users.route'));
+    this.app.use(this.RolsPath, require('../Routes/rols.route'));
+    this.app.use(this.LoginPath, require('../Routes/logIn.route'))
+    this.app.use(this.WatchmanPath, require('../Routes/watchmans.route'));
+    this.app.use(this.permissionsRolsPath, require('../Routes/permissions.route'));
+    this.app.use(this.guardShiftsPath, require('../Routes/guardShifts.route'))
+   
+    this.app.use(this.bookingPath, require('../Routes/booking.routes'));
+    this.app.use(this.vehiclePath, require('../Routes/vehicle.routes'));
+    this.app.use(this.notificationPath, require('../Routes/notification.routes'));
     // routes for spaces process
 
-    // this.app.use(this.spacesPath, require('../Routes/spaces'))
-    // this.app.use(this.ParkingSpacesPath, require('../Routes/parkingSpaces'))
+    this.app.use(this.SpacesPath, require('../Routes/spaces.routes'))
+    this.app.use(this.ParkingSpacesPath, require('../Routes/parking.spaces.routes'))
+    this.app.use(this.AssignedParkingPath, require('../Routes/assigned.parking.routes'))
+
 
     // routes for residents process 
 
-    // this.app.use(this.residentsPath, require('../Routes/residents'))
-    // this.app.use(this.OwnersPath, require('../Routes/owners'))
+    this.app.use(this.ResidentsPath, require('../Routes/residents.routes'))
+    this.app.use(this.OwnersPath, require('../Routes/owners.routes'))
+    this.app.use(this.SpaceOwnersPath, require('../Routes/space.owner.routes'))
+    this.app.use(this.SpaceResidentsPath, require('../Routes/space.residents.routes'))
+
+
     this.app.use(this.VisitorsPath, require('../Routes/visitors'))
     this.app.use(this.GuestIncomePath, require('../Routes/guest.income.route'))
     this.app.use(this.FinesPath, require('../Routes/fines.routes'))
   }
 
   async db_connect() {
+
     try {
       // await sequelize.authenticate();
       // Sincroniza los modelos con la base de datos
       await sequelize.sync({ force: true }).then(() => {
         console.log('Modelos sincronizados con la base de datos');
+
       });
-      console.log('Conexión exitosa a PostgreSQL');
+
+      console.log('PostgreSQL connection ok');
+
     } catch (err) {
-      console.error('Error al conectar a PostgreSQL:', err);
+
+      console.error('Error to connect PostgreSQL:', err);
+
     }
   }
 
   listen() {
     this.app.listen(this.port, () => {
-      console.log(`Escuchando en el puerto ${this.port}`);
+      console.log(`Listening port ${this.port}`);
     });
   }
 }

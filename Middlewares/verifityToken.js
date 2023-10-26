@@ -13,7 +13,7 @@ const verificarToken = (req, res, next) => {
     console.log(JSON.stringify(token));
     console.log(JSON.stringify(tokenSecret));
     const decoded = jwt.verify(tokenSecret, process.env.MISECRETKEY, { ignoreExpiration: false });
-    req.usuario = decoded;
+    req.user = decoded;
     next();
   } catch (error) {
     console.error('Error al verificar el token:', error);
