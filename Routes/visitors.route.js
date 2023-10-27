@@ -4,7 +4,7 @@ const {getVisitors, postVisitors, putVisitors, deleteVisitors} = require ('../Co
 const validations = require ('../Middlewares/visitors.middleware')
 
 route.get('/', getVisitors)
-route.post('/', validations.validate(validations.postValidationVisitor) ,postVisitors)
+route.post('/', validations.postValidationVisitor ,postVisitors)
 route.put('/', putVisitors)
 route.delete('/', deleteVisitors)
 
