@@ -28,10 +28,12 @@ const Guest_income = sequelize.define('guest_income', {
     state:{
         type: DataTypes.STRING,
         field: 'state',	
+        allowNull: false,
     },
     observations:{
         type: DataTypes.STRING,
         field: 'observations',
+        defaultValue: "Without observations",
     },
     idVisitor: {
         type: DataTypes.INTEGER,
@@ -44,10 +46,12 @@ const Guest_income = sequelize.define('guest_income', {
     idVehicle: {
         type: DataTypes.INTEGER,
         field: 'idvehicle',
+        defaultValue: null,
     },
     idParking: {
         type: DataTypes.INTEGER,
         field: 'idparking',
+        defaultValue: null,
     },
 
 });
