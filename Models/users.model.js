@@ -34,11 +34,7 @@ const User = sequelizeUser.define('users', {
   },
   idrole: {
     type: DataTypes.INTEGER,
-    field: 'idrole',
-    validate: {
-      isIn: [[1, 2, 3]], 
-    },
-    defaultValue: 2, 
+    field: 'idrole'
   },
   email: {
     type: DataTypes.STRING,
