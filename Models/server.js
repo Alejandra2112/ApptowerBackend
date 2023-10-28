@@ -65,6 +65,7 @@ class Server {
     this.app.use(this.bookingPath, require('../Routes/booking.routes'));
     this.app.use(this.vehiclePath, require('../Routes/vehicle.routes'));
     this.app.use(this.notificationPath, require('../Routes/notification.routes'));
+    
     // routes for spaces process
 
     this.app.use(this.SpacesPath, require('../Routes/spaces.routes'))
@@ -91,15 +92,15 @@ class Server {
       // await sequelize.authenticate();
       // Sincroniza los modelos con la base de datos
       await sequelize.sync({ force: false }).then(() => {
-        console.log('Modelos sincronizados con la base de datos');
+        console.log('Models synchronized with the database');
 
       });
 
-      console.log('PostgreSQL connection ok');
+      console.log('PostgreSQL connected');
 
     } catch (err) {
 
-      console.error('Error to connect PostgreSQL:', err);
+      console.error('Error connecting PostgreSQL:', err);
 
     }
   }

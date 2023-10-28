@@ -1,27 +1,27 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelizeUser = require('../Database/config'); 
+const sequelizeUser = require('../Database/config');
 const Rols = require('./rols.model');
-const Watchmans = require('./watchmans.model'); 
+const Watchmans = require('./watchmans.model');
 const usersforWatchmans = require('./user.watchman.model');
 const usersforResidents = require('./user.residents');
-const Resident = require('../Models/resident.model');
+const ResidentModel = require('./resident.model')
 
 const User = sequelizeUser.define('users', {
   iduser: {
     type: DataTypes.INTEGER,
-    primaryKey: true, 
+    primaryKey: true,
     autoIncrement: true,
-    field: 'iduser', 
+    field: 'iduser',
   },
   documentType: {
     type: DataTypes.STRING,
-    field: 'documentType', 
+    field: 'documentType',
   },
   document: {
     type: DataTypes.STRING,
     field: 'document',
-    unique: true, 
-    allowNull: true, 
+    unique: true,
+    allowNull: true,
   },
   name: {
     type: DataTypes.STRING,
@@ -29,8 +29,8 @@ const User = sequelizeUser.define('users', {
   },
   lastname: {
     type: DataTypes.STRING,
-    field: 'lastname', 
-    
+    field: 'lastname',
+
   },
   idrole: {
     type: DataTypes.INTEGER,
@@ -38,52 +38,53 @@ const User = sequelizeUser.define('users', {
   },
   email: {
     type: DataTypes.STRING,
-    field: 'email', 
+    field: 'email',
   },
   phone: {
     type: DataTypes.STRING,
-    field: 'phone', 
+    field: 'phone',
   },
   password: {
     type: DataTypes.STRING,
-    field: 'password', 
+    field: 'password',
     // validate: {
     //   len: [8, 12], 
     // },
-   
+
   },
   state: {
     type: DataTypes.STRING,
-    field: 'state', 
+    field: 'state',
     validate: {
-      isIn: [['Activo', 'Inactivo']], 
+      isIn: [['Activo', 'Inactivo']],
     },
-    defaultValue: 'Inactivo', 
+    defaultValue: 'Inactivo',
   },
 });
 
 //Relations
-User.belongsTo(Rols, { 
-    foreignKey: 'idrole', 
-    targetKey: 'idrole', 
-  });
+User.belongsTo(Rols, {
+  foreignKey: 'idrole',
+  targetKey: 'idrole',
+});
 
-  User.belongsToMany(Watchmans, {
-    through: usersforWatchmans, 
-    foreignKey: 'iduser',
-    otherKey: 'idwatchman',
-  });
-    
-  User.belongsToMany(Resident, {
-    through: usersforResidents, 
-    foreignKey: 'iduser',
-    otherKey: 'idResident',
-  });
+User.belongsToMany(Watchmans, {
+  through: usersforWatchmans,
+  foreignKey: 'iduser',
+  otherKey: 'idwatchman',
+});
+
+User.belongsToMany(ResidentModel, {
+  through: usersforResidents,
+  foreignKey: 'iduser',
+  otherKey: 'idResident',
+});
 
 //Hooks
-User.afterCreate(async(user) => {
-  if(user.idrole === 2 && user.state === 'Activo'){
-    const cretedResident = await Resident.create({
+
+User.afterCreate(async (user) => {
+  if (user.idrole === 2 && user.state === 'Activo') {
+    const cretedResident = await ResidentModel.create({
       name: user.name,
       lastName: user.lastname,
       docType: user.documentType,
@@ -104,7 +105,7 @@ User.afterCreate(async(user) => {
     });
 
   }
-  else if(user.idrole === 3 && user.state === 'Activo'){
+  else if (user.idrole === 3 && user.state === 'Activo') {
     const createdwatchman = await Watchmans.create({
       namewatchman: user.name,
       lastnamewatchman: user.lastname,
@@ -158,18 +159,18 @@ User.afterUpdate(async (user) => {
         idwatchman: watchmanId,
       });
     }
-  } 
+  }
   else {
-      await Watchmans.destroy({ where: { document: user.document } });
-      await usersforWatchmans.destroy({ where: { iduser: user.iduser } });
+    await Watchmans.destroy({ where: { document: user.document } });
+    await usersforWatchmans.destroy({ where: { iduser: user.iduser } });
   }
 });
 
 
 
-User.afterUpdate(async(user) => {
-  if(user.idrole === 2 && user.state === 'Activo'){
-    const existingResidents = await Resident.findOne({ where: { docType: user.document } });
+User.afterUpdate(async (user) => {
+  if (user.idrole === 2 && user.state === 'Activo') {
+    const existingResidents = await ResidentModel.findOne({ where: { docType: user.document } });
     if (existingResidents) {
       await existingResidents.update({
         name: user.name,
@@ -181,10 +182,10 @@ User.afterUpdate(async(user) => {
         birthday: null,
         sex: null,
         residentType: null,
-        status: user.state ? 'Active': 'Inactive',
+        status: user.state ? 'Active' : 'Inactive',
       });
     } else {
-      const changesUserR = await Resident.create({ 
+      const changesUserR = await ResidentModel.create({
         name: user.name,
         lastName: user.lastname,
         docType: user.documentType,
@@ -204,9 +205,9 @@ User.afterUpdate(async(user) => {
       });
     }
   }
-  else{
-      await Resident.destroy({ where: { docNumber: user.document } });
-      await usersforResidents.destroy({ where: { iduser: user.iduser } });
+  else {
+    await Resident.destroy({ where: { docNumber: user.document } });
+    await usersforResidents.destroy({ where: { iduser: user.iduser } });
   }
 });
 

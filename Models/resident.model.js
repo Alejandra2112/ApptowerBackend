@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
+const OwnersModel = require('./owners.model');
 
 const ResidentModel = sequelize.define('Residents', {
 
@@ -84,7 +85,7 @@ const ResidentModel = sequelize.define('Residents', {
     residentType: {
 
         type: DataTypes.STRING(15),
-        field: 'residentType',  
+        field: 'residentType',
         validate: {
             isIn: [['tenant', 'owner']]
         }
@@ -103,7 +104,59 @@ const ResidentModel = sequelize.define('Residents', {
 }, {
 
     timestamps: false
-    
+
 });
 
+// Hooks for create and update owners
+
+ResidentModel.afterCreate(async (resident) => {
+
+    if (resident.residentType === 'owner') {
+
+        const owner = await OwnersModel.create({
+
+            docType: resident.docType,
+            docNumber: resident.docNumber,
+            name: resident.name,
+            lastName: resident.lastname,
+            birthday: resident.birthday,
+            email: resident.email,
+            phoneNumber: resident.phoneNumber,
+            status: 'Active',
+
+        });
+    }
+})
+
+
+
+
+ResidentModel.afterUpdate(async (resident) => {
+
+    console.log(resident + 'hola')
+
+    const ownerToUpdate = await OwnersModel.findOne({ where: { docNumber: resident.docNumber } });
+
+    if (ownerToUpdate) {
+
+
+        await ownerToUpdate.update({
+
+            docType: resident.docType,
+            docNumber: resident.docNumber,
+            name: resident.name,
+            lastName: resident.lastname,
+            birthday: resident.birthday,
+            email: resident.email,
+            phoneNumber: resident.phoneNumber,
+            status: ownerToUpdate.status
+        });
+
+
+    }
+
+}
+)
+
 module.exports = ResidentModel;
+
