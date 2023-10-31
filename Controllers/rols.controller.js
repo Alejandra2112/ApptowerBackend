@@ -2,6 +2,8 @@ const { response } = require('express');
 const Rols = require('../Models/rols.model');
 const Permission = require('../Models/permissions.model');
 const rolsPermissions = require('../Models/rolsPermissions.model');
+const Privileges = require('../Models/privileges.model');
+const permissionPrivileges = require('../Models/permissionPrivileges.model');
 
 const getRols = async (req, res = response) => {
   try {
@@ -10,6 +12,12 @@ const getRols = async (req, res = response) => {
         {
           model: Permission,
           attributes: ['idpermission', 'permission'],
+          include: [
+            {
+              model: Privileges,
+              attributes: ['idprivilege', 'privilege'],
+            }
+          ]
         },
       ],
     });
@@ -29,7 +37,7 @@ const getRols = async (req, res = response) => {
 
 const postRols = async (req, res) => {
   let message = '';
-  const { namerole, description, permission } = req.body;
+  const { namerole, description, permission, privilege } = req.body;
 
   try {
     if (!permission || !Array.isArray(permission)) {
@@ -38,19 +46,36 @@ const postRols = async (req, res) => {
       });
     }
 
+    if (!privilege || !Array.isArray(privilege)) {
+      return res.status(400).json({
+        error: "Invalid privileges",
+      });
+    }
+
     const rols = await Rols.create({ namerole, description });
 
-  
+
     const roleId = rols.idrole;
+    const permissions = await Permission.findAll({
+      where: { idpermission: idpermission },
+    });
 
     const selectedPermissions = permission.map((idpermission) => {
       return {
-        idrole: roleId, 
+        idrole: roleId,
         idpermission,
       };
     });
 
+    const selectedPrivileges = privilege.map((idprivilege) => {
+      return {
+        idpermission: permissions,
+        idprivilege,
+      };
+    });
+
     await rolsPermissions.bulkCreate(selectedPermissions);
+    await permissionPrivileges.bulkCreate(selectedPrivileges);
 
     message = 'Rol registrado correctamente';
     res.json({

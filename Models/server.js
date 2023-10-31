@@ -5,7 +5,7 @@ class Server {
   constructor() {
     this.app = express();
     this.port = 3000;
-     
+
     //Users process path
     this.UserPath = '/api/users';
     this.LoginPath = '/api/login';
@@ -13,11 +13,14 @@ class Server {
     //Rols process path
     this.RolsPath = '/api/rols';
     this.permissionsRolsPath = '/api/permissions';
+    this.permissionsPrivilegesPath = '/api/privileges';
+
 
     //Watchman process path
     this.WatchmanPath = '/api/watchman';
     this.guardShiftsPath = '/api/guardshifts';
-    this.LoginPath = '/api/login';
+
+
     this.VisitorsPath = '/api/visitors';
     this.GuestIncomePath = '/api/guestincome';
     this.FinesPath = '/api/fines';
@@ -44,24 +47,26 @@ class Server {
 
   middlewares() {
     this.app.use((req, res, next) => {
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-        res.setHeader(
-            'Access-Control-Allow-Headers',
-            'Content-Type, Authorization'
-        );
-        return next();
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+      res.setHeader(
+        'Access-Control-Allow-Headers',
+        'Content-Type, Authorization'
+      );
+      return next();
     });
     this.app.use(express.json());
-}
+  }
   routes() {
-    this.app.use(this.UserPath, require('../Routes/users.route'));
-    this.app.use(this.RolsPath, require('../Routes/rols.route'));
-    this.app.use(this.LoginPath, require('../Routes/logIn.route'))
-    this.app.use(this.WatchmanPath, require('../Routes/watchmans.route'));
-    this.app.use(this.permissionsRolsPath, require('../Routes/permissions.route'));
-    this.app.use(this.guardShiftsPath, require('../Routes/guardShifts.route'))
-   
+    this.app.use(this.LoginPath, require('../Routes/logIn.routes'))
+    this.app.use(this.UserPath, require('../Routes/users.routes'));
+    this.app.use(this.RolsPath, require('../Routes/rols.routes'));
+    this.app.use(this.WatchmanPath, require('../Routes/watchmans.routes'));
+    this.app.use(this.permissionsRolsPath, require('../Routes/permissions.routes'));
+    this.app.use(this.permissionsPrivilegesPath, require('../Routes/privileges.routes'));
+    this.app.use(this.guardShiftsPath, require('../Routes/guardShifts.routes'))
+
+
     this.app.use(this.bookingPath, require('../Routes/booking.routes'));
     this.app.use(this.vehiclePath, require('../Routes/vehicle.routes'));
     this.app.use(this.notificationPath, require('../Routes/notification.routes'));
@@ -90,7 +95,7 @@ class Server {
     try {
       // await sequelize.authenticate();
       // Sincroniza los modelos con la base de datos
-      await sequelize.sync({ force: true }).then(() => {
+      await sequelize.sync({ force: false }).then(() => {
         console.log('Modelos sincronizados con la base de datos');
 
       });
