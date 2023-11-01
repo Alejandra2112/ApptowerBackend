@@ -1,25 +1,31 @@
-const {Router} = require ('express')
-const route = Router()
-const {logIn} = require ('../Controllers/logIn.controller')
-const verifityToken = require('../Middlewares/verifityToken')
-const User = require('../Models/users.model')
+const { Router } = require('express');
+const route = Router();
+const { logIn } = require('../Controllers/logIn.controller');
+const verifityToken = require('../Middlewares/verifityToken');
+const User = require('../Models/users.model');
 
-route.post('/', logIn)
+route.post('/', logIn);
 
 route.get('/access', verifityToken, (req, res) => {
-    const user = req.user;
-    const rol = user.rol;
-  
-    if (rol == 1) {
-      console.log("Es administrador");
-    } else if (rol == 2) {
-      console.log("Es residente");
-    } else {
-      console.log("Es vigilante");
-    }
+  const user = req.user;
+  const rol = user.rol;
+  let message = '';
+
+  if (rol == 1) {
+    message = 'Es Administrador';
+  } else if (rol == 2) {
+    message = 'Es residente';
+  } else {
+    message = 'Es vigilante';
+  }
+
+  res.json({
+    message: message,
   });
- 
-module.exports = route
+});
+
+module.exports = route;
+
 
 
 // const { Router } = require('express');
@@ -38,7 +44,7 @@ module.exports = route
 
 //   try {
 //     const roles = await Roles.findByPk(rol.idrol, {
-//       include: RolPermissions, 
+//       include: RolPermissions,
 //     });
 
 //     if (!roles) {

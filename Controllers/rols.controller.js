@@ -3,21 +3,14 @@ const Rols = require('../Models/rols.model');
 const Permission = require('../Models/permissions.model');
 const rolsPermissions = require('../Models/rolsPermissions.model');
 const Privileges = require('../Models/privileges.model');
-const permissionPrivileges = require('../Models/permissionPrivileges.model');
 
 const getRols = async (req, res = response) => {
   try {
     const rols = await Rols.findAll({
       include: [
         {
-          model: Permission,
-          attributes: ['idpermission', 'permission'],
-          include: [
-            {
-              model: Privileges,
-              attributes: ['idprivilege', 'privilege'],
-            }
-          ]
+          model: rolsPermissions,
+          attributes: ['idrolpermission', 'idrole', 'idpermission', 'idprivilege'],
         },
       ],
     });
@@ -34,54 +27,45 @@ const getRols = async (req, res = response) => {
   }
 };
 
-
 const postRols = async (req, res) => {
   let message = '';
-  const { namerole, description, permission, privilege } = req.body;
+  const { namerole, description, permissions, privileges } = req.body;
 
   try {
-    if (!permission || !Array.isArray(permission)) {
+    if (!permissions || !Array.isArray(permissions)) {
       return res.status(400).json({
         error: "Invalid permissions",
       });
     }
 
-    if (!privilege || !Array.isArray(privilege)) {
+    if (!privileges || !Array.isArray(privileges)) {
       return res.status(400).json({
         error: "Invalid privileges",
       });
     }
 
     const rols = await Rols.create({ namerole, description });
-
-
     const roleId = rols.idrole;
-    const permissions = await Permission.findAll({
-      where: { idpermission: idpermission },
-    });
 
-    const selectedPermissions = permission.map((idpermission) => {
-      return {
+    console.log('Created Rol:', rols);
+
+    const selectedPermissions = permissions.map((permissionId) =>
+      privileges.map((privilegeId) => ({
         idrole: roleId,
-        idpermission,
-      };
-    });
+        idpermission: permissionId,
+        idprivilege: privilegeId,
+      }))
+    );
+    const iteratedpermissions = [].concat(...selectedPermissions);
 
-    const selectedPrivileges = privilege.map((idprivilege) => {
-      return {
-        idpermission: permissions,
-        idprivilege,
-      };
-    });
-
-    await rolsPermissions.bulkCreate(selectedPermissions);
-    await permissionPrivileges.bulkCreate(selectedPrivileges);
+    await rolsPermissions.bulkCreate(iteratedpermissions);
 
     message = 'Rol registrado correctamente';
     res.json({
-      rols: message
+      rols: message,
     });
   } catch (error) {
+    console.error('Error:', error);
     res.status(500).json({
       error: error.message,
     });
@@ -89,29 +73,40 @@ const postRols = async (req, res) => {
 };
 
 
-
 const putRols = async (req, res = response) => {
   try {
-    const { idrole, ...update } = req.body;
+    const { idrole, permissions } = req.body;
     let message = '';
 
-    const [updatedRows] = await Rols.update(update, { where: { idrole: idrole } });
-    const permission = req.body.permissions;
+    const [updatedRows] = await Rols.update(req.body, { where: { idrole: idrole } });
 
-    if (permission && Array.isArray(permission)) {
-      const currentpermission = await rolsPermissions.findAll({ where: { idrole: idrole } });
-      const currentIds = currentpermission.map((p) => p.idpermission);
-      const requestedPer = permission;
+    if (permissions && Array.isArray(permissions)) {
+      // Obtén los permisos actuales asociados a este rol
+      const currentPermissions = await rolsPermissions.findAll({ where: { idrole: idrole } });
+      const currentPermissionIds = currentPermissions.map((p) => p.idpermission);
 
-      const toAdd = requestedPer.filter((idpermission) => !currentIds.includes(idpermission));
-      const toRemove = currentIds.filter((idpermission) => !requestedPer.includes(idpermission));
+      // Identifica los permisos a agregar y quitar
+      const permissionsToAdd = permissions.filter((idpermission) => !currentPermissionIds.includes(idpermission));
+      const permissionsToRemove = currentPermissionIds.filter((idpermission) => !permissions.includes(idpermission));
 
-      if (toAdd.length > 0) {
-        await rolsPermissions.bulkCreate(toAdd.map((idpermission) => ({ idrole: idrole, idpermission: idpermission })));
+      // Procesa los permisos a agregar
+      if (permissionsToAdd.length > 0) {
+        for (const idpermission of permissionsToAdd) {
+          // Aquí, debes obtener el idprivilege correspondiente de tu lógica de negocios
+          const idprivilege = obtenerIdPrivilege(idpermission); // Reemplaza 'obtenerIdPrivilege' con tu lógica real
+          if (idprivilege !== null) {
+            await rolsPermissions.create({
+              idrole: idrole,
+              idpermission: idpermission,
+              idprivilege: idprivilege,
+            });
+          }
+        }
       }
 
-      if (toRemove.length > 0) {
-        await rolsPermissions.destroy({ where: { idrole: idrole, idpermission: toRemove } });
+      // Procesa los permisos a quitar
+      if (permissionsToRemove.length > 0) {
+        await rolsPermissions.destroy({ where: { idrole: idrole, idpermission: permissionsToRemove } });
       }
     }
 

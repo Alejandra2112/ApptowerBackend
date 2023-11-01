@@ -8,7 +8,7 @@ const verificarToken = (req, res, next) => {
   }
 
   const tokenSecret = token.split(' ')[1]
-  
+
   try {
     console.log(JSON.stringify(token));
     console.log(JSON.stringify(tokenSecret));

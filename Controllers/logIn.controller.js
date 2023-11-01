@@ -1,9 +1,10 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const User = require('../Models/users.model');
 const Rols = require('../Models/rols.model');
 
 const logIn = async (req, res) => {
-  const { document, password} = req.body;
+  const { document, password } = req.body;
 
   try {
     const user = await User.findOne({ where: { document } });
@@ -11,25 +12,26 @@ const logIn = async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: 'Usuario no encontrado' });
     }
-    if (password !== user.password) {
+    if (!bcrypt.compareSync(password, user.password)) {
       return res.status(401).json({ message: 'Contraseña incorrecta' });
     }
-    if(user.state !== 'Activo'){
-      return res.status(401).json({ message: 'Ha ocurrido un problema, comunicate con el Administrador' });
+
+    if (user.state !== 'Activo') {
+      return res.status(401).json({ message: 'Ha ocurrido un problema, comunícate con el Administrador' });
     }
+
     const userWithRole = await User.findByPk(user.iduser, {
       include: Rols,
     });
 
     if (!userWithRole) {
-      return res.status(500).json({ message: 'Ocurrio un error' });
+      return res.status(500).json({ message: 'Ocurrió un error' });
     }
-    const userRoleId = user.idrole; 
-
+    const userRoleId = user.idrole;
 
     const tokenPayload = {
       iduser: user.iduser,
-      rol: userRoleId, 
+      rol: userRoleId,
     };
 
     const token = jwt.sign(tokenPayload, process.env.MISECRETKEY, {

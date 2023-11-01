@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
+const rolsPermissions = require('./rolsPermissions.model');
 
 const Privileges = sequelize.define('privileges', {
   idprivilege: {
@@ -11,18 +12,20 @@ const Privileges = sequelize.define('privileges', {
   privilege: {
     type: DataTypes.STRING,
     field: 'privilege',
-  },
-  state: {
-    type: DataTypes.STRING,
-    field: 'state',
-    validate: {
-      isIn: [['Activo', 'Inactivo']],
-    },
-    defaultValue: 'Inactivo',
-  },
+  }
 }, {
   timestamps: false,
 });
 
+//Relations
+Privileges.hasMany(rolsPermissions, {
+  foreignKey: 'idprivilege',
+  sourceKey: 'idprivilege',
+});
+
+rolsPermissions.belongsTo(Privileges, {
+  foreignKey: 'idprivilege',
+  targetKey: 'idprivilege',
+})
 
 module.exports = Privileges;

@@ -47,18 +47,50 @@ const postUser = async (req, res) => {
 };
 
 
+// const putUser = async (req, res = response) => {
+//   const body = req.body;
+//   let message = '';
+
+//   try {
+//     const { iduser, idrole, state, ...update } = body;
+
+//     const user = await User.findOne({ where: { iduser: iduser } });
+
+//     if (!user) {
+//       message = 'No se encontró un usuario con ese ID';
+//     } else {
+//       await user.update({ idrole, state, ...update }, { force: true });
+
+//       message = 'Usuario modificado exitosamente.';
+//     }
+//   } catch (error) {
+//     message = 'Error al modificar usuario: ' + error.message;
+//   }
+
+//   res.json({
+//     user: message,
+//   });
+// };
+
 const putUser = async (req, res = response) => {
   const body = req.body;
   let message = '';
 
   try {
-    const { iduser, idrole, state, ...update } = body;
+    const { iduser, idrole, state, password, ...update } = body;
 
     const user = await User.findOne({ where: { iduser: iduser } });
 
     if (!user) {
       message = 'No se encontró un usuario con ese ID';
     } else {
+      if (password) {
+        const salt = bcrypt.genSaltSync(10);
+        const hashedPassword = bcrypt.hashSync(password, salt);
+
+        update.password = hashedPassword;
+      }
+
       await user.update({ idrole, state, ...update }, { force: true });
 
       message = 'Usuario modificado exitosamente.';
@@ -71,6 +103,7 @@ const putUser = async (req, res = response) => {
     user: message,
   });
 };
+
 
 
 const deleteUser = async (req, res) => {

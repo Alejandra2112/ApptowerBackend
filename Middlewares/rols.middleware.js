@@ -1,4 +1,4 @@
-const {  validationResult, check} = require('express-validator');
+const { validationResult, check } = require('express-validator');
 
 const validateRols = [
   check('namerole')
