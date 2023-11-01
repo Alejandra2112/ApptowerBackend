@@ -196,7 +196,7 @@ User.afterUpdate(async (user) => {
         sex: null,
         residentType: null,
         status: 'Active',
-      });
+      }); 
       const ResidentId = changesUserR.idResident
 
       await usersforResidents.create({
