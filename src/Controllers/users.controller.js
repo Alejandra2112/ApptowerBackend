@@ -23,6 +23,28 @@ const getUser = async (req, res = response) => {
 };
 
 
+const getUserOne = async (req, res = response) => {
+  try {
+    const { iduser } = req.params;
+
+    const user = await User.findOne({ where: { iduser: iduser } });
+
+    if (!user) {
+      return res.status(404).json({ error: 'No se encontró un usuario con ese ID' });
+    }
+
+    res.json({
+      user,
+    });
+  } catch (error) {
+    console.error('Error al obtener usuario:', error);
+    res.status(500).json({
+      error: 'Error al obtener usuario',
+    });
+  }
+};
+
+
 const postUser = async (req, res) => {
 
   let message = '';
@@ -46,31 +68,6 @@ const postUser = async (req, res) => {
   });
 };
 
-
-// const putUser = async (req, res = response) => {
-//   const body = req.body;
-//   let message = '';
-
-//   try {
-//     const { iduser, idrole, state, ...update } = body;
-
-//     const user = await User.findOne({ where: { iduser: iduser } });
-
-//     if (!user) {
-//       message = 'No se encontró un usuario con ese ID';
-//     } else {
-//       await user.update({ idrole, state, ...update }, { force: true });
-
-//       message = 'Usuario modificado exitosamente.';
-//     }
-//   } catch (error) {
-//     message = 'Error al modificar usuario: ' + error.message;
-//   }
-
-//   res.json({
-//     user: message,
-//   });
-// };
 
 const putUser = async (req, res = response) => {
   const body = req.body;
@@ -131,4 +128,5 @@ module.exports = {
   postUser,
   putUser,
   deleteUser,
+  getUserOne
 };
