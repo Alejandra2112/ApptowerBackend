@@ -2,12 +2,12 @@ require('dotenv').config();
 const { Sequelize } = require('sequelize');
 
 
-const sequelize = new Sequelize(process.env.internalDbUrl , {
+const sequelize = new Sequelize(process.env.externalDbUrl, {
   dialect: 'postgres',
   dialectOptions: {
     ssl: {
-      require: true, 
-      rejectUnauthorized: false 
+      require: true,
+      rejectUnauthorized: false
     }
   }
 });
