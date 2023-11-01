@@ -58,7 +58,7 @@ const putOwner = async (req, res = response) => {
     let message = '';
 
     try {
-        const { idOwner, ...update } = body;
+        const { idOwner, ...update } = body; 
 
         const [updatedRows] = await OwnersModel.update(update, {
             where: { idOwner: idOwner },
@@ -85,6 +85,7 @@ const putOwner = async (req, res = response) => {
 
     });
 };
+
 
 
 // const deleteOwner = async (req, res) => {

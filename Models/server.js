@@ -70,6 +70,7 @@ class Server {
     this.app.use(this.bookingPath, require('../Routes/booking.routes'));
     this.app.use(this.vehiclePath, require('../Routes/vehicle.routes'));
     this.app.use(this.notificationPath, require('../Routes/notification.routes'));
+    
     // routes for spaces process
 
     this.app.use(this.SpacesPath, require('../Routes/spaces.routes'))
@@ -100,11 +101,11 @@ class Server {
 
       });
 
-      console.log('PostgreSQL connection ok');
+      console.log('PostgreSQL connected');
 
     } catch (err) {
 
-      console.error('Error to connect PostgreSQL:', err);
+      console.error('Error connecting PostgreSQL:', err);
 
     }
   }

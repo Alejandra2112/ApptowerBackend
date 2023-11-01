@@ -2,14 +2,14 @@ const { response } = require('express');
 const SpacesModel = require('../Models/spaces.model');
 
 const getSpace = async (req, res = response) => {
+
     try {
+
         const spaces = await SpacesModel.findAll();
 
         console.log('Space get ok', spaces);
 
-        res.json({
-            spaces,
-        });
+        res.json({ spaces });
 
     } catch (error) {
 
@@ -25,7 +25,6 @@ const getSpace = async (req, res = response) => {
 
 const postSpace = async (req, res) => {
 
-
     let message = '';
     const body = req.body;
 
@@ -33,7 +32,7 @@ const postSpace = async (req, res) => {
     
     try {
         await SpacesModel.create(body);
-        message = 'Space created';
+        message = 'New space created.';
     } catch (e) {
         message = e.message;
     }
@@ -57,17 +56,17 @@ const putSpace = async (req, res = response) => {
 
         if (updatedRows > 0) {
 
-            message = 'Space update ok';
+            message = 'Space updated successfully.';
 
         } else {
 
-            message = 'Id space is not found';
+            message = 'Id space not found';
 
         }
 
     } catch (error) {
 
-        message = 'Error update space: ' + error.message;
+        message = 'Error updating space: ' + error.message;
 
     }
     res.json({
