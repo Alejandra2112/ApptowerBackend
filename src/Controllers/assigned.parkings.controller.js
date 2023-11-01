@@ -6,43 +6,43 @@ const SpaceModel = require('../Models/spaces.model');
 const getAssignedParking = async (req, res) => {
 
     try {
-  
-      const assignedParkings = await AssignedParkingModel.findAll();
-  
-      const spaces = await SpaceModel.findAll({
-        attributes: ['idSpace', 'spaceType', 'spaceName', 'status']
-    });
-  
-      const parkingSpaces = await ParkingSpaceModel.findAll({
-        attributes: ['idParkingSpace', 'parkingName', 'parkingType', 'status'],
-    });
-      
-    const data = assignedParkings.map(ap => {
-        
-        const space = spaces.find(space => space.idSpace === ap.idSpace);
-        const parkingSpace = parkingSpaces.find(ps => ps.idParkingSpace === ap.idParkingSpace);
-    
-        return {
-           ...ap.dataValues,
-           space,
-           parkingSpace
-        }
-    })
-  
-      res.json({
 
-        parkingSpaces: data
+        const assignedParkings = await AssignedParkingModel.findAll();
 
-    });
-  
+        const spaces = await SpaceModel.findAll({
+            attributes: ['idSpace', 'spaceType', 'spaceName', 'status']
+        });
+
+        const parkingSpaces = await ParkingSpaceModel.findAll({
+            attributes: ['idParkingSpace', 'parkingName', 'parkingType', 'status'],
+        });
+
+        const data = assignedParkings.map(ap => {
+
+            const space = spaces.find(space => space.idSpace === ap.idSpace);
+            const parkingSpace = parkingSpaces.find(ps => ps.idParkingSpace === ap.idParkingSpace);
+
+            return {
+                ...ap.dataValues,
+                space,
+                parkingSpace
+            }
+        })
+
+        res.json({
+
+            parkingSpaces: data
+
+        });
+
     } catch (error) {
-  
-      console.error(error);
-      res.status(500).json({ error: 'Error getting assigned parkings' });
-  
+
+        console.error(error);
+        res.status(500).json({ error: 'Error getting assigned parkings' });
+
     }
-  
-  }
+
+}
 
 
 const postAssignedParking = async (req, res) => {
