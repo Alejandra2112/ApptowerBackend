@@ -3,7 +3,43 @@ const AssignedParkingModel = require('../Models/assigned.parking.model');
 const ParkingSpaceModel = require('../Models/parking.spaces.model');
 const SpaceModel = require('../Models/spaces.model');
 
-const getAssignedParking = async (req, res) => {
+const getSpacesWithAssignedParking = async (req, res = response) => {
+    try {
+        const { idSpace } = req.params;
+
+        const spaces = await AssignedParkingModel.findAll({
+            where: { idSpace: idSpace },
+        });
+        const parkingSpaces = await ParkingSpaceModel.findAll({
+            attributes: ['idParkingSpace', 'parkingName', 'parkingType', 'status'],
+        });
+
+        const data = spaces.map(ap => {
+            const parkingSpace = parkingSpaces.find(ps => ps.idParkingSpace === ap.idParkingSpace);
+
+            return {
+                ...ap.dataValues,
+                parkingSpace
+            }
+        });
+
+        if (!data || data.length === 0) {
+            return res.status(404).json({ error: 'Id space not found.' });
+        }
+
+        res.json({
+            spaces: data,
+        });
+    } catch (error) {
+        console.error('Error to get spaces.', error);
+        res.status(500).json({
+            error: 'Error to get spaces.',
+        });
+    }
+};
+
+
+const getAllAssignedParking = async (req, res) => {
 
     try {
 
@@ -142,7 +178,8 @@ const deleteAssignedParking = async (req, res) => {
 
 
 module.exports = {
-    getAssignedParking,
+    getSpacesWithAssignedParking,
+    getAllAssignedParking,
     postAssignedParking,
     putAssignedParking,
     deleteAssignedParking,

@@ -1,8 +1,9 @@
 const {Router} = require ('express')
 const route = Router()
-const {getAssignedParking, postAssignedParking, putAssignedParking, deleteAssignedParking } = require ('../Controllers/assigned.parkings.controller')
+const {getSpacesWithAssignedParking, getAllAssignedParking, postAssignedParking, putAssignedParking, deleteAssignedParking } = require ('../Controllers/assigned.parkings.controller')
 
-route.get('/', getAssignedParking)
+route.get('/:idSpace', getSpacesWithAssignedParking);
+route.get('/', getAllAssignedParking)
 route.post('/', postAssignedParking)
 route.put('/', putAssignedParking)
 route.delete('/', deleteAssignedParking)
