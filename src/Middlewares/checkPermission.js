@@ -1,45 +1,31 @@
-// const Roles = require('../Models/rols.model');
-// const Permissions = require('../Models/permissions.model');
-// const User = require('../Models/users.model');
-// const RolPermissions = require('../Models/rolsPermissions.model');
+const RolsPermissions = require("../Models/rolsPermissions.model");
 
-// const checkPermission =  async(req, res, next) => {
+const checkPermissions = (permission, privilege) => {
+    return async (req, res, next) => {
+        const { idrole } = req.user;
 
-//   const userId = req.user.iduser; 
-//   const functionality = req.params.functionality; 
+        console.log('ID del rol:', idrole);
+        console.log('Permiso:', permission);
+        console.log('Privilegio:', privilege);
 
-//   try {
-   
-//     const user = await User.findByPk(userId, {
-//       include: Roles, 
-//     });
+        try {
+            const havePermissions = await RolsPermissions.findOne({
+                where: { idrole, idpermission: permission, idprivilege: privilege },
+            });
 
-//     if (!user) {
-//       return res.status(401).json({ message: 'Usuario no válido' });
-//     }
+            console.log('Resultado de la consulta a la base de datos:', havePermissions);
 
-//     const rol = user.rol;
-//     const rolPermissions = await RolPermissions.findAll({
-//       where: { idRol: rol.idrol },
-//       include: Permissions,
-//     });
+            if (!havePermissions) {
+                return res.status(403).json({ message: 'No tienes permisos para esta acción' });
+            }
 
-//     if (!rolPermissions) {
-//       return res.status(401).json({ message: 'Rol de usuario no válido' });
-//     }
+            next();
+        } catch (error) {
+            console.error('Error al verificar los permisos:', error);
+            res.status(500).json({ message: 'Error en la verificación de permisos' });
+        }
+    };
+};
 
-//     const hasPermission = rolPermissions.some((rp) =>
-//       rp.permissions.some((p) => p.permission === functionality)
-//     );
 
-//     if (!hasPermission) {
-//       return res.status(403).json({ message: 'Acceso denegado' });
-//     }
-//     next();
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'Error interno del servidor' });
-//   }
-// }
-
-// module.exports = checkPermission;
+module.exports = checkPermissions;

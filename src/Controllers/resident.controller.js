@@ -35,7 +35,7 @@ const postResident = async (req, res) => {
     const body = req.body;
 
     console.log(body)
-    
+
     try {
 
         await ResidentModel.create(body);

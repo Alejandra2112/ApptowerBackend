@@ -1,4 +1,4 @@
-const {validationResult,check}= require('express-validator')
+const { validationResult, check } = require('express-validator')
 
 const validateWatchman = [
   check('namewatchman')
@@ -12,7 +12,7 @@ const validateWatchman = [
   check('documentType')
     .isIn(['CC', 'CE'])
     .withMessage('El campo "documentType" debe ser "CC" o "CE'),
-
+  
   check('document')
     .isString()
     .withMessage('El campo "document" debe ser una cadena')
@@ -31,11 +31,8 @@ const validateWatchman = [
 
   check('dateOfbirth')
     .isISO8601()
-    .withMessage('El campo "dateOfbirth" debe ser una fecha ISO8601 válida'),
+    .withMessage('El campo "dateOfbirth" debe ser una fecha válida en formato (YYYY-MM-DD)'),
 
-  check('state')
-    .isIn(['Activo', 'Inactivo'])
-    .withMessage('El campo "state" debe ser "Activo" o "Inactivo'),
 
   (req, res, next) => {
     const errors = validationResult(req);

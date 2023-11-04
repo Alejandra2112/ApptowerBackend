@@ -89,6 +89,7 @@ const putUser = async (req, res = response) => {
       }
 
       await user.update({ idrole, state, ...update }, { force: true });
+      await user.reload();
 
       message = 'Usuario modificado exitosamente.';
     }

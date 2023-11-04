@@ -127,12 +127,30 @@ User.afterCreate(async (user) => {
 })
 
 
-
 User.afterUpdate(async (user) => {
   if (user.idrole === 3 && user.state === 'Activo') {
-    const existingWatchman = await Watchmans.findOne({ where: { document: user.document } });
-    if (existingWatchman) {
-      await existingWatchman.update({
+
+    const createW = await Watchmans.create({
+      namewatchman: user.name,
+      lastnamewatchman: user.lastname,
+      documentType: user.documentType,
+      document: user.document,
+      phone: user.phone,
+      email: user.email,
+      dateOfbirth: null,
+      state: user.state,
+    });
+    const watchmanId = createW.idwatchman;
+
+    await usersforWatchmans.create({
+      iduser: user.iduser,
+      idwatchman: watchmanId,
+    });
+  } else if (user.idrole === 3) {
+    const changesW = await Watchmans.findOne({ where: { document: user.document } });
+
+    if (changesW) {
+      await changesW.update({
         namewatchman: user.name,
         lastnamewatchman: user.lastname,
         documentType: user.documentType,
@@ -141,51 +159,38 @@ User.afterUpdate(async (user) => {
         email: user.email,
         state: user.state,
       });
-    } else {
-      const changesUserW = await Watchmans.create({
-        namewatchman: user.name,
-        lastnamewatchman: user.lastname,
-        documentType: user.documentType,
-        document: user.document,
-        phone: user.phone,
-        email: user.email,
-        dateOfbirth: null,
-        state: 'Activo',
-      });
-      const watchmanId = changesUserW.idwatchman
-
-      await usersforWatchmans.create({
-        iduser: user.iduser,
-        idwatchman: watchmanId,
-      });
     }
   }
-  else {
+});
+
+User.afterUpdate(async (user) => {
+  if (user.idrole !== 3) {
     await Watchmans.destroy({ where: { document: user.document } });
     await usersforWatchmans.destroy({ where: { iduser: user.iduser } });
+  } else if (user.idrole !== 2) {
+    await ResidentModel.destroy({ where: { docNumber: user.document } });
+    await usersforResidents.destroy({ where: { iduser: user.iduser } });
   }
 });
 
 
-
 User.afterUpdate(async (user) => {
   if (user.idrole === 2 && user.state === 'Activo') {
-    const existingResidents = await ResidentModel.findOne({ where: { docType: user.document } });
-    if (existingResidents) {
-      await existingResidents.update({
+    const changesUserR = await ResidentModel.findOne({ where: { docType: user.document } });
+    if (changesUserR) {
+      await changesUserR.update({
         name: user.name,
         lastName: user.lastname,
         docType: user.documentType,
-        docNumber: user.document,
         phoneNumber: user.phone,
         email: user.email,
         birthday: null,
         sex: null,
         residentType: null,
-        status: user.state ? 'Active' : 'Inactive',
+        // status: user.state ? 'Active' : 'Inactive',
       });
     } else {
-      const changesUserR = await ResidentModel.create({
+      const createResident = await ResidentModel.create({
         name: user.name,
         lastName: user.lastname,
         docType: user.documentType,
@@ -196,18 +201,14 @@ User.afterUpdate(async (user) => {
         sex: null,
         residentType: null,
         status: 'Active',
-      }); 
-      const ResidentId = changesUserR.idResident
+      });
+      const ResidentId = createResident.idResident
 
       await usersforResidents.create({
         iduser: user.iduser,
         idResident: ResidentId,
       });
     }
-  }
-  else {
-    await Resident.destroy({ where: { docNumber: user.document } });
-    await usersforResidents.destroy({ where: { iduser: user.iduser } });
   }
 });
 

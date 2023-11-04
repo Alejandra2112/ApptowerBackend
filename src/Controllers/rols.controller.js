@@ -27,6 +27,38 @@ const getRols = async (req, res = response) => {
   }
 };
 
+
+const getRolsOne = async (req, res = response) => {
+  try {
+    const { idrole } = req.params;
+
+    const rols = await Rols.findOne({
+      where: { idrole: idrole },
+      include: [
+        {
+          model: rolsPermissions,
+          attributes: ['idrolpermission', 'idrole', 'idpermission', 'idprivilege'],
+        },
+      ],
+    });
+
+    if (!rols) {
+      return res.status(404).json({ error: 'No se encontró un rol con ese ID' });
+    }
+
+    res.json({
+      rols,
+    });
+  } catch (error) {
+    console.error('Error al obtener usuario:', error);
+    res.status(500).json({
+      error: 'Error al obtener usuario',
+    });
+  }
+};
+
+
+
 const postRols = async (req, res) => {
   let message = '';
   const { namerole, description, permissions, privileges } = req.body;
@@ -151,5 +183,6 @@ module.exports = {
   getRols,
   postRols,
   putRols,
-  deleteRols
+  deleteRols,
+  getRolsOne
 };

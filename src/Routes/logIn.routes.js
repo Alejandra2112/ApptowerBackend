@@ -11,7 +11,7 @@ route.get('/access', verifityToken, (req, res) => {
   const rol = user.rol;
   let message = '';
 
-  if (rol == 1) {
+  if (rol == 1 || rol == 4) {
     message = 'Es Administrador';
   } else if (rol == 2) {
     message = 'Es residente';

@@ -1,4 +1,6 @@
 const { validationResult, check } = require('express-validator');
+const Rols = require('../Models/rols.model');
+const User = require('../Models/users.model');
 
 const validateUser = [
   check('documentType')
@@ -8,7 +10,16 @@ const validateUser = [
   check('document')
     .isString()
     .isLength({ min: 8, max: 10 })
-    .withMessage('El campo "document" debe ser una cadena de 8 a 10 caracteres'),
+    .withMessage('El campo "document" debe ser una cadena de 8 a 10 caracteres')
+    .custom(async (value) => {
+      const existingDocument = await User.findOne({ where: { document: value } });
+
+      if (existingDocument) {
+        throw new Error('El documento ya se encuentra asignado a un usuario');
+      }
+      return true;
+    }),
+
 
   check('name')
     .isString()
@@ -19,14 +30,18 @@ const validateUser = [
     .withMessage('El campo "lastname" debe ser una cadena'),
 
   check('idrole')
-    .custom((value, { req }) => {
+    .custom(async (value) => {
       if (typeof value === 'undefined') {
         req.body.idrole = 2;
         return true;
       }
-      return value === 1 || value === 2 || value === 3;
-    })
-    .withMessage('El campo "idrole" debe ser 1"Administrador", 2"Residente" o 3"Vigilante"'),
+      const existingRol = await Rols.findOne({ where: { idrole: value } });
+
+      if (!existingRol) {
+        throw new Error('No existe el rol');
+      }
+    }),
+
 
   check('email')
     .isEmail()
@@ -45,10 +60,10 @@ const validateUser = [
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors });
+      return res.status(400).json({ errors: errors.array() });
     }
     next();
   },
 ];
 
-module.exports = { validateUser };
+module.exports = validateUser;
