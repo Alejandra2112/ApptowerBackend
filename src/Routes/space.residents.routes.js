@@ -1,10 +1,14 @@
-const {Router} = require ('express')
+const { Router } = require('express')
 const route = Router()
-const {getSpaceResidents, postSpaceResident, putSpaceResident, deleteSpaceResident } = require ('../Controllers/space.residents.controller')
+const { getOneSpaceResidents, getAllSpaceResidents, postSpaceResident, putSpaceResident, deleteSpaceResident } = require('../Controllers/space.residents.controller')
+const validation = require('../Middlewares/validation.middleware')
+const { createSpaceResidentValidation, updateSpaceResidentValidation } = require('../Middlewares/space.residents.middleware')
 
-route.get('/', getSpaceResidents)
-route.post('/', postSpaceResident)
-route.put('/', putSpaceResident)
-// route.delete('/', deleteSpaceResident)
+
+route.get('/:idSpace', getOneSpaceResidents)
+route.get('/', getAllSpaceResidents)
+route.post('/', createSpaceResidentValidation, validation, postSpaceResident)
+route.put('/', updateSpaceResidentValidation, validation,putSpaceResident)
+route.delete('/', deleteSpaceResident)
 
 module.exports = route  

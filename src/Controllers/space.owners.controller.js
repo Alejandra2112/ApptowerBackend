@@ -3,7 +3,7 @@ const SpaceOwnerModel = require('../Models/space.owners.model');
 const OwnersModel = require('../Models/owners.model');
 const SpaceModel = require('../Models/spaces.model');
 
-const getSpaceOwners = async (req, res = response) => {
+const getOneSpaceOwners = async (req, res = response) => {
     try {
         const { idSpace } = req.params;
 
@@ -181,7 +181,7 @@ const deleteSpaceOwner = async (req, res) => {
 
 module.exports = {
     getAllSpaceOwners,
-    getSpaceOwners,
+    getOneSpaceOwners,
     postSpaceOwner,
     putSpaceOwner,
     deleteSpaceOwner,

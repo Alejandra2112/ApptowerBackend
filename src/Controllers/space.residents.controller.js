@@ -3,8 +3,43 @@ const ResidentsModel = require('../Models/resident.model');
 const SpaceResidentModel = require('../Models/space.residents.model');
 const SpaceModel = require('../Models/spaces.model');
 
+const getOneSpaceResidents = async (req, res = response) => {
+    try {
+        const { idSpace } = req.params;
 
-const getSpaceResidents = async (req, res) => {
+        const spaceResidents = await SpaceResidentModel.findAll({
+            where: { idSpace: idSpace }
+        });
+        const residents = await ResidentsModel.findAll({
+            attributes: ['idResident', 'residentType', 'docNumber', 'name', 'lastName', 'email', 'phoneNumber' ],
+        });
+
+        const data = spaceResidents.map(sp => {
+            const resident = residents.find(re => re.idResident === sp.idResident);
+
+            return {
+                ...sp.dataValues,
+                resident 
+            }
+        });
+
+        if (!data || data.length === 0) {
+            return res.status(404).json({ error: 'Id space not found.' });
+        }
+
+        res.json({
+            spaceResidents: data,
+        });
+    } catch (error) {
+        console.error('Error to get space residents.', error);
+        res.status(500).json({
+            error: 'Error to get space residents.',
+        });
+    }
+};
+
+
+const getAllSpaceResidents = async (req, res) => {
 
     try {
   
@@ -26,7 +61,7 @@ const getSpaceResidents = async (req, res) => {
         const resident = residents.find(re => re.idResident === re.idResident);
     
         return {
-           ...so.dataValues,
+           ...sr.dataValues,
            space,
            resident
         }
@@ -59,8 +94,8 @@ const postSpaceResident = async (req, res) => {
     
     try {
 
-        await ResidentsModel.create(body);
-        message = 'Resident created';
+        await SpaceResidentModel.create(body);
+        message = 'Add resident to space.';
 
     } catch (e) {
 
@@ -142,7 +177,8 @@ const deleteSpaceResident = async (req, res) => {
 
 
 module.exports = {
-    getSpaceResidents,
+    getOneSpaceResidents,
+    getAllSpaceResidents,
     postSpaceResident,
     putSpaceResident,
     deleteSpaceResident,

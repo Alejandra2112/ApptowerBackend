@@ -1,7 +1,33 @@
 const { response } = require('express');
 const ResidentModel = require('../Models/resident.model');
 
-const getResidents = async (req, res = response) => {
+const getOneResidents = async (req, res = response) => {
+    try {
+
+        const { idResident } = req.params;
+
+        const resident = await ResidentModel.findOne({ where: { idResident: idResident } });
+
+        if (!resident) {
+            return res.status(404).json({ error: 'Id resident not found.' });
+        }
+
+        res.json({
+            resident,
+        });
+
+    } catch (error) {
+
+        console.error('Error to get space.', error);
+        res.status(500).json({
+
+            error: 'Error to get space.',
+
+        });
+    }
+};
+
+const getAllResidents = async (req, res = response) => {
     try {
 
         const residents = await ResidentModel.findAll();
@@ -121,7 +147,8 @@ const deleteResident = async (req, res) => {
 
 
 module.exports = {
-    getResidents,
+    getOneResidents,
+    getAllResidents,
     postResident,
     putResident,
     deleteResident,
