@@ -8,7 +8,7 @@ const { createSpaceResidentValidation, updateSpaceResidentValidation } = require
 route.get('/:idSpace', getOneSpaceResidents)
 route.get('/', getAllSpaceResidents)
 route.post('/', createSpaceResidentValidation, validation, postSpaceResident)
-route.put('/', updateSpaceResidentValidation, validation,putSpaceResident)
+route.put('/', updateSpaceResidentValidation, validation, putSpaceResident)
 route.delete('/', deleteSpaceResident)
 
 module.exports = route  

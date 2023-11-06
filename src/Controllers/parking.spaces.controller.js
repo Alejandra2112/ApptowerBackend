@@ -1,7 +1,30 @@
 const { response } = require('express');
 const ParkingSpacesModel = require('../Models/parking.spaces.model');
 
-const getParkingSpace = async (req, res = response) => {
+const getOneParkingSpace = async (req, res = response) => {
+    try {
+      const { idParkingSpace } = req.params;
+
+      console.log(idParkingSpace)
+  
+      const parkinSpace = await ParkingSpacesModel.findOne({ where: { idParkingSpace: idParkingSpace } });
+  
+      if (!parkinSpace) {
+        return res.status(404).json({ error: 'Id parking space not found.' });
+      }
+  
+      res.json({
+        parkinSpace,
+      });
+    } catch (error) {
+      console.error('Error to get parking space.', error);
+      res.status(500).json({
+        error: 'Error to get parking space.',
+      });
+    }
+  };
+
+const getAllParkingSpace = async (req, res = response) => {
 
     try {
 
@@ -120,7 +143,8 @@ const putParkingSpace = async (req, res = response) => {
 
 
 module.exports = {
-    getParkingSpace,
+    getOneParkingSpace,
+    getAllParkingSpace,
     postParkingSpace,
     putParkingSpace,
     // deleteParkingSpace,
