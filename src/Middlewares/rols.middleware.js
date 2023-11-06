@@ -5,6 +5,14 @@ const validateRols = [
     .isString()
     .withMessage('El campo "namerole" debe ser una cadena'),
 
+  check('permissions')
+    .isArray({ min: 1 })
+    .withMessage('Debes proporcionar al menos un permiso'),
+
+  check('privileges')
+    .isArray({ min: 1 })
+    .withMessage('Debes proporcionar al menos un privilegio'),
+
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

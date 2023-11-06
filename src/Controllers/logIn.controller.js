@@ -28,10 +28,11 @@ const logIn = async (req, res) => {
       return res.status(500).json({ message: 'Ocurrió un error' });
     }
     const userRoleId = user.idrole;
+    console.log("idrole", userRoleId);
 
     const tokenPayload = {
       iduser: user.iduser,
-      rol: userRoleId,
+      idrole: userRoleId,
     };
 
     const token = jwt.sign(tokenPayload, process.env.MISECRETKEY, {

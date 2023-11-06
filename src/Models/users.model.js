@@ -20,9 +20,12 @@ const User = sequelizeUser.define('users', {
   document: {
     type: DataTypes.STRING,
     field: 'document',
-    unique: true,
+    unique: {
+      msg: 'El documento ya se encuentra asignado a un usuario'
+    },
     allowNull: true,
   },
+
   name: {
     type: DataTypes.STRING,
     field: 'name',
@@ -47,9 +50,6 @@ const User = sequelizeUser.define('users', {
   password: {
     type: DataTypes.STRING,
     field: 'password',
-    // validate: {
-    //   len: [8, 12], 
-    // },
 
   },
   state: {
@@ -58,7 +58,7 @@ const User = sequelizeUser.define('users', {
     validate: {
       isIn: [['Activo', 'Inactivo']],
     },
-    defaultValue: 'Inactivo',
+    defaultValue: 'Activo',
   },
 });
 

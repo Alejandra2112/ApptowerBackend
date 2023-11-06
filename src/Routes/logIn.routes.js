@@ -8,15 +8,18 @@ route.post('/', logIn);
 
 route.get('/access', verifityToken, (req, res) => {
   const user = req.user;
-  const rol = user.rol;
+  const rol = user.idrole;
   let message = '';
 
-  if (rol == 1 || rol == 4) {
-    message = 'Es Administrador';
+  if (rol == 1) {
+    message = 'Es 1: Administrador';
   } else if (rol == 2) {
-    message = 'Es residente';
-  } else {
-    message = 'Es vigilante';
+    message = 'Es 2: residente';
+  } else if (rol == 3) {
+    message = 'Es 3: vigilante';
+  }
+  else {
+    message = '';
   }
 
   res.json({

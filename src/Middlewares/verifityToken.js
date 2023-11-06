@@ -7,14 +7,15 @@ const verificarToken = (req, res, next) => {
     return res.status(401).json({ mensaje: 'Acceso denegado' });
   }
 
+  const tokenSecret = token.split(' ')[1]
+
   try {
-    const decoded = jwt.verify(token, process.env.MISECRETKEY, { ignoreExpiration: false });
-
-    if (!decoded.idrole) {
-      return res.status(401).json({ mensaje: 'Token no válido...' });
-    }
-
+    console.log(JSON.stringify(token));
+    console.log(JSON.stringify(tokenSecret));
+    const decoded = jwt.verify(tokenSecret, process.env.MISECRETKEY, { ignoreExpiration: false });
     req.user = decoded;
+    console.log('Contenido de req.user:', req.user);
+
     next();
   } catch (error) {
     console.error('Error al verificar el token:', error);
