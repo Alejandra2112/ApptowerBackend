@@ -69,7 +69,7 @@ const postUser = async (req, res) => {
 };
 
 
-const putUser = async (req, res = response) => {
+const putUser = async (req, res) => {
   const body = req.body;
   let message = '';
 
@@ -82,8 +82,8 @@ const putUser = async (req, res = response) => {
       message = 'No se encontró un usuario con ese ID';
     } else {
       if (password) {
-        const salt = bcrypt.genSaltSync(10);
-        const hashedPassword = bcrypt.hashSync(password, salt);
+        const salt = bcryptjs.genSaltSync(10);
+        const hashedPassword = bcryptjs.hashSync(password, salt);
 
         update.password = hashedPassword;
       }

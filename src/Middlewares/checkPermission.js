@@ -1,16 +1,17 @@
 const RolsPermissions = require("../Models/rolsPermissions.model");
+const User = require("../Models/users.model");
 
-const checkPermissions = (permission, privilege) => {
+const checkPermissions = (privilege, permission) => {
     return async (req, res, next) => {
         const { idrole } = req.user;
 
-        console.log('ID del rol:', idrole);
+        console.log('Id del rol:', idrole);
         console.log('Permiso:', permission);
         console.log('Privilegio:', privilege);
 
         try {
             const havePermissions = await RolsPermissions.findOne({
-                where: { idrole, idpermission: permission, idprivilege: privilege },
+                where: { idrole, idprivilege: privilege, idpermission: permission, },
             });
 
             console.log('Resultado de la consulta a la base de datos:', havePermissions);

@@ -79,8 +79,6 @@ const postRols = async (req, res) => {
     const rols = await Rols.create({ namerole, description });
     const roleId = rols.idrole;
 
-    console.log('Created Rol:', rols);
-
     const selectedPermissions = permissions.map((permissionId) =>
       privileges.map((privilegeId) => ({
         idrole: roleId,
@@ -105,58 +103,39 @@ const postRols = async (req, res) => {
 };
 
 
-const putRols = async (req, res = response) => {
+const putRols = async (req, res) => {
+  const { idrole, permissions, privileges } = req.body;
+
   try {
-    const { idrole, permissions } = req.body;
-    let message = '';
-
-    const [updatedRows] = await Rols.update(req.body, { where: { idrole: idrole } });
-
-    if (permissions && Array.isArray(permissions)) {
-      // Obtén los permisos actuales asociados a este rol
-      const currentPermissions = await rolsPermissions.findAll({ where: { idrole: idrole } });
-      const currentPermissionIds = currentPermissions.map((p) => p.idpermission);
-
-      // Identifica los permisos a agregar y quitar
-      const permissionsToAdd = permissions.filter((idpermission) => !currentPermissionIds.includes(idpermission));
-      const permissionsToRemove = currentPermissionIds.filter((idpermission) => !permissions.includes(idpermission));
-
-      // Procesa los permisos a agregar
-      if (permissionsToAdd.length > 0) {
-        for (const idpermission of permissionsToAdd) {
-          // Aquí, debes obtener el idprivilege correspondiente de tu lógica de negocios
-          const idprivilege = obtenerIdPrivilege(idpermission); // Reemplaza 'obtenerIdPrivilege' con tu lógica real
-          if (idprivilege !== null) {
-            await rolsPermissions.create({
-              idrole: idrole,
-              idpermission: idpermission,
-              idprivilege: idprivilege,
-            });
-          }
-        }
-      }
-
-      // Procesa los permisos a quitar
-      if (permissionsToRemove.length > 0) {
-        await rolsPermissions.destroy({ where: { idrole: idrole, idpermission: permissionsToRemove } });
-      }
+    const existingRole = await Rols.findByPk(idrole);
+    if (!existingRole) {
+      return res.status(404).json({ error: 'No se encontró un rol con ese ID' });
     }
 
-    if (updatedRows > 0) {
-      message = 'Rol actualizado exitosamente.';
-    } else {
-      message = 'No se encontró un rol con ese ID';
+    await rolsPermissions.destroy({ where: { idrole } });
+
+    if (permissions && Array.isArray(permissions) && privileges && Array.isArray(privileges)) {
+
+      const permissionPrivilegeAsso = permissions.map((permissionId) =>
+
+        privileges.map((privilegeId) => ({
+          idrole,
+          idpermission: permissionId,
+          idprivilege: privilegeId,
+        }))
+      );
+      const iteratedAsso = [].concat(...permissionPrivilegeAsso);
+
+      await rolsPermissions.bulkCreate(iteratedAsso);
     }
 
-    res.json({
-      rols: message,
-    });
+    return res.json({ message: 'Rol actualizado exitosamente' });
   } catch (error) {
-    res.status(500).json({
-      error: 'Error al modificar rol: ' + error.message,
-    });
+    console.error('Error al actualizar el rol:', error);
+    res.status(500).json({ error: 'Error al actualizar el rol' });
   }
 };
+
 
 
 const deleteRols = async (req, res) => {

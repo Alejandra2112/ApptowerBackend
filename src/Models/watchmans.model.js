@@ -25,6 +25,9 @@ const Watchman = sequelize.define('watchmans', {
     type: DataTypes.STRING,
     field: 'document',
     unique: true,
+    unique: {
+      msg: 'El documento ya se encuentra asignado a un vigilante'
+    },
   },
   phone: {
     type: DataTypes.STRING,
@@ -44,6 +47,7 @@ const Watchman = sequelize.define('watchmans', {
     validate: {
       isIn: [['Activo', 'Inactivo']],
     },
+    defaultValue: 'Activo'
   },
 });
 

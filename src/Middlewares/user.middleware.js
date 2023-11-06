@@ -10,15 +10,7 @@ const validateUser = [
   check('document')
     .isString()
     .isLength({ min: 8, max: 10 })
-    .withMessage('El campo "document" debe ser una cadena de 8 a 10 caracteres')
-    .custom(async (value) => {
-      const existingDocument = await User.findOne({ where: { document: value } });
-
-      if (existingDocument) {
-        throw new Error('El documento ya se encuentra asignado a un usuario');
-      }
-      return true;
-    }),
+    .withMessage('El campo "document" debe ser una cadena de 8 a 10 caracteres'),
 
 
   check('name')
@@ -30,18 +22,18 @@ const validateUser = [
     .withMessage('El campo "lastname" debe ser una cadena'),
 
   check('idrole')
-    .custom(async (value) => {
-      if (typeof value === 'undefined') {
+    .custom(async (value, { req }) => {
+      if (typeof value === 'undefined' || value === null) {
+        value = 2;
         req.body.idrole = 2;
-        return true;
+        req.body.state = 'Inactivo';
       }
       const existingRol = await Rols.findOne({ where: { idrole: value } });
-
       if (!existingRol) {
         throw new Error('No existe el rol');
       }
+      return true;
     }),
-
 
   check('email')
     .isEmail()
