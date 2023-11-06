@@ -10,11 +10,18 @@ const validateResult = (req, res, next) => {
 };
 
 const postValidationVisitor = [
-    check('name').not().isEmpty().isString().isLength({min: 3, max: 50}),
-    check('lastname', 'Lastname is required').not().isEmpty().isString().isLength({min: 3, max: 50}),
-    check('documentType', 'Document type is required').not().isEmpty().matches(/CC|CE|TI|PA/).isLength({min: 2, max: 2}),
-    check('documentNumber', 'Document number is required').not().isEmpty().isLength({min: 7, max: 10}),
-    check('genre', 'Genre is required').not().isEmpty().matches(/M|F|O/),
+    check('name', 'Name is required or its value is invalid').not().isEmpty().isString().isLength({min: 3, max: 50}),
+    check('lastname', 'Lastname is required or its value is invalid').not().isEmpty().isString().isLength({min: 3, max: 50}),
+    check('documentType', 'Document type is required or its value is invalid').not().isEmpty().matches(/CC|CE|TI|PA/).isLength({min: 2, max: 2}),
+    check('documentNumber', 'Document number is required or its value is invalid').not().isEmpty().isLength({min: 7, max: 10}),
+    check('genre', 'Genre is required or its value is invalid').not().isEmpty().matches(/M|F|O/),
+    check('access', 'Access is required').not().isEmpty().isBoolean(),
+    (req, res, next)=>{
+        validateResult(req, res, next);
+    }
+];
+
+const putValidationVisitor = [
     check('access', 'Access is required').not().isEmpty().isBoolean(),
     (req, res, next)=>{
         validateResult(req, res, next);
@@ -23,6 +30,7 @@ const postValidationVisitor = [
 
 module.exports = {
     postValidationVisitor,
+    putValidationVisitor,
 };
 
 
