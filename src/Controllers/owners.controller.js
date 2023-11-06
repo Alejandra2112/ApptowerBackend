@@ -1,7 +1,28 @@
 const { response } = require('express');
 const OwnersModel = require('../Models/owners.model');
 
-const getOwners = async (req, res = response) => {
+const getOneOwners = async (req, res = response) => {
+    try {
+        const { idOwner } = req.params;
+
+        const owner = await OwnersModel.findOne({ where: { idOwner: idOwner } });
+
+        if (!owner) {
+            return res.status(404).json({ error: 'Id owner not found.' });
+        }
+
+        res.json({
+            owner,
+        });
+    } catch (error) {
+        console.error('Error to get owner.', error);
+        res.status(500).json({
+            error: 'Error to get owner.',
+        });
+    }
+};
+
+const getAllOwners = async (req, res = response) => {
     try {
 
         const owners = await OwnersModel.findAll();
@@ -33,7 +54,7 @@ const postOwner = async (req, res) => {
     const body = req.body;
 
     console.log(body)
-    
+
     try {
 
         await OwnersModel.create(body);
@@ -58,7 +79,7 @@ const putOwner = async (req, res = response) => {
     let message = '';
 
     try {
-        const { idOwner, ...update } = body; 
+        const { idOwner, ...update } = body;
 
         const [updatedRows] = await OwnersModel.update(update, {
             where: { idOwner: idOwner },
@@ -120,7 +141,8 @@ const putOwner = async (req, res = response) => {
 
 
 module.exports = {
-    getOwners,
+    getOneOwners,
+    getAllOwners,
     postOwner,
     putOwner,
     // deleteOwner,

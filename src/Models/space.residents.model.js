@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
 
-const SpaceResidentModel = sequelize.define('SpaceResidents', { 
+const SpaceResidentModel = sequelize.define('SpaceResidents', {
 
   idSpaceResident: {
 
@@ -23,31 +23,31 @@ const SpaceResidentModel = sequelize.define('SpaceResidents', {
 
     type: DataTypes.INTEGER,
     field: 'idResident',
-    
+
   },
 
   residentStartDate: {
 
     type: DataTypes.DATE,
     field: 'residentStartDate',
-    
+
   },
 
   residentEndDate: {
 
     type: DataTypes.DATE,
     field: 'residentEndDate',
-    
+
   },
 
   status: {
     type: DataTypes.STRING,
     field: 'status',
     validate: {
-        isIn: [['Active', 'Inactive']],
+      isIn: [['Active', 'Inactive']],
     },
     defaultValue: 'Active',
-},
+  },
 
 }, {
 

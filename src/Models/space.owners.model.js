@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
 
-const SpaceOwnerModel = sequelize.define('SpaceOwners', { 
+const SpaceOwnerModel = sequelize.define('SpaceOwners', {
 
   idSpaceOwner: {
 
@@ -23,31 +23,31 @@ const SpaceOwnerModel = sequelize.define('SpaceOwners', {
 
     type: DataTypes.INTEGER,
     field: 'idOwner',
-    
+
   },
 
   OwnershipStartDate: {
 
     type: DataTypes.DATE,
     field: 'OwnershipStartDate',
-    
+
   },
 
   OwnershipEndDate: {
 
     type: DataTypes.DATE,
     field: 'OwnershipEndDate',
-    
+
   },
 
-  OwnershipStatus: {
+  status: {
     type: DataTypes.STRING,
-    field: 'OwnershipStatus',
+    field: 'status',
     validate: {
-        isIn: [['Active', 'Inactive']],
+      isIn: [['Active', 'Inactive']],
     },
     defaultValue: 'Active',
-},
+  },
 
 }, {
 

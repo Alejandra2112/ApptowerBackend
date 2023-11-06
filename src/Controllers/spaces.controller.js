@@ -1,7 +1,28 @@
 const { response } = require('express');
 const SpacesModel = require('../Models/spaces.model');
 
-const getSpace = async (req, res = response) => {
+const getOneSpace = async (req, res = response) => {
+    try {
+      const { idSpace } = req.params;
+  
+      const space = await SpacesModel.findOne({ where: { idSpace: idSpace } });
+  
+      if (!space) {
+        return res.status(404).json({ error: 'Id space not found.' });
+      }
+  
+      res.json({
+        space,
+      });
+    } catch (error) {
+      console.error('Error to get space.', error);
+      res.status(500).json({
+        error: 'Error to get space.',
+      });
+    }
+  };
+
+const getAllSpaces = async (req, res = response) => {
 
     try {
 
@@ -109,7 +130,8 @@ const putSpace = async (req, res = response) => {
 
 
 module.exports = {
-    getSpace,
+    getOneSpace,
+    getAllSpaces,
     postSpace,
     putSpace,
     // deleteSpace,
