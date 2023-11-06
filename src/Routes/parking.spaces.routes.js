@@ -4,7 +4,7 @@ const { getOneParkingSpace, getAllParkingSpace, postParkingSpace, putParkingSpac
 const { createParkinValidation, updateParkinValidation } = require('../Middlewares/parking.spaces.middleware')
 const validation = require('../Middlewares/validation.middleware')
 
-route.get('/:idParkingSpaces', getOneParkingSpace)
+route.get('/:idParkingSpace', getOneParkingSpace)
 route.get('/', getAllParkingSpace)
 route.post('/', createParkinValidation, validation, postParkingSpace)
 route.put('/', updateParkinValidation, validation, putParkingSpace)

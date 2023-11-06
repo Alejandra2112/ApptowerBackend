@@ -4,8 +4,6 @@ const ParkingSpacesModel = require('../Models/parking.spaces.model');
 const getOneParkingSpace = async (req, res = response) => {
     try {
       const { idParkingSpace } = req.params;
-
-      console.log(idParkingSpace)
   
       const parkinSpace = await ParkingSpacesModel.findOne({ where: { idParkingSpace: idParkingSpace } });
   
@@ -84,6 +82,8 @@ const putParkingSpace = async (req, res = response) => {
 
     try {
         const { idParkingSpace, ...update } = body;
+
+        //Can not update parkingName
 
         const [updatedRows] = await ParkingSpacesModel.update(update, {
             where: { idParkingSpace: idParkingSpace },
