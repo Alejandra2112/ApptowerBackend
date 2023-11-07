@@ -1,7 +1,7 @@
 const { response } = require('express');
 const OwnersModel = require('../Models/owners.model');
 
-const getOneOwners = async (req, res = response) => {
+const getOneOwner = async (req, res = response) => {
     try {
         const { idOwner } = req.params;
 
@@ -141,7 +141,7 @@ const putOwner = async (req, res = response) => {
 
 
 module.exports = {
-    getOneOwners,
+    getOneOwner,
     getAllOwners,
     postOwner,
     putOwner,
