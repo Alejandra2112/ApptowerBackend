@@ -1,9 +1,9 @@
-const Fine = require('../Models/fines.model');
+const Fines = require('../Models/fines.model');
 const { response } = require('express');
 
 const getFines = async (req, res = response) => {
     try {
-        const fines = await Fine.findAll();
+        const fines = await Fines.findAll();
 
         console.log('impuestos obtenidos correctamente:', fines);
 
@@ -24,7 +24,7 @@ const postFines = async (req, res) => {
     let message = '';
     const body = req.body;
     try {
-        await Fine.create(body);
+        await Fines.create(body);
         message = 'Impuesto Registrado Exitosamente';
     } catch (e) {
         message = e.message;
@@ -39,10 +39,10 @@ const putFines = async (req, res = response) => {
     let message = '';
 
     try {
-        const { idTax, ...update } = body;
+        const { idfines, ...update } = body;
 
         const [updatedRows] = await Fines.update(update, {
-            where: { idTax: idTax },
+            where: { idfines: idfines },
         });
 
         if (updatedRows > 0) {
@@ -54,37 +54,13 @@ const putFines = async (req, res = response) => {
         message = 'Error al modificar impuesto: ' + error.message;
     }
     res.json({
-        Finess: message,
+        fines: message,
     });
 };
 
-const deleteFines = async (req, res = response) => {
-    const body = req.body;
-    let message = '';
-
-    try {
-        const { idTax } = body;
-
-        const deleted = await Fines.destroy({
-            where: { idTax: idTax },
-        });
-
-        if (deleted) {
-            message = 'Impuesto eliminado exitosamente.';
-        } else {
-            message = 'No se encontró un impuesto con ese ID';
-        }
-    } catch (error) {
-        message = 'Error al eliminar impuesto: ' + error.message;
-    }
-    res.json({
-        Finess: message,
-    });
-};
 
 module.exports = {
     getFines,
     postFines,
     putFines,
-    deleteFines,
 };
