@@ -45,9 +45,6 @@ const validateUser = [
     .optional()
     .withMessage('El campo "phone" debe ser una cadena de 10 caracteres'),
 
-  check('password')
-    .isLength({ min: 8, max: 12 })
-    .withMessage('El campo "password" debe tener entre 8 y 12 caracteres'),
 
   (req, res, next) => {
     const errors = validationResult(req);
