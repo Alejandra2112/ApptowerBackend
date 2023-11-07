@@ -38,7 +38,7 @@ const validateRols = [
           const privilege = await Privilege.findByPk(privilegeId);
           return privilege !== null;
         })
-      );
+      )
 
       if (validPermissions.includes(false) || validPrivileges.includes(false)) {
         return res.status(400).json({
