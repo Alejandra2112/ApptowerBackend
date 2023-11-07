@@ -138,30 +138,29 @@ const putRols = async (req, res) => {
 
 
 
-const deleteRols = async (req, res) => {
-  const { idrole } = req.body;
-  let message = '';
-  try {
-    const rowsDeleted = await Rols.destroy({ where: { idrole: idrole } });
+// const deleteRols = async (req, res) => {
+//   const { idrole } = req.body;
+//   let message = '';
+//   try {
+//     const rowsDeleted = await Rols.destroy({ where: { idrole: idrole } });
 
-    if (rowsDeleted > 0) {
-      message = 'Rol eliminado exitosamente';
-    } else {
-      res.status(404).json({ error: 'No se encontró un rol con ese ID' });
-    }
-  } catch (e) {
-    res.status(500).json({ error: 'Error al eliminar rol', message: e.message });
-  }
-  res.json({
-    rols: message,
-  });
-};
+//     if (rowsDeleted > 0) {
+//       message = 'Rol eliminado exitosamente';
+//     } else {
+//       res.status(404).json({ error: 'No se encontró un rol con ese ID' });
+//     }
+//   } catch (e) {
+//     res.status(500).json({ error: 'Error al eliminar rol', message: e.message });
+//   }
+//   res.json({
+//     rols: message,
+//   });
+// };
 
 
 module.exports = {
   getRols,
   postRols,
   putRols,
-  deleteRols,
   getRolsOne
 };

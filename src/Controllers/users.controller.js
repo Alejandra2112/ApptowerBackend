@@ -104,30 +104,29 @@ const putUser = async (req, res) => {
 
 
 
-const deleteUser = async (req, res) => {
-  const { iduser } = req.body;
-  let message = '';
-  try {
-    const rowsDeleted = await User.destroy({ where: { iduser: iduser } });
+// const deleteUser = async (req, res) => {
+//   const { iduser } = req.body;
+//   let message = '';
+//   try {
+//     const rowsDeleted = await User.destroy({ where: { iduser: iduser } });
 
-    if (rowsDeleted > 0) {
-      message = 'Usuario eliminado exitosamente';
-    } else {
-      res.status(404).json({ error: 'No se encontró un usuario con ese ID' });
-    }
-  } catch (e) {
-    res.status(500).json({ error: 'Error al eliminar usuario', message: e.message });
-  }
-  res.json({
-    user: message,
-  });
-};
+//     if (rowsDeleted > 0) {
+//       message = 'Usuario eliminado exitosamente';
+//     } else {
+//       res.status(404).json({ error: 'No se encontró un usuario con ese ID' });
+//     }
+//   } catch (e) {
+//     res.status(500).json({ error: 'Error al eliminar usuario', message: e.message });
+//   }
+//   res.json({
+//     user: message,
+//   });
+// };
 
 
 module.exports = {
   getUser,
   postUser,
   putUser,
-  deleteUser,
   getUserOne
 };
