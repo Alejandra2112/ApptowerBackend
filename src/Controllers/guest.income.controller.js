@@ -37,11 +37,13 @@ const postGuestIncome = async (req, res) => {
 const putGuestIncome = async (req, res = response) => {
     const body = req.body;
     let message = '';
-
+ 
     try {
-        const { idGuest_income, ...update } = body;
+        const { idGuest_income, departureDate } = body;
 
-        const [updatedRows] = await GuestIncome.update(update, {
+        const [updatedRows] = await GuestIncome.update({
+            departureDate: departureDate,
+        }, {
             where: { idGuest_income: idGuest_income },
         });
 
@@ -58,29 +60,10 @@ const putGuestIncome = async (req, res = response) => {
     });
 };
 
-const deleteGuestIncome = async (req, res = response) => {
-    let message = '';
-    const { idGuest_income } = req.body;
 
-    try {
-        const rowCount = await GuestIncome.destroy({
-            where: { idGuest_income: idGuest_income },
-        });
-        message =
-            rowCount > 0
-                ? 'Ingreso eliminado exitosamente.'
-                : 'No se encontró un ingreso con ese ID';
-    } catch (error) {
-        message = 'Error al eliminar ingreso: ' + error.message;
-    }
-    res.json({
-        guestIncome: message,
-    });
-};
 
 module.exports = {
     getGuestIncome,
     postGuestIncome,
     putGuestIncome,
-    deleteGuestIncome,
 };

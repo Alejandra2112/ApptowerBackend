@@ -39,9 +39,13 @@ const putFines = async (req, res = response) => {
     let message = '';
 
     try {
-        const { idfines, ...update } = body;
+        const { idfines, state, paymentproof } = body;
 
-        const [updatedRows] = await Fines.update(update, {
+        const [updatedRows] = await Fines.update({
+            state: state,
+            paymentproof: paymentproof
+        
+        }, {
             where: { idfines: idfines },
         });
 
