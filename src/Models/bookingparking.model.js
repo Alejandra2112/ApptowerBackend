@@ -28,7 +28,7 @@ const Bookingparking = sequelize.define('bookingparking', {
 
   idVisitor: {
     type: DataTypes.INTEGER,
-    field: 'idvisitor',
+    field: 'idVisitor',
   },
   idvehicle: {
     type: DataTypes.INTEGER,
@@ -58,7 +58,7 @@ Bookingparking.belongsTo(Vehicle, {
   targetKey: 'idvehicle',
 });
 Bookingparking.belongsTo(Visitors, {
-  foreignKey: 'idvisitor',
-  targetKey: 'idvisitor',
+  foreignKey: 'idVisitor',
+  targetKey: 'idVisitor',
 });
 module.exports = Bookingparking;
