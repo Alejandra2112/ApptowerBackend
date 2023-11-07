@@ -5,17 +5,17 @@ const getFines = async (req, res = response) => {
     try {
         const fines = await Fines.findAll();
 
-        console.log('impuestos obtenidos correctamente:', fines);
+        console.log('Multas obtenidas correctamente:', fines);
 
         res.json({
             fines,
         });
     } catch (error) {
 
-        console.error('Error al obtener impuestos:', error);
+        console.error('Error al obtener multas:', error);
 
         res.status(500).json({
-            error: 'Error al obtener impuestos',
+            error: 'Error al obtener multas',
         });
     }
 };
@@ -25,7 +25,7 @@ const postFines = async (req, res) => {
     const body = req.body;
     try {
         await Fines.create(body);
-        message = 'Impuesto Registrado Exitosamente';
+        message = 'Multa Registrada Exitosamente';
     } catch (e) {
         message = e.message;
     }
@@ -46,12 +46,12 @@ const putFines = async (req, res = response) => {
         });
 
         if (updatedRows > 0) {
-            message = 'Impuesto modificado exitosamente.';
+            message = 'Multa modificada exitosamente.';
         } else {
-            message = 'No se encontró un impuesto con ese ID';
+            message = 'No se encontró una multa con ese ID';
         }
     } catch (error) {
-        message = 'Error al modificar impuesto: ' + error.message;
+        message = 'Error al modificar multa: ' + error.message;
     }
     res.json({
         fines: message,
