@@ -37,14 +37,24 @@ const updateParkinValidation = [
         .trim()
         .matches(/^[a-zA-Z0-9\s]+$/)
         .withMessage('Parking space name must contain only letters and numbers.')
-        .custom(async (value) => {
+        .custom(async (value, { req }) => {
+            const body = req.body;
+            const { parkingName } = body;
+
             const existingParking = await ParkingSpacesModel.findOne({ where: { parkingName: value } });
 
-            if (existingParking) {
-                throw new Error('Parking space name is already in use');
+
+            if (value === parkingName) {
+                return true;
+            } else {
+
+                if (existingParking) {
+                    throw new Error('Parking space name is already in use');
+                }
+                return true;
+
             }
 
-            return true;
         }),
     check('parkingType')
         .optional()

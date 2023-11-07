@@ -5,8 +5,8 @@ const validations = require ('../Middlewares/visitors.middleware')
 
 route.get('/', getVisitors)
 route.post('/', validations.postValidationVisitor ,postVisitors)
-route.put('/', putVisitors)
-route.delete('/', deleteVisitors)
+route.put('/', validations.putValidationVisitor , putVisitors)
+// route.delete('/', deleteVisitors)
 
 
 
