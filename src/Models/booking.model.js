@@ -11,9 +11,9 @@ const Booking = sequelize.define('booking', {
     autoIncrement: true,
     field: 'idbooking', 
   },
-  idSpaceResident: {
+  idSpace: {
     type: DataTypes.INTEGER,
-    field: 'idSpaceResident',
+    field: 'idSpace',
   },
   idResident: {
       type: DataTypes.INTEGER,

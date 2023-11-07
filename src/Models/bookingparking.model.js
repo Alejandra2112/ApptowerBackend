@@ -4,7 +4,6 @@ const User = require('./users.model');
 const Booking = require('./booking.model');
 const Parking = require('./parking.spaces.model');
 const Vehicle = require('./vehicle.model');
-const ParkingSpacesModel = require('./parking.spaces.model');
 const Visitors = require('./visitors.model');
 
 const Bookingparking = sequelize.define('bookingparking', {
@@ -49,7 +48,7 @@ Bookingparking.belongsTo(Booking, {
   foreignKey: 'idbooking',
   targetKey: 'idbooking',
 });
-Bookingparking.belongsTo(ParkingSpacesModel, {
+Bookingparking.belongsTo(Parking, {
   foreignKey: 'idParkingSpace',
   targetKey: 'idParkingSpace',
 });
