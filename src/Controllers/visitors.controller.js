@@ -39,9 +39,9 @@ const putVisitors = async (req, res = response) => {
     let message = '';
 
     try {
-        const { idVisitor, ...update } = body;
+        const { idVisitor, access } = body;
 
-        const [updatedRows] = await Visitors.update(update, {
+        const [updatedRows] = await Visitors.update({ access:access}, {
             where: { idVisitor: idVisitor },
         });
 
@@ -58,33 +58,10 @@ const putVisitors = async (req, res = response) => {
     });
 };
 
-const deleteVisitors = async (req, res = response) => {
-    const body = req.body;
-    let message = '';
 
-    try {
-        const { idVisitor } = body;
-
-        const destroy = await Visitors.destroy({
-            where: { idVisitor: idVisitor },
-        });
-
-        if (destroy) {
-            message = 'Visitante eliminado exitosamente.';
-        } else {
-            message = 'No se encontró un visitante con ese ID';
-        }
-    } catch (error) {
-        message = 'Error al eliminar visitante: ' + error.message;
-    }
-    res.json({
-        visitors: message,
-    });
-};
 
 module.exports={
     getVisitors,
     postVisitors,
     putVisitors,
-    deleteVisitors,
 }
