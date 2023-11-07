@@ -1,8 +1,8 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../Database/config'); 
-const Users = require('./users.model');
-const Residents = require('./resident.model');
 
+const Residents = require('./resident.model');
+const Space = require('./spaces.model');
 
 const Booking = sequelize.define('booking', {
   idbooking: {
@@ -11,9 +11,9 @@ const Booking = sequelize.define('booking', {
     autoIncrement: true,
     field: 'idbooking', 
   },
-  iduser: {
+  idSpaceResident: {
     type: DataTypes.INTEGER,
-    field: 'iduser',
+    field: 'idSpaceResident',
   },
   idResident: {
       type: DataTypes.INTEGER,
@@ -31,10 +31,10 @@ const Booking = sequelize.define('booking', {
 {
   timestamps: false, 
 });
-Booking.belongsTo(Users, { 
-  foreignKey: 'iduser', 
-  targetKey: 'iduser',
-}); 
+Booking.belongsTo(Space, {
+  foreignKey: 'idSpace', 
+  targetKey: 'idSpace', 
+});
 Booking.belongsTo(Residents, {
   foreignKey: 'idResident', 
   targetKey: 'idResident', 

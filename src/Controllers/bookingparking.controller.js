@@ -1,13 +1,12 @@
-const { response } = require('express');
+const {response} = require('express');
+const Bookingparking = require('../Models/bookingparking.model');
 
-const Booking = require('../Models/booking.model');
-
-const getBooking = async (req, res = response) => {
+const getBookingparking = async (req, res = response) => {
     try {
-        const booking = await Booking.findAll();
+        const bookingparking = await Bookingparking.findAll();
 
         res.json({
-            booking,
+            bookingparking,
         });
     } catch (error) {
         res.status(500).json({
@@ -15,28 +14,30 @@ const getBooking = async (req, res = response) => {
         });
     }
 }
-const postBooking = async (req, res) => {
+
+const postBookingparking = async (req, res) => {
     let message = '';
     const body = req.body;
     try {
-        await Booking.create(body);
+        await Bookingparking.create(body);
         message = 'Reserva Registrada Exitosamente';        
     } catch (error) {
         message = error.message;
     }
     res.json({
-        booking: message,
+        bookingparking: message,
     });
 }
-const putBooking = async (req, res = response) => {
+
+const putBookingparking = async (req, res = response) => {
     const body = req.body;
     let message = '';
 
     try {
-        const { idbooking, Updating } = body;
+        const { idbookingparking, Updating } = body;
 
-        const [updatedRows] = await Booking.update(Updating, {
-            where: { idbooking: idbooking },
+        const [updatedRows] = await Bookingparking.update(Updating, {
+            where: { idbookingparking: idbookingparking },
         });
 
         if (updatedRows > 0) {
@@ -48,11 +49,12 @@ const putBooking = async (req, res = response) => {
         message = 'Error al modificar reserva: ' + error.message;
     }
     res.json({
-        booking: message,
+        bookingparking: message,
     });
 }
+
 module.exports = {
-    getBooking,
-    postBooking,
-    putBooking,
+    getBookingparking,
+    postBookingparking,
+    putBookingparking,
 }

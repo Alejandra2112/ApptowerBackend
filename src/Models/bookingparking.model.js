@@ -1,60 +1,64 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = require('../Database/config'); 
+const sequelize = require('../Database/config');
 const User = require('./users.model');
 const Booking = require('./booking.model');
 const Parking = require('./parking.spaces.model');
 const Vehicle = require('./vehicle.model');
+const ParkingSpacesModel = require('./parking.spaces.model');
+const Visitors = require('./visitors.model');
 
-const Bookingparking = sequelize.define('reservasparqueadero', {
+const Bookingparking = sequelize.define('bookingparking', {
 
-    idbookingparking: {
+  idbookingparking: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
-    field: 'idbookingoparking', 
-    },
-
-    idbooking: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-    field: 'idbooking', 
-    },
-
-    iduser: {
-      type: DataTypes.INTEGER,
-      field: 'iduser',
-    },
-
-    idParkingSpace: {
-        type: DataTypes.INTEGER,
-        field: 'idParkingSpace',
-    },
-
-    idvehicle: {
-        type: DataTypes.INTEGER,
-        field: 'idvehicle',
-    },
+    field: 'idbookingparking',
   },
+
+  idbooking: {
+    type: DataTypes.INTEGER,
+    field: 'idbooking',
+  },
+
+  idParkingSpace: {
+    type: DataTypes.INTEGER,
+    field: 'idParkingSpace',
+  },
+
+  idVisitor: {
+    type: DataTypes.INTEGER,
+    field: 'idvisitor',
+  },
+  idvehicle: {
+    type: DataTypes.INTEGER,
+    field: 'idvehicle',
+  },
+
+  plate: {
+    type: DataTypes.STRING,
+    field: 'plate',
+  },
+},
   {
     timestamps: false,
-}
+  }
 );
 
-Bookingparking.belongsTo(User, {
-  foreignKey: 'iduser',
-  targetKey: 'iduser',
-}); 
-Bookingparking.belongsTo(Booking,{
+Bookingparking.belongsTo(Booking, {
   foreignKey: 'idbooking',
   targetKey: 'idbooking',
 });
-Bookingparking.belongsTo(Parking,{
-foreignKey: 'idparking',
-targetKey: 'idparking',
+Bookingparking.belongsTo(ParkingSpacesModel, {
+  foreignKey: 'idParkingSpace',
+  targetKey: 'idParkingSpace',
 });
-Bookingparking.belongsTo(Vehicle,{
-foreignKey: 'idvehicle',
-targetKey: 'idvehicle',
+Bookingparking.belongsTo(Vehicle, {
+  foreignKey: 'idvehicle',
+  targetKey: 'idvehicle',
+});
+Bookingparking.belongsTo(Visitors, {
+  foreignKey: 'idvisitor',
+  targetKey: 'idvisitor',
 });
 module.exports = Bookingparking;

@@ -37,6 +37,7 @@ class Server {
     this.SpaceResidentsPath = '/api/spaceResidents';
 
     this.bookingPath = '/api/booking';
+    this.bookingParkingPath = '/api/bookingParking';
     this.vehiclePath = '/api/vehicle';
     this.notificationPath = '/api/notification';
     this.middlewares();
@@ -68,6 +69,7 @@ class Server {
 
 
     this.app.use(this.bookingPath, require('../Routes/booking.routes'));
+    this.app.use(this.bookingParkingPath, require('../Routes/bookingparking.routes'));
     this.app.use(this.vehiclePath, require('../Routes/vehicle.routes'));
     this.app.use(this.notificationPath, require('../Routes/notification.routes'));
 
@@ -96,7 +98,7 @@ class Server {
     try {
       // await sequelize.authenticate();
       // Sincroniza los modelos con la base de datos
-      await sequelize.sync({ force: false }).then(() => {
+      await sequelize.sync({ force: true }).then(() => {
         console.log('Modelos sincronizados con la base de datos');
 
       });
