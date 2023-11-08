@@ -20,8 +20,8 @@ const postValidationGuestIncome = [
 ];
 
 const putValidationGuestIncome = [
-    check('idguest_income', 'Guest income is required or its value is invalid').not().isEmpty().isInt(),
-    check('departureDate', 'Departure date is required or its value is invalid').not().isEmpty().isDate(),
+    check('idGuest_income', 'Guest income is required or its value is invalid').not().isEmpty().isInt(),
+    check('departureDate', 'Departure date is required or its value is invalid').not().isEmpty().isISO8601(),
     ( req, res, next ) => {
         validateResult(req, res, next);
     }
