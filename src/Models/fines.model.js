@@ -33,10 +33,6 @@ const Fines = sequelize.define('fines', {
         type: DataTypes.INTEGER,
         field: 'idApartment',
     },
-    apartmentNumber: {
-        type: DataTypes.INTEGER,
-        field: 'apartment_number',
-    },
     state: {
         type: DataTypes.STRING,
         field: 'state',
