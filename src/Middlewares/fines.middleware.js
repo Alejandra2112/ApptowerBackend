@@ -9,11 +9,10 @@ const validateResult = (req, res, next) => {
 
 const postFinesValidation = [
     check('fineType', 'Fine type is required or its value is invalid').not().isEmpty().isString().isLength({min: 3, max: 50}),
-    check('incidentDate', 'Incident date is required or its value is invalid').not().isEmpty().isDate(),
-    check('paymentDate', 'Payment date is required or its value is invalid').not().isEmpty().isDate(),
+    check('incidentDate', 'Incident date is required or its value is invalid').not().isEmpty().isISO8601(),
+    check('paymentDate', 'Payment date is required or its value is invalid').not().isEmpty().isISO8601(),
     check('amount', 'Amount is required or its value is invalid').not().isEmpty().isInt(),
     check('idSpace', 'Space is required or its value is invalid').not().isEmpty().isInt(),
-    check('apartmentNumber', 'Apartment number is required or its value is invalid').not().isEmpty().isInt(),
     check('state', 'State is required or its value is invalid').not().isEmpty().isString().isLength({min: 3, max: 50}),
     check('evidenceFiles', 'Evidence files is required or its value is invalid').not().isEmpty().isString().isLength({min: 3, max: 50}),    (req, res, next)=>{
         validateResult(req, res, next);
@@ -21,8 +20,8 @@ const postFinesValidation = [
 ];
 
 const putFinesValidation = [
-    check('idfines', 'Fines is required or its value is invalid').not().isEmpty().isInt(),
-    check('paymentProof', 'Payment proof is required or its value is invalid').not().isEmpty().isString().isLength({min: 3, max: 50}),
+    check('idFines', 'Fines is required or its value is invalid').not().isEmpty().isInt(),
+    check('paymentproof', 'Payment proof is required or its value is invalid').not().isEmpty().isString().isLength({min: 3, max: 50}),
     check('state', 'State is required or its value is invalid').not().isEmpty().isString().isLength({min: 3, max: 50}),
     ( req, res, next ) => {
         validateResult(req, res, next);
