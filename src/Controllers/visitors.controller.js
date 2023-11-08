@@ -1,7 +1,7 @@
 const { response } = require('express');
 const Visitors = require('../Models/visitors.model');
 
-const getVisitors = async (req, res = response) => {
+const getVisitorsAll = async (req, res = response) => {
     try {
       const visitors = await Visitors.findAll();
 
@@ -19,6 +19,27 @@ const getVisitors = async (req, res = response) => {
       });
     }  
 };
+
+const getVisitorsOne = async (req, res = response) => {
+    try {
+        const { idVisitor } = req.params;
+
+        const visitors = await Visitors.findOne({ where: { idVisitor: idVisitor } });
+
+        if (!visitors) {
+            return res.status(404).json({ error: 'No se encontró un visitante con ese ID' });
+        }
+
+        res.json({
+            visitors,
+        });
+    } catch (error) {
+        console.error('Error al obtener visitante:', error);
+        res.status(500).json({
+            error: 'Error al obtener visitante',
+        });
+    }
+}
 
 const postVisitors = async (req, res) => {
     let message = '';
@@ -61,7 +82,8 @@ const putVisitors = async (req, res = response) => {
 
 
 module.exports={
-    getVisitors,
+    getVisitorsAll,
+    getVisitorsOne,
     postVisitors,
     putVisitors,
 }
