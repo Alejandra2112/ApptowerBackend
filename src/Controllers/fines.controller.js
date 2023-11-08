@@ -1,7 +1,7 @@
 const Fines = require('../Models/fines.model');
 const { response } = require('express');
 
-const getFines = async (req, res = response) => {
+const getFinesAll = async (req, res = response) => {
     try {
         const fines = await Fines.findAll();
 
@@ -19,6 +19,28 @@ const getFines = async (req, res = response) => {
         });
     }
 };
+
+const getFinesOne = async (req, res = response) => {
+    try {
+        const { idfines } = req.params;
+
+        const fines = await Fines.findOne({ where: { idfines: idfines } });
+
+        if (!fines) {
+            return res.status(404).json({ error: 'No se encontró una multa con ese ID' });
+        }
+
+        res.json({
+            fines,
+        });
+    } catch (error) {
+        console.error('Error al obtener multa:', error);
+        res.status(500).json({
+            error: 'Error al obtener multa',
+        });
+    }
+
+}
 
 const postFines = async (req, res) => {
     let message = '';
@@ -64,7 +86,8 @@ const putFines = async (req, res = response) => {
 
 
 module.exports = {
-    getFines,
+    getFinesAll,
+    getFinesOne,
     postFines,
     putFines,
 };

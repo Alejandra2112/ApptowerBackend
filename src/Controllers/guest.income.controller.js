@@ -1,7 +1,7 @@
 const GuestIncome = require('../Models/guest.income.model');
 const { response } = require('express');
 
-const getGuestIncome = async (req, res = response) => {
+const getGuestIncomeAll = async (req, res = response) => {
     try {
         const guestIncome = await GuestIncome.findAll();
 
@@ -19,6 +19,28 @@ const getGuestIncome = async (req, res = response) => {
         });
     }
 };
+
+const getGuestIncomeOne = async (req, res = response) => {
+    try {
+        const { idGuest_income } = req.params;
+
+        const guestIncome = await GuestIncome.findOne({ where: { idGuest_income: idGuest_income } });
+
+        if (!guestIncome) {
+            return res.status(404).json({ error: 'No se encontró un ingreso con ese ID' });
+        }
+
+        res.json({
+            guestIncome,
+        });
+    } catch (error) {
+        console.error('Error al obtener ingreso:', error);
+        res.status(500).json({
+            error: 'Error al obtener ingreso',
+        });
+    }
+
+}
 
 const postGuestIncome = async (req, res) => {
     let message = '';
@@ -63,7 +85,8 @@ const putGuestIncome = async (req, res = response) => {
 
 
 module.exports = {
-    getGuestIncome,
+    getGuestIncomeAll,
+    getGuestIncomeOne,
     postGuestIncome,
     putGuestIncome,
 };
