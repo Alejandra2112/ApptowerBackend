@@ -26,6 +26,7 @@ class Server {
     this.FinesPath = '/api/fines';
 
     // Spaces process path
+    this.ApartmentsPath = '/api/apartments';
     this.SpacesPath = '/api/spaces';
     this.ParkingSpacesPath = '/api/parkingSpaces';
     this.AssignedParkingPath = '/api/assignedParkingSpaces';
@@ -33,8 +34,8 @@ class Server {
     // Residents process path
     this.OwnersPath = '/api/owners';
     this.ResidentsPath = '/api/residents';
-    this.SpaceOwnersPath = '/api/spacesOwners';
-    this.SpaceResidentsPath = '/api/spaceResidents';
+    this.ApartmentOwnersPath = '/api/spacesOwners';
+    this.ApartmentResidentsPath = '/api/spaceResidents';
 
     this.bookingPath = '/api/booking';
     this.vehiclePath = '/api/vehicle';
@@ -73,6 +74,7 @@ class Server {
 
     // routes for spaces process
 
+    this.app.use(this.ApartmentsPath, require('../Routes/apartment.routes'))
     this.app.use(this.SpacesPath, require('../Routes/spaces.routes'))
     this.app.use(this.ParkingSpacesPath, require('../Routes/parking.spaces.routes'))
     this.app.use(this.AssignedParkingPath, require('../Routes/assigned.parking.routes'))
@@ -82,8 +84,8 @@ class Server {
 
     this.app.use(this.ResidentsPath, require('../Routes/residents.routes'))
     this.app.use(this.OwnersPath, require('../Routes/owners.routes'))
-    this.app.use(this.SpaceOwnersPath, require('../Routes/space.owner.routes'))
-    this.app.use(this.SpaceResidentsPath, require('../Routes/space.residents.routes'))
+    this.app.use(this.ApartmentOwnersPath, require('../Routes/apartment.owner.routes'))
+    this.app.use(this.ApartmentResidentsPath, require('../Routes/apartment.residents.routes'))
 
 
     this.app.use(this.VisitorsPath, require('../Routes/visitors.route'))
@@ -96,8 +98,8 @@ class Server {
     try {
       // await sequelize.authenticate();
       // Sincroniza los modelos con la base de datos
-      await sequelize.sync({ force: false }).then(() => {
-        console.log('Modelos sincronizados con la base de datos');
+      await sequelize.sync({ force: true }).then(() => {
+        console.log('Models synchronized with the database');
 
       });
 

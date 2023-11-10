@@ -2,19 +2,20 @@ const { response } = require('express');
 const AssignedParkingModel = require('../Models/assigned.parking.model');
 const ParkingSpaceModel = require('../Models/parking.spaces.model');
 const SpaceModel = require('../Models/spaces.model');
+const ApartmentModel = require('../Models/apartment.model');
 
-const getSpacesWithAssignedParking = async (req, res = response) => {
+const getApartmentWithAssignedParking = async (req, res = response) => {
     try {
-        const { idSpace } = req.params;
+        const { idApartment } = req.params;
 
-        const spaces = await AssignedParkingModel.findAll({
-            where: { idSpace: idSpace },
+        const apartment = await AssignedParkingModel.findAll({
+            where: { idApartment: idApartment },
         });
         const parkingSpaces = await ParkingSpaceModel.findAll({
             attributes: ['idParkingSpace', 'parkingName', 'parkingType', 'status'],
         });
 
-        const data = spaces.map(ap => {
+        const data = apartment.map(ap => {
             const parkingSpace = parkingSpaces.find(ps => ps.idParkingSpace === ap.idParkingSpace);
 
             return {
@@ -24,16 +25,16 @@ const getSpacesWithAssignedParking = async (req, res = response) => {
         });
 
         if (!data || data.length === 0) {
-            return res.status(404).json({ error: 'Id space not found.' });
+            return res.status(404).json({ error: 'Id apartment not found.' });
         }
 
         res.json({
-            spaces: data,
+            apartment: data,
         });
     } catch (error) {
-        console.error('Error to get spaces.', error);
+        console.error('Error to get apartment.', error);
         res.status(500).json({
-            error: 'Error to get spaces.',
+            error: 'Error to get apartment.',
         });
     }
 };
@@ -45,8 +46,8 @@ const getAllAssignedParking = async (req, res) => {
 
         const assignedParkings = await AssignedParkingModel.findAll();
 
-        const spaces = await SpaceModel.findAll({
-            attributes: ['idSpace', 'spaceType', 'spaceName', 'status']
+        const apartments = await ApartmentModel.findAll({
+            attributes: ['idApartment', 'apartmentName', 'area', 'status']
         });
 
         const parkingSpaces = await ParkingSpaceModel.findAll({
@@ -55,12 +56,12 @@ const getAllAssignedParking = async (req, res) => {
 
         const data = assignedParkings.map(ap => {
 
-            const space = spaces.find(space => space.idSpace === ap.idSpace);
+            const apartment = apartments.find(at => at.idSpace === ap.idApartment);
             const parkingSpace = parkingSpaces.find(ps => ps.idParkingSpace === ap.idParkingSpace);
 
             return {
                 ...ap.dataValues,
-                space,
+                apartment,
                 parkingSpace
             }
         })
@@ -178,7 +179,7 @@ const deleteAssignedParking = async (req, res) => {
 
 
 module.exports = {
-    getSpacesWithAssignedParking,
+    getApartmentWithAssignedParking,
     getAllAssignedParking,
     postAssignedParking,
     putAssignedParking,
