@@ -14,9 +14,14 @@ const SpacesModel = sequelize.define('Spaces', {
         type: DataTypes.STRING,
         field: 'spaceType',
         validate: {
-            isIn: [['Apartament', 'Social area', 'Wet area']],
+            isIn: [['Social area', 'Wet area']],
         },
         // allowNull: false,
+    },
+
+    image: {
+        type: DataTypes.STRING, 
+        field: 'image',
     },
 
     spaceName: {

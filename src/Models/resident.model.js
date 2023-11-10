@@ -13,6 +13,11 @@ const ResidentModel = sequelize.define('Residents', {
 
     },
 
+    pdf: {
+        type: DataTypes.STRING, 
+        field: 'pdf',
+    },
+
     docType: {
 
         type: DataTypes.STRING(5),
@@ -31,6 +36,8 @@ const ResidentModel = sequelize.define('Residents', {
         // allowNull: false
 
     },
+
+    
 
     name: {
 

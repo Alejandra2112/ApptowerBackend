@@ -11,6 +11,12 @@ const OwnersModel = sequelize.define('Owners', {
         field: 'idOwner'
 
     },
+    
+    pdf: {
+        type: DataTypes.STRING, 
+        field: 'pdf',
+    },
+
 
     docType: {
 
