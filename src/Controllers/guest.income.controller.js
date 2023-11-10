@@ -1,7 +1,7 @@
 const GuestIncome = require('../Models/guest.income.model');
 const { response } = require('express');
 
-const getGuestIncome = async (req, res = response) => {
+const getGuestIncomeAll = async (req, res = response) => {
     try {
         const guestIncome = await GuestIncome.findAll();
 
@@ -20,6 +20,28 @@ const getGuestIncome = async (req, res = response) => {
     }
 };
 
+const getGuestIncomeOne = async (req, res = response) => {
+    try {
+        const { idGuest_income } = req.params;
+
+        const guestIncome = await GuestIncome.findOne({ where: { idGuest_income: idGuest_income } });
+
+        if (!guestIncome) {
+            return res.status(404).json({ error: 'No se encontró un ingreso con ese ID' });
+        }
+
+        res.json({
+            guestIncome,
+        });
+    } catch (error) {
+        console.error('Error al obtener ingreso:', error);
+        res.status(500).json({
+            error: 'Error al obtener ingreso',
+        });
+    }
+
+}
+
 const postGuestIncome = async (req, res) => {
     let message = '';
     const body = req.body;
@@ -37,11 +59,13 @@ const postGuestIncome = async (req, res) => {
 const putGuestIncome = async (req, res = response) => {
     const body = req.body;
     let message = '';
-
+ 
     try {
-        const { idGuest_income, ...update } = body;
+        const { idGuest_income, departureDate } = body;
 
-        const [updatedRows] = await GuestIncome.update(update, {
+        const [updatedRows] = await GuestIncome.update({
+            departureDate: departureDate,
+        }, {
             where: { idGuest_income: idGuest_income },
         });
 
@@ -58,29 +82,11 @@ const putGuestIncome = async (req, res = response) => {
     });
 };
 
-const deleteGuestIncome = async (req, res = response) => {
-    let message = '';
-    const { idGuest_income } = req.body;
 
-    try {
-        const rowCount = await GuestIncome.destroy({
-            where: { idGuest_income: idGuest_income },
-        });
-        message =
-            rowCount > 0
-                ? 'Ingreso eliminado exitosamente.'
-                : 'No se encontró un ingreso con ese ID';
-    } catch (error) {
-        message = 'Error al eliminar ingreso: ' + error.message;
-    }
-    res.json({
-        guestIncome: message,
-    });
-};
 
 module.exports = {
-    getGuestIncome,
+    getGuestIncomeAll,
+    getGuestIncomeOne,
     postGuestIncome,
     putGuestIncome,
-    deleteGuestIncome,
 };

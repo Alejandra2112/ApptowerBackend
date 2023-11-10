@@ -1,36 +1,58 @@
-const Taxe = require('../Models/fines.model');
+const Fines = require('../Models/fines.model');
 const { response } = require('express');
 
-const getFines = async (req, res = response) => {
+const getFinesAll = async (req, res = response) => {
     try {
-        const taxes = await Taxe.findAll();
+        const fines = await Fines.findAll();
 
-        console.log('impuestos obtenidos correctamente:', taxes);
+        console.log('Multas obtenidas correctamente:', fines);
 
         res.json({
-            taxes,
+            fines,
         });
     } catch (error) {
 
-        console.error('Error al obtener impuestos:', error);
+        console.error('Error al obtener multas:', error);
 
         res.status(500).json({
-            error: 'Error al obtener impuestos',
+            error: 'Error al obtener multas',
         });
     }
 };
+
+const getFinesOne = async (req, res = response) => {
+    try {
+        const { idfines } = req.params;
+
+        const fines = await Fines.findOne({ where: { idfines: idfines } });
+
+        if (!fines) {
+            return res.status(404).json({ error: 'No se encontró una multa con ese ID' });
+        }
+
+        res.json({
+            fines,
+        });
+    } catch (error) {
+        console.error('Error al obtener multa:', error);
+        res.status(500).json({
+            error: 'Error al obtener multa',
+        });
+    }
+
+}
 
 const postFines = async (req, res) => {
     let message = '';
     const body = req.body;
     try {
-        await Taxe.create(body);
-        message = 'Impuesto Registrado Exitosamente';
+        await Fines.create(body);
+        message = 'Multa Registrada Exitosamente';
     } catch (e) {
         message = e.message;
     }
     res.json({
-        taxes: message,
+        fines: message,
     });
 };
 
@@ -39,52 +61,33 @@ const putFines = async (req, res = response) => {
     let message = '';
 
     try {
-        const { idTax, ...update } = body;
+        const { idfines, state, paymentproof } = body;
 
-        const [updatedRows] = await Taxe.update(update, {
-            where: { idTax: idTax },
+        const [updatedRows] = await Fines.update({
+            state: state,
+            paymentproof: paymentproof
+        
+        }, {
+            where: { idfines: idfines },
         });
 
         if (updatedRows > 0) {
-            message = 'Impuesto modificado exitosamente.';
+            message = 'Multa modificada exitosamente.';
         } else {
-            message = 'No se encontró un impuesto con ese ID';
+            message = 'No se encontró una multa con ese ID';
         }
     } catch (error) {
-        message = 'Error al modificar impuesto: ' + error.message;
+        message = 'Error al modificar multa: ' + error.message;
     }
     res.json({
-        taxes: message,
+        fines: message,
     });
 };
 
-const deleteFines = async (req, res = response) => {
-    const body = req.body;
-    let message = '';
-
-    try {
-        const { idTax } = body;
-
-        const deleted = await Taxe.destroy({
-            where: { idTax: idTax },
-        });
-
-        if (deleted) {
-            message = 'Impuesto eliminado exitosamente.';
-        } else {
-            message = 'No se encontró un impuesto con ese ID';
-        }
-    } catch (error) {
-        message = 'Error al eliminar impuesto: ' + error.message;
-    }
-    res.json({
-        taxes: message,
-    });
-};
 
 module.exports = {
-    getFines,
+    getFinesAll,
+    getFinesOne,
     postFines,
     putFines,
-    deleteFines,
 };

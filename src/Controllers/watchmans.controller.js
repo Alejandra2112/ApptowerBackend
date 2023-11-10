@@ -94,29 +94,28 @@ const putWatchman = async (req, res = response) => {
 
 
 
-const deleteWatchman = async (req, res) => {
-  const { idwatchman } = req.body;
-  let message = '';
-  try {
-    const rowsDeleted = await Watchman.destroy({ where: { idwatchman: idwatchman }, });
+// const deleteWatchman = async (req, res) => {
+//   const { idwatchman } = req.body;
+//   let message = '';
+//   try {
+//     const rowsDeleted = await Watchman.destroy({ where: { idwatchman: idwatchman }, });
 
-    if (rowsDeleted > 0) {
-      message = 'Vigilante eliminado exitosamente';
-    } else {
-      res.status(404).json({ error: 'No se encontró un vigilante con ese ID' });
-    }
-  } catch (e) {
-    res.status(500).json({ error: 'Error al eliminar vigilante', message: e.message });
-  }
-  res.json({
-    watchman: message,
-  });
-};
+//     if (rowsDeleted > 0) {
+//       message = 'Vigilante eliminado exitosamente';
+//     } else {
+//       res.status(404).json({ error: 'No se encontró un vigilante con ese ID' });
+//     }
+//   } catch (e) {
+//     res.status(500).json({ error: 'Error al eliminar vigilante', message: e.message });
+//   }
+//   res.json({
+//     watchman: message,
+//   });
+// };
 
 
 module.exports = {
   getWatchman,
   postWatchman,
   putWatchman,
-  deleteWatchman,
 };

@@ -4,10 +4,10 @@ const User = require('../Models/users.model');
 const Rols = require('../Models/rols.model');
 
 const logIn = async (req, res) => {
-  const { document, password } = req.body;
+  const { usuario, password } = req.body;
 
   try {
-    const user = await User.findOne({ where: { document } });
+    const user = await User.findOne({ where: { document: usuario } });
 
     if (!user) {
       return res.status(401).json({ message: 'Usuario no encontrado' });
