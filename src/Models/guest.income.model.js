@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
 const Visitors = require('./visitors.model');
-const SpacesModel = require('./spaces.model');
+const ApartmentModel = require('./apartment.model');
 
 
 const Guest_income = sequelize.define('guest_income', {
@@ -28,7 +28,7 @@ const Guest_income = sequelize.define('guest_income', {
     //     field: 'state',	
     //     allowNull: false,
     // },
-    observations:{
+    observations: {
         type: DataTypes.STRING,
         field: 'observations',
         defaultValue: "Without observations",
@@ -37,19 +37,20 @@ const Guest_income = sequelize.define('guest_income', {
         type: DataTypes.INTEGER,
         field: 'idvisitor',
     },
-    idSpace: {
+    idApartment: {
         type: DataTypes.INTEGER,
-        field: 'idspace',
+        field: 'idAPartment',
     }
 
 });
 
-    Guest_income.belongsTo(Visitors, {
-        foreignKey: 'idvisitor',as:'visitor'
-    });
-    Guest_income.belongsTo(SpacesModel, {
-        foreignKey: 'idspace', as:'space'
-    });
+Guest_income.belongsTo(Visitors, {
+    foreignKey: 'idvisitor', as: 'visitor'
+});
+Guest_income.belongsTo(ApartmentModel, {
+    foreignKey: 'idApartment',
+    as: 'apartment'
+});
 
 
 
