@@ -10,10 +10,10 @@ const Notification = sequelize.define('notification',
         autoIncrement: true,
         field: 'idnotification', 
     },
-    iduser: {
-        type: DataTypes.INTEGER,
-        field: 'iduser',
-    },
+    // iduser: {
+    //     type: DataTypes.INTEGER,
+    //     field: 'iduser',
+    // },
     notificationtype: {
         type: DataTypes.INTEGER,
         field: 'notificationtype',

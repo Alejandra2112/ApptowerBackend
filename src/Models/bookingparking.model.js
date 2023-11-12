@@ -15,10 +15,10 @@ const Bookingparking = sequelize.define('bookingparking', {
     field: 'idbookingparking',
   },
 
-  idbooking: {
-    type: DataTypes.INTEGER,
-    field: 'idbooking',
-  },
+  // idbooking: {
+  //   type: DataTypes.INTEGER,
+  //   field: 'idbooking',
+  // },
 
   idParkingSpace: {
     type: DataTypes.INTEGER,
@@ -34,20 +34,21 @@ const Bookingparking = sequelize.define('bookingparking', {
     field: 'idvehicle',
   },
 
-  plate: {
-    type: DataTypes.STRING,
-    field: 'plate',
-  },
+  // plate: {
+  //   type: DataTypes.STRING,
+  //   field: 'plate',
+  // },
+ 
 },
   {
     timestamps: false,
   }
 );
 
-Bookingparking.belongsTo(Booking, {
-  foreignKey: 'idbooking',
-  targetKey: 'idbooking',
-});
+// Bookingparking.belongsTo(Booking, {
+//   foreignKey: 'idbooking',
+//   targetKey: 'idbooking',
+// });
 Bookingparking.belongsTo(Parking, {
   foreignKey: 'idParkingSpace',
   targetKey: 'idParkingSpace',

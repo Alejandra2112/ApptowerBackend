@@ -1,6 +1,6 @@
 const {response} = require('express');
 const Bookingparking = require('../Models/bookingparking.model');
-
+//GET ONE X ID USER
 const getBookingparking = async (req, res = response) => {
     try {
         const bookingparking = await Bookingparking.findAll();
