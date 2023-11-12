@@ -1,11 +1,14 @@
 const permissionMap = {
-    vigilantes: 1,
-    usuarios: 2,
-    espacios: 3,
-    residentes: 4,
-    ingresos: 5,
-    visitantes: 6,
-    multas:7
+    users: 1,
+    spaces: 2,
+    watchmans: 3,
+    shifts:4,
+    residents: 5,
+    incomes: 6,
+    visitors: 7,
+    fines:8,
+    parking:9,
+    owners:10,
     //mas permisos pero hay que mirar que esten en la BD y que no la borren:v
 };
 module.exports = permissionMap;
