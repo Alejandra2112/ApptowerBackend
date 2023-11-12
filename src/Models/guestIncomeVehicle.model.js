@@ -4,15 +4,16 @@ const User = require('./users.model');
 const Booking = require('./booking.model');
 const Parking = require('./parking.spaces.model');
 const Vehicle = require('./vehicle.model');
+const GuestIncome = require('./guest.income.model');
 // const Visitors = require('./visitors.model');
 
-const Bookingparking = sequelize.define('bookingparking', {
+const GuestIncomeVehicle = sequelize.define('guestincomevehicle', {
 
-  idbookingparking: {
+  idguestincomevehicle: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
-    field: 'idbookingparking',
+    field: 'idguestincomevehicle',
   },
 
   // idbooking: {
@@ -33,12 +34,15 @@ const Bookingparking = sequelize.define('bookingparking', {
     type: DataTypes.INTEGER,
     field: 'idvehicle',
   },
-
+  idGuest_income: {
+    type: DataTypes.INTEGER,
+    field: 'idguest_income',
+},
   // plate: {
   //   type: DataTypes.STRING,
   //   field: 'plate',
   // },
- 
+ //ADICIONAR COIMENTARIO
 },
   {
     timestamps: false,
@@ -49,11 +53,15 @@ const Bookingparking = sequelize.define('bookingparking', {
 //   foreignKey: 'idbooking',
 //   targetKey: 'idbooking',
 // });
-Bookingparking.belongsTo(Parking, {
+GuestIncomeVehicle.belongsTo(GuestIncome, {
+  foreignKey: 'idGuest_income',
+  targetKey: 'idGuest_income',
+})
+GuestIncomeVehicle.belongsTo(Parking, {
   foreignKey: 'idParkingSpace',
   targetKey: 'idParkingSpace',
 });
-Bookingparking.belongsTo(Vehicle, {
+GuestIncomeVehicle.belongsTo(Vehicle, {
   foreignKey: 'idvehicle',
   targetKey: 'idvehicle',
 });
@@ -61,4 +69,4 @@ Bookingparking.belongsTo(Vehicle, {
 //   foreignKey: 'idVisitor',
 //   targetKey: 'idVisitor',
 // });
-module.exports = Bookingparking;
+module.exports = GuestIncomeVehicle;

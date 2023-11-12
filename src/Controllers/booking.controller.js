@@ -1,11 +1,7 @@
 const { response } = require('express');
 
 const Booking = require('../Models/booking.model');
-<<<<<<< HEAD
 //AÑADIR GETONE POR ID
-=======
-
->>>>>>> 3b75d39 (cambios antes del desastre)
 const getBooking = async (req, res = response) => {
     try {
         const booking = await Booking.findAll();

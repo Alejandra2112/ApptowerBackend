@@ -38,7 +38,7 @@ class Server {
     this.ApartmentResidentsPath = '/api/spaceResidents';
 
     this.bookingPath = '/api/booking';
-    this.bookingParkingPath = '/api/bookingParking';
+    this.GuestIncomeVehiclePath = '/api/guestincomevehicle';
     this.vehiclePath = '/api/vehicle';
     this.notificationPath = '/api/notification';
     this.middlewares();
@@ -70,7 +70,7 @@ class Server {
 
 
     this.app.use(this.bookingPath, require('../Routes/booking.routes'));
-    this.app.use(this.bookingParkingPath, require('../Routes/bookingparking.routes'));
+    this.app.use(this.GuestIncomeVehiclePath, require('../Routes/guestincomevehicle.routes'));
     this.app.use(this.vehiclePath, require('../Routes/vehicle.routes'));
     this.app.use(this.notificationPath, require('../Routes/notification.routes'));
 

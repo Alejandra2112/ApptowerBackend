@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../Database/config'); 
-
+const User = require('./users.model');
 
 const Notification = sequelize.define('notification', 
 {
@@ -10,10 +10,10 @@ const Notification = sequelize.define('notification',
         autoIncrement: true,
         field: 'idnotification', 
     },
-    // iduser: {
-    //     type: DataTypes.INTEGER,
-    //     field: 'iduser',
-    // },
+    iduser: {
+        type: DataTypes.INTEGER,
+        field: 'iduser',
+    },
     notificationtype: {
         type: DataTypes.INTEGER,
         field: 'notificationtype',
@@ -26,4 +26,5 @@ const Notification = sequelize.define('notification',
 {
     timestamps: false, 
 });
+Notification.belongsTo(User, {foreignKey: 'iduser', targetKey: 'iduser'});
 module.exports = Notification;
