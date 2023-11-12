@@ -4,7 +4,7 @@ const User = require('./users.model');
 const Booking = require('./booking.model');
 const Parking = require('./parking.spaces.model');
 const Vehicle = require('./vehicle.model');
-const Visitors = require('./visitors.model');
+// const Visitors = require('./visitors.model');
 
 const Bookingparking = sequelize.define('bookingparking', {
 
@@ -25,10 +25,10 @@ const Bookingparking = sequelize.define('bookingparking', {
     field: 'idParkingSpace',
   },
 
-  idVisitor: {
-    type: DataTypes.INTEGER,
-    field: 'idVisitor',
-  },
+  // idVisitor: {
+  //   type: DataTypes.INTEGER,
+  //   field: 'idVisitor',
+  // },
   idvehicle: {
     type: DataTypes.INTEGER,
     field: 'idvehicle',
@@ -57,8 +57,8 @@ Bookingparking.belongsTo(Vehicle, {
   foreignKey: 'idvehicle',
   targetKey: 'idvehicle',
 });
-Bookingparking.belongsTo(Visitors, {
-  foreignKey: 'idVisitor',
-  targetKey: 'idVisitor',
-});
+// Bookingparking.belongsTo(Visitors, {
+//   foreignKey: 'idVisitor',
+//   targetKey: 'idVisitor',
+// });
 module.exports = Bookingparking;

@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
-const SpaceResidentModel = require('./space.residents.model');
+const ApartmentResidentModel = require('./apartment.residents.model');
 
 const Vehicle = sequelize.define('vehicle', {
     idvehicle: {
@@ -10,9 +10,9 @@ const Vehicle = sequelize.define('vehicle', {
         field: 'idvehicle',
     },
 
-    idSpaceResident: {
+    idApartmentResident: {
         type: DataTypes.INTEGER,
-        field: 'idSpace',
+        field: 'idApartmentResident',
     },
 
     typeuser: {
@@ -30,10 +30,10 @@ const Vehicle = sequelize.define('vehicle', {
     timestamps: false,
 },
 );
-Vehicle.belongsTo(SpaceResidentModel,
+Vehicle.belongsTo(ApartmentResidentModel,
     {
-        foreignKey: 'idSpaceResident',
-        targetKey: 'idSpaceResident',
+        foreignKey: 'idApartmentResident',
+        targetKey: 'idApartmentResident',
     }
 )
 module.exports = Vehicle;
