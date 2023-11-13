@@ -2,7 +2,7 @@ const { v4: uuidv4 } = require('uuid');
 const cloudinary = require("cloudinary").v2;
 cloudinary.config(process.env.CLOUDINARY_URL);
 
-const upload = async (file, allowedFileExtensions = ['png', 'jpg', 'jpeg']) => {
+const upload = async (file, allowedFileExtensions = ['png', 'jpg', 'jpeg'], folder = '') => {
     try {
         const shortNameImage = file.name.split('.');
         const extension = shortNameImage[shortNameImage.length - 1];
@@ -14,8 +14,9 @@ const upload = async (file, allowedFileExtensions = ['png', 'jpg', 'jpeg']) => {
         const uniqueName = uuidv4();
 
         const result = await cloudinary.uploader.upload(file.tempFilePath, {
+            // resource_type: 'raw', // Especifica el tipo de recurso como "raw" para archivos no procesados
             public_id: uniqueName,
-            folder: '',
+            folder: folder,
             overwrite: true
         });
 
