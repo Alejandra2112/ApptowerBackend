@@ -26,8 +26,8 @@ const validateWatchman = require('../Middlewares/watchman.middleware');
 
 route.get('/', getWatchman) // posicion one: privilege, posicion two: permission
 
-route.post('/', validateWatchman, postWatchman)
-route.put('/', validateWatchman, putWatchman)
+route.post('/', validateWatchman, checkPermissions(privilegesMap.post_watchman, permissionMap.vigilantes), postWatchman)
+route.put('/', validateWatchman, checkPermissions(privilegesMap.put_watchman, permissionMap.vigilantes), putWatchman)
 // route.delete('/', checkPermissions(privilegesMap.delete_watchman, permissionMap), deleteWatchman)
 
 module.exports = route
