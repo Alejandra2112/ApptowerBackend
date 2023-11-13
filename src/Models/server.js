@@ -1,5 +1,6 @@
 const express = require('express');
 const sequelize = require('../Database/config');
+const fileUpload = require('express-fileupload') 
 
 class Server {
   constructor() {
@@ -57,6 +58,11 @@ class Server {
       return next();
     });
     this.app.use(express.json());
+    this.app.use(fileUpload({
+      useTempFiles : true,
+      tempFileDir : '/tmp/',
+      createParentPath: true
+  }));
   }
   routes() {
     this.app.use(this.LoginPath, require('../Routes/logIn.routes'))

@@ -54,15 +54,27 @@ const spacesUpdateValidation = [
         .trim()
         .matches(/^[a-zA-Z0-9\s]+$/)
         .withMessage('Space name must contain only letters and numbers.')
-        .custom(async (value) => {
+
+        .custom(async (value, { req }) => {
+            const body = req.body;
+            const { spaceName } = body;
+
             const existingSpace = await SpacesModel.findOne({ where: { spaceName: value } });
 
-            if (existingSpace) {
-                throw new Error('Space name is already in use');
+
+            if (value === spaceName) {
+                return true;
+            } else {
+
+                if (existingSpace) {
+                    throw new Error('Space name is already in use');
+                }
+                return true;
+
             }
 
-            return true;
         }),
+
 
     check('area')
         .optional()
