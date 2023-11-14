@@ -1,5 +1,6 @@
 const { response } = require('express');
 const ResidentModel = require('../Models/resident.model');
+const { upload, updateFile } = require('../Helpers/uploads.helpers');
 
 const getOneResidents = async (req, res = response) => {
     try {
@@ -53,65 +54,65 @@ const getAllResidents = async (req, res = response) => {
 
 }
 
-
 const postResident = async (req, res) => {
 
 
-    let message = '';
-    const body = req.body;
-
-    console.log(body)
-
     try {
 
-        await ResidentModel.create(body);
-        message = 'resident created';
+        const imageUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
+
+        const { pdf, status, ...others } = req.body;
+
+        console.log(pdf)
+        console.log(status)
+
+        const resident = await ResidentModel.create({
+            pdf: imageUrl,
+            status: 'Inactive',
+            ...others
+        })
+
+        res.json({
+            message: 'Resident created'
+        })
+
+        console.log(resident)
 
     } catch (e) {
-
-        message = e.message;
-
+        console.error('Error creating resident:', e);
+        const message = e.message || 'Error creating resident.';
+        res.status(500).json({ message });
     }
-    res.json({
-
-        residents: message,
-
-    });
 };
-
 
 const putResident = async (req, res = response) => {
 
-    const body = req.body;
-    let message = '';
-
     try {
-        const { idResident, ...update } = body;
+        const resident = await ResidentModel.findByPk(req.body.idResident);
 
-        const [updatedRows] = await ResidentModel.update(update, {
-            where: { idResident: idResident },
-        });
 
-        if (updatedRows > 0) {
-
-            message = 'Resident update ok';
-
-        } else {
-
-            message = 'Id Resident is not found';
-
+        if (!resident) {
+            return res.status(400).json({ msg: "Id resident not found." });
         }
 
+        const newPdf = await updateFile(req.files, resident.pdf, ['pdf'], 'Documents' )
+        const { pdf, ...others } = req.body
+
+        const updatedSpace = await resident.update({
+            pdf: newPdf,
+            ...others
+        }, {
+            where: { idResident: req.body.idResident }
+        });
+
+        res.json({
+            spaces: 'Resident update',
+            // updatedSpace: updatedSpace.toJSON()
+        });
     } catch (error) {
-
-        message = 'Error update resident: ' + error.message;
-
+        console.error(error);
+        res.status(500).json({ msg: "Internal server error" });
     }
-    res.json({
-
-        residents: message,
-
-    });
 };
 
 

@@ -14,7 +14,7 @@ const upload = async (file, allowedFileExtensions = ['png', 'jpg', 'jpeg'], fold
         const uniqueName = uuidv4();
 
         const result = await cloudinary.uploader.upload(file.tempFilePath, {
-            // resource_type: 'raw', // Especifica el tipo de recurso como "raw" para archivos no procesados
+            resource_type: (extension == 'pdf') ? 'raw' : null,
             public_id: uniqueName,
             folder: folder,
             overwrite: true
@@ -26,20 +26,40 @@ const upload = async (file, allowedFileExtensions = ['png', 'jpg', 'jpeg'], fold
     }
 };
 
-const updateFile = async (newFile, oldFile) => {
+const updateFile = async (newFile, oldFile, allowedFileExtensions = ['png', 'jpg', 'jpeg'], folder = '') => {
 
-    if (newFile && newFile.image) {
+    if (newFile && newFile.image || newFile && newFile.pdf) {
         if (oldFile) {
-            const publicId = oldFile.match(/\/v\d+\/(.+)\./)[1];
-            await cloudinary.uploader.destroy(publicId);
+
+            if (oldFile.includes(['.png', '.jpg', '.jpeg'])) {
+
+                const urlArr = oldFile.split('/')
+                const arr = urlArr[urlArr.length - 1]
+                const {public_id} = arr.split('.')
+                const publicId = public_id
+
+                await cloudinary.uploader.destroy(publicId);
+                return imageUrl = await upload(newFile.image, allowedFileExtensions, folder);
+
+            }
+
+            else {
+                const urlArr = oldFile.split('/')
+                console.log(urlArr + "Que vqaina no?")
+                const arr = urlArr[urlArr.length - 1]
+                const publicId = arr
+
+                await cloudinary.uploader.destroy(publicId);
+                return imageUrl = await upload(newFile.pdf ,allowedFileExtensions, folder);
+            }
+
         }
 
-        return imageUrl = await upload(newFile.image);
     }
 }
 
 
 module.exports = {
-    upload, 
+    upload,
     updateFile
 }

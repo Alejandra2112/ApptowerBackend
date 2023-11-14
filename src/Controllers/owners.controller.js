@@ -1,5 +1,7 @@
 const { response } = require('express');
 const OwnersModel = require('../Models/owners.model');
+const { upload, updateFile } = require('../Helpers/uploads.helpers');
+
 
 const getOneOwner = async (req, res = response) => {
     try {
@@ -46,65 +48,65 @@ const getAllOwners = async (req, res = response) => {
 
 }
 
-
 const postOwner = async (req, res) => {
 
 
-    let message = '';
-    const body = req.body;
-
-    console.log(body)
-
     try {
 
-        await OwnersModel.create(body);
-        message = 'Owner created';
+        const imageUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
+
+        const { pdf, status, ...others } = req.body;
+
+        console.log(pdf)
+        console.log(status)
+
+        const owner = await OwnersModel.create({
+            pdf: imageUrl,
+            status: 'Inactive',
+            ...others
+        })
+
+        res.json({
+            message: 'Owner created'
+        })
+
+        console.log(owner)
 
     } catch (e) {
-
-        message = e.message;
-
+        console.error('Error creating owner:', e);
+        const message = e.message || 'Error creating owner.';
+        res.status(500).json({ message });
     }
-    res.json({
-
-        owners: message,
-
-    });
 };
-
 
 const putOwner = async (req, res = response) => {
 
-    const body = req.body;
-    let message = '';
-
     try {
-        const { idOwner, ...update } = body;
+        const owner = await OwnersModel.findByPk(req.body.idOwner);
 
-        const [updatedRows] = await OwnersModel.update(update, {
-            where: { idOwner: idOwner },
-        });
 
-        if (updatedRows > 0) {
-
-            message = 'Owner update ok';
-
-        } else {
-
-            message = 'Id owner is not found';
-
+        if (!owner) {
+            return res.status(400).json({ msg: "Id owner not found." });
         }
 
+        const newPdf = await updateFile(req.files, owner.pdf, ['pdf'], 'Documents' )
+        const { pdf, ...others } = req.body
+
+        const updatedSpace = await owner.update({
+            pdf: newPdf,
+            ...others
+        }, {
+            where: { idOwner: req.body.idOwner }
+        });
+
+        res.json({
+            spaces: 'Owner update',
+            // updatedSpace: updatedSpace.toJSON()
+        });
     } catch (error) {
-
-        message = 'Error update owner: ' + error.message;
-
+        console.error(error);
+        res.status(500).json({ msg: "Internal server error" });
     }
-    res.json({
-
-        owners: message,
-
-    });
 };
 
 

@@ -1,6 +1,6 @@
 const express = require('express');
 const sequelize = require('../Database/config');
-const fileUpload = require('express-fileupload') 
+const fileUpload = require('express-fileupload')
 
 class Server {
   constructor() {
@@ -63,10 +63,10 @@ class Server {
     });
     this.app.use(express.json());
     this.app.use(fileUpload({
-      useTempFiles : true,
-      tempFileDir : '/tmp/',
+      useTempFiles: true,
+      tempFileDir: '/tmp/',
       createParentPath: true
-  }));
+    }));
   }
   routes() {
     this.app.use(this.LoginPath, require('../Routes/logIn.routes'))
@@ -109,9 +109,8 @@ class Server {
   async db_connect() {
 
     try {
-      // await sequelize.authenticate();
-      // Sincroniza los modelos con la base de datos
-      await sequelize.sync({ force: true }).then(() => {
+      
+      await sequelize.sync({ force: false }).then(() => {
         console.log('Models synchronized with the database');
 
       });
