@@ -29,9 +29,6 @@ const validateWatchman = [
     .isEmail()
     .withMessage('El campo "email" debe ser un correo electrónico válido'),
 
-  check('dateOfbirth')
-    .isISO8601()
-    .withMessage('El campo "dateOfbirth" debe ser una fecha válida en formato (YYYY-MM-DD)'),
 
 
   (req, res, next) => {
