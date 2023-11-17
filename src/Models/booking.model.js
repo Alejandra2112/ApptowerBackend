@@ -1,8 +1,8 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../Database/config'); 
-const Users = require('./users.model');
-const Residents = require('./resident.model');
 
+const User = require('./users.model');
+const Space = require('./spaces.model');
 
 const Booking = sequelize.define('booking', {
   idbooking: {
@@ -11,14 +11,14 @@ const Booking = sequelize.define('booking', {
     autoIncrement: true,
     field: 'idbooking', 
   },
+  idSpace: {
+    type: DataTypes.INTEGER,
+    field: 'idSpace',
+  },
   iduser: {
     type: DataTypes.INTEGER,
     field: 'iduser',
   },
-  idResident: {
-      type: DataTypes.INTEGER,
-      field: 'idResident',
-    },
   bookingtype: {
       type: DataTypes.INTEGER,
       field: 'bookingtype',
@@ -26,18 +26,44 @@ const Booking = sequelize.define('booking', {
   bookingdate: {
     type: DataTypes.DATE,
     field: 'bookingdate', 
-  }
+  },
+  amount: {
+    type: DataTypes.INTEGER,
+    field: 'amount', 
+  },
+  status: {
+    type: DataTypes.STRING,
+    field: 'status', 
+  },
+  finalDate: {
+    type: DataTypes.DATE,
+    field: 'finalDate', 
+  },
 },
+ //AGREGAR CANTIDAD
+  //FECHA FINAL
+  //ESTATUS
+  /* 
+    pendiente
+    cancelado
+    activo
+    finalizado
+
+
+
+    por pagar
+    pagado
+  */
 {
-  timestamps: false, 
+  timestamps: true, 
 });
-Booking.belongsTo(Users, { 
+Booking.belongsTo(Space, {
+  foreignKey: 'idSpace', 
+  targetKey: 'idSpace', 
+});
+Booking.belongsTo(User, {
   foreignKey: 'iduser', 
-  targetKey: 'iduser',
-}); 
-Booking.belongsTo(Residents, {
-  foreignKey: 'idResident', 
-  targetKey: 'idResident', 
+  targetKey: 'iduser', 
 });
 
 module.exports = Booking;

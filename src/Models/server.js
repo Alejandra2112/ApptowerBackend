@@ -1,5 +1,6 @@
 const express = require('express');
 const sequelize = require('../Database/config');
+const fileUpload = require('express-fileupload')
 
 class Server {
   constructor() {
@@ -27,6 +28,7 @@ class Server {
 
     // Spaces process path
     this.ApartmentsPath = '/api/apartments';
+    this.ApartmentsPath = '/api/apartments';
     this.SpacesPath = '/api/spaces';
     this.ParkingSpacesPath = '/api/parkingSpaces';
     this.AssignedParkingPath = '/api/assignedParkingSpaces';
@@ -36,8 +38,11 @@ class Server {
     this.ResidentsPath = '/api/residents';
     this.ApartmentOwnersPath = '/api/spacesOwners';
     this.ApartmentResidentsPath = '/api/spaceResidents';
+    this.ApartmentOwnersPath = '/api/spacesOwners';
+    this.ApartmentResidentsPath = '/api/spaceResidents';
 
     this.bookingPath = '/api/booking';
+    this.GuestIncomeVehiclePath = '/api/guestincomevehicle';
     this.vehiclePath = '/api/vehicle';
     this.notificationPath = '/api/notification';
     this.middlewares();
@@ -57,6 +62,11 @@ class Server {
       return next();
     });
     this.app.use(express.json());
+    this.app.use(fileUpload({
+      useTempFiles: true,
+      tempFileDir: '/tmp/',
+      createParentPath: true
+    }));
   }
   routes() {
     this.app.use(this.LoginPath, require('../Routes/logIn.routes'))
@@ -69,6 +79,7 @@ class Server {
 
 
     this.app.use(this.bookingPath, require('../Routes/booking.routes'));
+    this.app.use(this.GuestIncomeVehiclePath, require('../Routes/guestincomevehicle.routes'));
     this.app.use(this.vehiclePath, require('../Routes/vehicle.routes'));
     this.app.use(this.notificationPath, require('../Routes/notification.routes'));
 
@@ -86,6 +97,8 @@ class Server {
     this.app.use(this.OwnersPath, require('../Routes/owners.routes'))
     this.app.use(this.ApartmentOwnersPath, require('../Routes/apartment.owner.routes'))
     this.app.use(this.ApartmentResidentsPath, require('../Routes/apartment.residents.routes'))
+    this.app.use(this.ApartmentOwnersPath, require('../Routes/apartment.owner.routes'))
+    this.app.use(this.ApartmentResidentsPath, require('../Routes/apartment.residents.routes'))
 
 
     this.app.use(this.VisitorsPath, require('../Routes/visitors.route'))
@@ -96,8 +109,7 @@ class Server {
   async db_connect() {
 
     try {
-      // await sequelize.authenticate();
-      // Sincroniza los modelos con la base de datos
+      
       await sequelize.sync({ force: false }).then(() => {
         console.log('Models synchronized with the database');
 

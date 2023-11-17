@@ -1,26 +1,27 @@
 const { response } = require('express');
 const SpacesModel = require('../Models/spaces.model');
+const { upload, updateFile } = require('../Helpers/uploads.helpers');
 
 const getOneSpace = async (req, res = response) => {
     try {
-      const { idSpace } = req.params;
-  
-      const space = await SpacesModel.findOne({ where: { idSpace: idSpace } });
-  
-      if (!space) {
-        return res.status(404).json({ error: 'Id space not found.' });
-      }
-  
-      res.json({
-        space,
-      });
+        const { idSpace } = req.params;
+
+        const space = await SpacesModel.findOne({ where: { idSpace: idSpace } });
+
+        if (!space) {
+            return res.status(404).json({ error: 'Id space not found.' });
+        }
+
+        res.json({
+            space,
+        });
     } catch (error) {
-      console.error('Error to get space.', error);
-      res.status(500).json({
-        error: 'Error to get space.',
-      });
+        console.error('Error to get space.', error);
+        res.status(500).json({
+            error: 'Error to get space.',
+        });
     }
-  };
+};
 
 const getAllSpaces = async (req, res = response) => {
 
@@ -28,7 +29,7 @@ const getAllSpaces = async (req, res = response) => {
 
         const spaces = await SpacesModel.findAll();
 
-        console.log('Space get ok', spaces);
+        // console.log('Space get ok', spaces);
 
         res.json({ spaces });
 
@@ -43,59 +44,69 @@ const getAllSpaces = async (req, res = response) => {
 
 }
 
-
 const postSpace = async (req, res) => {
-
-    let message = '';
-    const body = req.body;
-
-    console.log(body)
-    
     try {
-        await SpacesModel.create(body);
-        message = 'New space created.';
-    } catch (e) {
-        message = e.message;
-    }
-    res.json({
-        spaces: message,
-    });
-};
 
+        const imageUrl = await upload(req.files.image)
+
+        const { image, ...others } = req.body;
+
+        const space = await SpacesModel.create({
+            image: imageUrl,
+            ...others
+        })
+
+        res.json({
+            message: 'Space created'
+        })
+
+        console.log(space)
+
+    } catch (e) {
+        console.error('Error creating space:', e);
+        const message = e.message || 'Error creating space.';
+        res.status(500).json({ message });
+    }
+};
 
 const putSpace = async (req, res = response) => {
-
-    const body = req.body;
-    let message = '';
-
     try {
-        const { idSpace, ...update } = body;
+        const space = await SpacesModel.findByPk(req.body.idSpace);
 
-        const [updatedRows] = await SpacesModel.update(update, {
-            where: { idSpace: idSpace },
-        });
 
-        if (updatedRows > 0) {
-
-            message = 'Space updated successfully.';
-
-        } else {
-
-            message = 'Id space not found';
-
+        if (!space) {
+            return res.status(400).json({ msg: "Id space not found." });
         }
 
+        const imageUrl = await updateFile(req.files, space.image)
+
+
+        const updatedSpace = await space.update({
+            spaceType: req.body.spaceType,
+            image: imageUrl,
+            spaceName: req.body.spaceName,
+            area: req.body.area,
+            capacity: req.body.capacity,
+            status: req.body.status,
+
+        }, {
+            where: { idSpace: req.body.idSpace }
+        });
+
+        res.json({
+            spaces: 'Spaces update',
+            // updatedSpace: updatedSpace.toJSON()
+        });
     } catch (error) {
-
-        message = 'Error updating space: ' + error.message;
-
+        console.error(error);
+        res.status(500).json({ msg: "Internal server error" });
     }
-    res.json({
-
-        spaces: message,
-
-    });
 };
+
+
+
+
+
 
 
 // const deleteSpace = async (req, res) => {

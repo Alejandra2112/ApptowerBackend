@@ -118,16 +118,23 @@ const putDocNumberOwner = [
         .isLength({ min: 8, max: 12 })
         .withMessage('Document number must be between 8 and 12 characters.')
 
-        .custom(async (value) => {
-            if (value) {
-                const existing = await OwnersModel.findOne({ where: { docNumber: value } });
+        .custom(async (value, { req }) => {
+            const body = req.body;
+            const { docNumber } = body;
 
-                if (existing) {
+            const existingDocOwner = await OwnersModel.findOne({ where: { docNumber: value } });
+
+            if (value === docNumber) {
+                return true;
+            } else {
+
+                if (existingDocOwner) {
                     throw new Error('Owner document number is already in use');
                 }
+                return true;
+
             }
 
-            return true;
         }),
 ]
 
@@ -138,17 +145,23 @@ const putDocNumberResident = [
         .isString()
         .isLength({ min: 8, max: 12 })
         .withMessage('Document number must be between 8 and 12 characters.')
+        .custom(async (value, { req }) => {
+            const body = req.body;
+            const { docNumber } = body;
 
-        .custom(async (value) => {
-            if (value) {
-                const existing = await ResidentModel.findOne({ where: { docNumber: value } });
+            const existingDocRecident = await ResidentModel.findOne({ where: { docNumber: value } });
 
-                if (existing) {
+            if (value === docNumber) {
+                return true;
+            } else {
+
+                if (existingDocRecident) {
                     throw new Error('Resident document number is already in use');
                 }
+                return true;
+
             }
 
-            return true;
         }),
 ]
 
