@@ -3,44 +3,36 @@ const Permission = require('../Models/permissions.model');
 const Privilege = require('../Models/privileges.model');
 
 const validateRols = [
-  check('namerole')
-    .isString()
-    .withMessage('El campo "namerole" debe ser una cadena'),
-
-  check('permissions')
-    .isArray({ min: 1 })
-    .withMessage('Debes proporcionar al menos un permiso'),
-
-  check('privileges')
-    .isArray({ min: 1 })
-    .withMessage('Debes proporcionar al menos un privilegio'),
+  check('namerole').isString().withMessage('El campo "namerole" debe ser una cadena'),
 
   async (req, res, next) => {
-    const errors = validationResult(req);
+    const { namerole, detailsRols } = req.body;
 
-    if (!errors.isEmpty()) {
-      return res.status(400).json(errors);
+    if (!detailsRols || detailsRols.length === 0) {
+      return res.status(400).json({
+        error: 'Debes proporcionar al menos un detalle de rol',
+      });
     }
 
-    const { permissions, privileges } = req.body;
-
     try {
+      const permissions = detailsRols.map((detail) => detail.permiso);
+      const privileges = detailsRols.map((detail) => detail.privilege);
 
-      const validPermissions = await Promise.all(
-        permissions.map(async (permissionId) => {
-          const permission = await Permission.findByPk(permissionId);
-          return permission !== null;
-        })
-      );
+      const existingPermissions = await Permission.findAll({
+        where: {
+          permission: permissions,
+        },
+        attributes: ['idpermission'],
+      });
 
-      const validPrivileges = await Promise.all(
-        privileges.map(async (privilegeId) => {
-          const privilege = await Privilege.findByPk(privilegeId);
-          return privilege !== null;
-        })
-      )
+      const existingPrivileges = await Privilege.findAll({
+        where: {
+          privilege: privileges,
+        },
+        attributes: ['idprivilege'],
+      });
 
-      if (validPermissions.includes(false) || validPrivileges.includes(false)) {
+      if (existingPermissions.length !== detailsRols.length || existingPrivileges.length !== detailsRols.length) {
         return res.status(400).json({
           error: 'Algunos de los permisos o privilegios proporcionados no existen en la base de datos.',
         });
@@ -55,4 +47,3 @@ const validateRols = [
 ];
 
 module.exports = validateRols;
-

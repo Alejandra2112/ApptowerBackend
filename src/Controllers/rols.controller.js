@@ -59,37 +59,35 @@ const getRolsOne = async (req, res = response) => {
 
 
 
+
 const postRols = async (req, res) => {
   let message = '';
-  const { namerole, description, permissions, privileges } = req.body;
+  const { namerole, description, detailsRols } = req.body;
 
   try {
-    if (!permissions || !Array.isArray(permissions)) {
+    if (!detailsRols || !Array.isArray(detailsRols)) {
       return res.status(400).json({
-        error: "Invalid permissions",
-      });
-    }
-
-    if (!privileges || !Array.isArray(privileges)) {
-      return res.status(400).json({
-        error: "Invalid privileges",
+        error: "Invalid detailsRols",
       });
     }
 
     const rols = await Rols.create({ namerole, description });
-    const roleId = rols.idrole;
 
-    const selectedPermissions = permissions.map((permissionId) =>
-      privileges.map((privilegeId) => ({
-        idrole: roleId,
-        idpermission: permissionId,
-        idprivilege: privilegeId,
-      }))
-    );
-    const iteratedpermissions = [].concat(...selectedPermissions);
+    const detailInstances = await Promise.all(detailsRols.map(async (detail) => {
+      const permission = await Permission.findOne({ where: { permission: detail.permiso } });
+      const privilege = await Privileges.findOne({ where: { privilege: detail.privilege } });
 
-    await rolsPermissions.bulkCreate(iteratedpermissions);
+      console.log('permission:', permission);
+      console.log('privilege:', privilege);
 
+      return {
+        idrole: rols.idrole,
+        idpermission: permission ? permission.idpermission : null,
+        idprivilege: privilege ? privilege.idprivilege : null,
+      };
+    }));
+
+    await rolsPermissions.bulkCreate(detailInstances);
     message = 'Rol registrado correctamente';
     res.json({
       rols: message,
@@ -101,6 +99,9 @@ const postRols = async (req, res) => {
     });
   }
 };
+
+
+
 
 
 const putRols = async (req, res) => {
