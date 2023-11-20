@@ -1,12 +1,12 @@
-const {response} = require('express');
-const guestincomevehicle = require('../Models/guestIncomeVehicle.model');
+const { response } = require('express');
+const GuestIncomeVehicle = require('../Models/guestIncomeVehicle.model');
 //GET ONE X ID USER
 const getGuestIncomeVehicle = async (req, res = response) => {
     try {
-        const guestincomevehicle = await guestincomevehicle.findAll();
+        const Guestincomevehicle = await GuestIncomeVehicle.findAll();
 
         res.json({
-            bookingparking: guestincomevehicle,
+            Guestincomevehicle,
         });
     } catch (error) {
         res.status(500).json({
@@ -19,7 +19,7 @@ const postGuestIncomeVehicle = async (req, res) => {
     let message = '';
     const body = req.body;
     try {
-        await guestincomevehicle.create(body);
+        await GuestIncomeVehicle.create(body);
         message = 'Vehiculo del visitante ingresado exitosamente';        
     } catch (error) {
         message = error.message;
@@ -36,7 +36,7 @@ const putGuestIncomeVehicle = async (req, res = response) => {
     try {
         const { idbookingparking, Updating } = body;
 
-        const [updatedRows] = await guestincomevehicle.update(Updating, {
+        const [updatedRows] = await GuestIncomeVehicle.update(Updating, {
             where: { idbookingparking: idbookingparking },
         });
 
