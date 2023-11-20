@@ -1,10 +1,10 @@
-const {Router} = require('express');
-const router = Router();
+const { Router } = require('express');
+const route = Router();
 
-const {getGuestIncomeVehicle, postGuestIncomeVehicle, putGuestIncomeVehicle} = require('../controllers/guestincomevehicle.controller');
+const { getGuestIncomeVehicle, postGuestIncomeVehicle, putGuestIncomeVehicle } = require('../controllers/guestincomevehicle.controller');
 
-router.get('/', getGuestIncomeVehicle);
-router.post('/', postGuestIncomeVehicle);
-router.put('/:id', putGuestIncomeVehicle);
+route.get('/', getGuestIncomeVehicle);
+route.post('/', postGuestIncomeVehicle);
+route.put('/:id', putGuestIncomeVehicle);
 
-module.exports = router;
+module.exports = route;

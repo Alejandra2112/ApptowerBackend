@@ -30,17 +30,15 @@ const validateWatchman = [
     .withMessage('El campo "email" debe ser un correo electrónico válido'),
   check('dateOfBirth')
     .custom((value) => {
-      // Validar si el valor es una fecha válida en el formato esperado
-      const regexDate = /^\d{4}-\d{2}-\d{2}$/; // Formato YYYY-MM-DD
+      const regexDate = /^\d{4}-\d{2}-\d{2}$/;
 
       if (!regexDate.test(value)) {
         throw new Error('El campo "dateOfBirth" debe ser una fecha en formato YYYY-MM-DD');
       }
 
-      // Calcular la edad en base a la fecha de nacimiento
       const birthDate = new Date(value);
       const today = new Date();
-      const millisecondsIn18Years = 18 * 365 * 24 * 60 * 60 * 1000; // Calcula los milisegundos en 18 años
+      const millisecondsIn18Years = 18 * 365 * 24 * 60 * 60 * 1000;
 
       if (today - birthDate < millisecondsIn18Years) {
         throw new Error('Debes tener al menos 18 años');
