@@ -56,10 +56,6 @@ const User = sequelizeUser.define('users', {
         args: true,
         msg: 'La contraseña no puede estar vacía',
       },
-      len: {
-        args: [8, 12],
-        msg: 'La contraseña debe tener entre 8 y 12 caracteres',
-      },
     },
   },
   state: {

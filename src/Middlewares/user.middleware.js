@@ -35,6 +35,11 @@ const validateUser = [
       return true;
     }),
 
+  check('password')
+    .isLength({ min: 8, max: 12 })
+    .withMessage('El campo "password" debe tener al menos 8 a 12 caracteres'),
+
+
   check('email')
     .isEmail()
     .withMessage('El campo "email" debe ser un correo electrónico válido'),
