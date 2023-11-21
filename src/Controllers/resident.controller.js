@@ -65,6 +65,8 @@ const postResident = async (req, res) => {
 
         console.log(pdf)
         console.log(status)
+        console.log(imageUrl)
+
 
         const resident = await ResidentModel.create({
             pdf: imageUrl,
