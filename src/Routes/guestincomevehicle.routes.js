@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const route = Router();
 
-const { getGuestIncomeVehicle, postGuestIncomeVehicle, putGuestIncomeVehicle } = require('../controllers/guestincomevehicle.controller');
+const { getGuestIncomeVehicle, postGuestIncomeVehicle, putGuestIncomeVehicle } = require('../Controllers/guestincomevehicle.controller');
 
 route.get('/', getGuestIncomeVehicle);
 route.post('/', postGuestIncomeVehicle);

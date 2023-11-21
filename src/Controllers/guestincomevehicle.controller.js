@@ -20,7 +20,7 @@ const postGuestIncomeVehicle = async (req, res) => {
     const body = req.body;
     try {
         await GuestIncomeVehicle.create(body);
-        message = 'Vehiculo del visitante ingresado exitosamente';        
+        message = 'Vehiculo del visitante ingresado exitosamente';
     } catch (error) {
         message = error.message;
     }

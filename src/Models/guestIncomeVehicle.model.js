@@ -1,7 +1,5 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
-const User = require('./users.model');
-const Booking = require('./booking.model');
 const Parking = require('./parking.spaces.model');
 const Vehicle = require('./vehicle.model');
 const GuestIncome = require('./guest.income.model');
@@ -37,12 +35,12 @@ const GuestIncomeVehicle = sequelize.define('guestincomevehicle', {
   idGuest_income: {
     type: DataTypes.INTEGER,
     field: 'idguest_income',
-},
+  },
   // plate: {
   //   type: DataTypes.STRING,
   //   field: 'plate',
   // },
- //ADICIONAR COIMENTARIO
+  //ADICIONAR COIMENTARIO
 },
   {
     timestamps: false,
