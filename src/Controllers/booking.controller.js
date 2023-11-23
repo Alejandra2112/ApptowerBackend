@@ -1,6 +1,8 @@
 const { response } = require('express');
 
 const Booking = require('../Models/booking.model');
+const User = require('../Models/users.model');
+const SpacesModel = require('../Models/spaces.model');
 
 const getBooking = async (req, res = response) => {
     try {

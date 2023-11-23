@@ -5,7 +5,6 @@ const Watchmans = require('./watchmans.model');
 const usersforWatchmans = require('./user.watchman.model');
 const usersforResidents = require('./user.residents');
 const ResidentModel = require('./resident.model')
-const Booking = require('./booking.model');
 
 const User = sequelizeUser.define('users', {
   iduser: {
@@ -74,7 +73,6 @@ User.belongsTo(Rols, {
   foreignKey: 'idrole',
   targetKey: 'idrole',
 });
-User.hasMany(Booking, { foreignKey: 'iduser' });
 
 User.belongsToMany(Watchmans, {
   through: usersforWatchmans,
