@@ -28,12 +28,12 @@ const validateWatchman = [
   check('email')
     .isEmail()
     .withMessage('El campo "email" debe ser un correo electrónico válido'),
-  check('dateOfBirth')
+  check('dateOfbirth')
     .custom((value) => {
       const regexDate = /^\d{4}-\d{2}-\d{2}$/;
 
       if (!regexDate.test(value)) {
-        throw new Error('El campo "dateOfBirth" debe ser una fecha en formato YYYY-MM-DD');
+        throw new Error('El campo "dateOfbirth" debe ser una fecha en formato YYYY-MM-DD');
       }
 
       const birthDate = new Date(value);

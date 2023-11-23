@@ -47,9 +47,12 @@ const getAllSpaces = async (req, res = response) => {
 const postSpace = async (req, res) => {
     try {
 
+        console.log(req.files.image)
         const imageUrl = await upload(req.files.image)
 
-        const { image, ...others } = req.body;
+        const { image, status, ...others } = req.body;
+
+        console.log(image)
 
         const space = await SpacesModel.create({
             image: imageUrl,
@@ -97,9 +100,10 @@ const putSpace = async (req, res = response) => {
             spaces: 'Spaces update',
             // updatedSpace: updatedSpace.toJSON()
         });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ msg: "Internal server error" });
+    }  catch (e) {
+        console.error('Error creating space:', e);
+        const message = e.message || 'Error creating space.';
+        res.status(500).json({ message, errorDetails: e }); 
     }
 };
 

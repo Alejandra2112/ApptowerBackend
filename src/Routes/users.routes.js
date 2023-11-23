@@ -9,7 +9,7 @@ route.get('/:iduser', getUserOne);
 
 route.get('/', getUser)
 route.post('/', validateUser, postUser)
-route.put('/', validateUser, putUser)
+route.put('/', putUser)
 
 
 module.exports = route

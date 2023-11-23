@@ -116,54 +116,54 @@ const ResidentModel = sequelize.define('Residents', {
 
 // Hooks for create and update owners
 
-ResidentModel.afterCreate(async (resident) => {
+// ResidentModel.afterCreate(async (resident) => {
 
-    if (resident.residentType === 'owner') {
+//     if (resident.residentType === 'owner') {
 
-        const owner = await OwnersModel.create({
+//         const owner = await OwnersModel.create({
 
-            docType: resident.docType,
-            docNumber: resident.docNumber,
-            name: resident.name,
-            lastName: resident.lastname,
-            birthday: resident.birthday,
-            email: resident.email,
-            phoneNumber: resident.phoneNumber,
-            status: 'Active',
+//             docType: resident.docType,
+//             docNumber: resident.docNumber,
+//             name: resident.name,
+//             lastName: resident.lastname,
+//             birthday: resident.birthday,
+//             email: resident.email,
+//             phoneNumber: resident.phoneNumber,
+//             status: 'Active',
 
-        });
-    }
-})
-
-
+//         });
+//     }
+// })
 
 
-ResidentModel.afterUpdate(async (resident) => {
-
-    console.log(resident + 'hola')
-
-    const ownerToUpdate = await OwnersModel.findOne({ where: { docNumber: resident.docNumber } });
-
-    if (ownerToUpdate) {
 
 
-        await ownerToUpdate.update({
+// ResidentModel.afterUpdate(async (resident) => {
 
-            docType: resident.docType,
-            docNumber: resident.docNumber,
-            name: resident.name,
-            lastName: resident.lastname,
-            birthday: resident.birthday,
-            email: resident.email,
-            phoneNumber: resident.phoneNumber,
-            status: ownerToUpdate.status
-        });
+//     console.log(resident + 'hola')
+
+//     const ownerToUpdate = await OwnersModel.findOne({ where: { docNumber: resident.docNumber } });
+
+//     if (ownerToUpdate) {
 
 
-    }
+//         await ownerToUpdate.update({
 
-}
-)
+//             docType: resident.docType,
+//             docNumber: resident.docNumber,
+//             name: resident.name,
+//             lastName: resident.lastname,
+//             birthday: resident.birthday,
+//             email: resident.email,
+//             phoneNumber: resident.phoneNumber,
+//             status: ownerToUpdate.status
+//         });
+
+
+//     }
+
+// }
+// )
 
 module.exports = ResidentModel;
 
