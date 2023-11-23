@@ -1,10 +1,16 @@
 const { response } = require('express');
 
 const Booking = require('../Models/booking.model');
-//AÑADIR GETONE POR ID
+
 const getBooking = async (req, res = response) => {
     try {
-        const booking = await Booking.findAll();
+        const booking = await Booking.findAll({
+            include: [
+                { model: User, attributes: ['name', 'lastname', 'email'] },
+                { model: SpacesModel, attributes: ['spaceName', 'spaceType'] }
+            ]
+        });
+
 
         res.json({
             booking,
@@ -17,41 +23,74 @@ const getBooking = async (req, res = response) => {
 }
 
 const postBooking = async (req, res) => {
-    let message = '';
     const body = req.body;
-    try {
-        await Booking.create(body);
-        message = 'Reserva Registrada Exitosamente';        
-    } catch (error) {
-        message = error.message;
+
+    if (!body.idSpace || !body.iduser || !body.bookingdate || !body.amount) {
+        return res.status(400).json({
+            error: 'Faltan datos necesarios para la reserva. Por favor, verifique los datos enviados.',
+        });
     }
-    res.json({
-        booking: message,
-    });
-}
-const putBooking = async (req, res = response) => {
-    const body = req.body;
-    let message = '';
 
     try {
-        const { idbooking, Updating } = body;
+        const newBooking = await Booking.create(body);
 
-        const [updatedRows] = await Booking.update(Updating, {
+        res.status(201).json({
+            message: 'Reserva Registrada Exitosamente',
+            bookingId: newBooking.idbooking, 
+            bookingDetails: newBooking, 
+        });
+    } catch (error) {
+       
+        if (error.name === 'SequelizeUniqueConstraintError') {
+            return res.status(400).json({
+                error: 'La reserva no pudo ser creada debido a un conflicto de datos.',
+            });
+        }
+
+        
+        res.status(500).json({
+            error: 'Error al registrar la reserva: ' + error.message,
+        });
+    }
+};
+
+const putBooking = async (req, res) => {
+    const { idbooking } = req.params;
+    const updateData = req.body;
+
+    
+    if (!idbooking) {
+        return res.status(400).json({
+            error: 'ID de reserva no proporcionado.',
+        });
+    }
+
+    try {
+        
+        const [updatedRows] = await Booking.update(updateData, {
             where: { idbooking: idbooking },
         });
 
-        if (updatedRows > 0) {
-            message = 'Reserva modificada exitosamente.';
-        } else {
-            message = 'No se encontró una reserva con ese ID';
+        if (updatedRows === 0) {
+        
+            return res.status(404).json({
+                error: 'No se encontró una reserva con ese ID.',
+            });
         }
+
+        
+        res.json({
+            message: 'Reserva modificada exitosamente.',
+            updatedRows: updatedRows,
+        });
     } catch (error) {
-        message = 'Error al modificar reserva: ' + error.message;
+        
+        res.status(500).json({
+            error: 'Error al modificar reserva: ' + error.message,
+        });
     }
-    res.json({
-        booking: message,
-    });
-}
+};
+
 module.exports = {
     getBooking,
     postBooking,
