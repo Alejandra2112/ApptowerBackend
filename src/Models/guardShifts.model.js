@@ -23,13 +23,6 @@ const guardShifts = sequelize.define('guardShifts', {
     type: DataTypes.DATE,
     field: 'end',
   },
-  state: {
-    type: DataTypes.STRING,
-    field: 'state',
-    validate: {
-      isIn: [['Activo', 'Inactivo']],
-    }
-  }
 }, {
   timestamps: false,
 });
