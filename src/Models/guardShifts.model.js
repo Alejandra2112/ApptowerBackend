@@ -29,7 +29,8 @@ const guardShifts = sequelize.define('guardShifts', {
     validate: {
       isIn: [['Activo', 'Inactivo']],
     }
-  },
+  }
+}, {
   timestamps: false,
 });
 
