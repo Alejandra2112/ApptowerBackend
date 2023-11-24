@@ -101,9 +101,6 @@ const postRols = async (req, res) => {
 };
 
 
-
-
-
 const putRols = async (req, res) => {
   const { idrole, permissions, privileges } = req.body;
 
@@ -136,6 +133,9 @@ const putRols = async (req, res) => {
     res.status(500).json({ error: 'Error al actualizar el rol' });
   }
 };
+
+
+
 
 
 
