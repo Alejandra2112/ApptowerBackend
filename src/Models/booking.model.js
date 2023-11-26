@@ -19,10 +19,6 @@ const Booking = sequelize.define('booking', {
     type: DataTypes.INTEGER,
     field: 'iduser',
   },
-  bookingtype: {
-      type: DataTypes.INTEGER,
-      field: 'bookingtype',
-  },
   bookingdate: {
     type: DataTypes.DATE,
     field: 'bookingdate', 
