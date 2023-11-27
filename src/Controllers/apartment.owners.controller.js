@@ -7,21 +7,32 @@ const getOneApartmentOwners = async (req, res = response) => {
     try {
         const { idApartment } = req.params;
 
-        const apartment = await ApartmentModel.findAll({
+        const apartmentOwners = await ApartmentOwnerModel.findAll({
             where: { idApartment: idApartment },
         });
+
+        
+        const apartments = await ApartmentModel.findAll({
+            attributes: ['idApartment', 'apartmentName', 'area', 'status']
+
+        });
+
         const owners = await OwnersModel.findAll({
             attributes: ['idOwner', 'docNumber', 'name', 'lastName', 'email', 'phoneNumber'],
+
         });
 
-        const data = apartment.map(so => {
-            const owner = owners.find(ow => ow.idOwner === so.idOwner);
+        const data = apartmentOwners.map(ao => {
+
+            const apartment = apartments.find(apartment => apartment.idSpace === ao.idApartment);
+            const owner = owners.find(ow => ow.idOwner === ow.idOwner);
 
             return {
-                ...so.dataValues,
+                ...ao.dataValues,
+                apartment,
                 owner
             }
-        });
+        })
 
         if (!data || data.length === 0) {
             return res.status(404).json({ error: 'Id apartment not found.' });

@@ -54,6 +54,7 @@ const postSpace = async (req, res) => {
 
         console.log(image)
 
+        
         const space = await SpacesModel.create({
             image: imageUrl,
             ...others
