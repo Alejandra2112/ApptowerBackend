@@ -19,10 +19,6 @@ const Booking = sequelize.define('booking', {
     type: DataTypes.INTEGER,
     field: 'iduser',
   },
-  bookingtype: {
-      type: DataTypes.INTEGER,
-      field: 'bookingtype',
-  },
   bookingdate: {
     type: DataTypes.DATE,
     field: 'bookingdate', 
@@ -31,10 +27,7 @@ const Booking = sequelize.define('booking', {
     type: DataTypes.INTEGER,
     field: 'amount', 
   },
-  status: {
-    type: DataTypes.STRING,
-    field: 'status', 
-  },
+  status: { type: DataTypes.ENUM, values: ['pendiente', 'cancelado', 'activo', 'finalizado', 'por pagar', 'pagado'] },
   finalDate: {
     type: DataTypes.DATE,
     field: 'finalDate', 

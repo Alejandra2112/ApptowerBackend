@@ -58,11 +58,10 @@ const getRolsOne = async (req, res = response) => {
 };
 
 
-
-
 const postRols = async (req, res) => {
   let message = '';
   const { namerole, description, detailsRols } = req.body;
+  console.log(detailsRols, 'detailsRols')
 
   try {
     if (!detailsRols || !Array.isArray(detailsRols)) {
@@ -100,12 +99,8 @@ const postRols = async (req, res) => {
   }
 };
 
-
-
-
-
 const putRols = async (req, res) => {
-  const { idrole, permissions, privileges } = req.body;
+  const { idrole, detailsRols } = req.body;
 
   try {
     const existingRole = await Rols.findByPk(idrole);
@@ -115,19 +110,29 @@ const putRols = async (req, res) => {
 
     await rolsPermissions.destroy({ where: { idrole } });
 
-    if (permissions && Array.isArray(permissions) && privileges && Array.isArray(privileges)) {
+    if (detailsRols && Array.isArray(detailsRols) && detailsRols.length > 0) {
+      const detailInstances = detailsRols.map(async (detail) => {
+        const { permiso, privilege } = detail;
 
-      const permissionPrivilegeAsso = permissions.map((permissionId) =>
+        const permission = await Permission.findOne({ where: { permission: permiso } });
+        const privilegeObj = await Privileges.findOne({ where: { privilege } });
 
-        privileges.map((privilegeId) => ({
+        if (!permission || !privilegeObj) {
+          return res.status(400).json({
+            error: `El permiso '${permiso}' o el privilegio '${privilege}' no existen en la base de datos.`,
+          });
+        }
+
+        return {
           idrole,
-          idpermission: permissionId,
-          idprivilege: privilegeId,
-        }))
-      );
-      const iteratedAsso = [].concat(...permissionPrivilegeAsso);
+          idpermission: permission.idpermission,
+          idprivilege: privilegeObj.idprivilege,
+        };
+      });
 
-      await rolsPermissions.bulkCreate(iteratedAsso);
+      const resolvedInstances = await Promise.all(detailInstances);
+
+      await rolsPermissions.bulkCreate(resolvedInstances);
     }
 
     return res.json({ message: 'Rol actualizado exitosamente' });
@@ -136,6 +141,9 @@ const putRols = async (req, res) => {
     res.status(500).json({ error: 'Error al actualizar el rol' });
   }
 };
+
+
+
 
 
 
