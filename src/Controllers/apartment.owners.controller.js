@@ -7,28 +7,39 @@ const getOneApartmentOwners = async (req, res = response) => {
     try {
         const { idApartment } = req.params;
 
-        const apartment = await ApartmentModel.findAll({
+        const apartmentOwners = await ApartmentOwnerModel.findAll({
             where: { idApartment: idApartment },
         });
-        const owners = await OwnersModel.findAll({
-            attributes: ['idOwner', 'docNumber', 'name', 'lastName', 'email', 'phoneNumber'],
+
+        
+        const apartments = await ApartmentModel.findAll({
+            attributes: ['idApartment', 'apartmentName', 'area', 'status']
+
         });
 
-        const data = apartment.map(so => {
-            const owner = owners.find(ow => ow.idOwner === so.idOwner);
+        const owners = await OwnersModel.findAll({
+            attributes: ['idOwner', 'docType', 'docNumber', 'name', 'lastName', 'email', 'phoneNumber', "status"],
+
+        });
+
+        const data = apartmentOwners.map(ao => {
+
+            const apartment = apartments.find(apartment => apartment.idApartment === ao.idApartment);
+            const owner = owners.find(ow => ow.idOwner === ao.idOwner);
 
             return {
-                ...so.dataValues,
+                ...ao.dataValues,
+                apartment,
                 owner
             }
-        });
+        })
 
         if (!data || data.length === 0) {
             return res.status(404).json({ error: 'Id apartment not found.' });
         }
 
         res.json({
-            spaces: data,
+            apartmentOwners: data,
         });
     } catch (error) {
         console.error('Error to get apartment.', error);
@@ -51,15 +62,15 @@ const getAllApartmentOwners = async (req, res) => {
         });
 
         const owners = await OwnersModel.findAll({
-            attributes: ['idOwner', 'docNumber', 'name', 'lastName', 'email', 'phoneNumber'],
+            attributes: ['idOwner', 'docType', 'docNumber', 'name', 'lastName', 'email', 'phoneNumber', 'status'],
 
         });
 
         const data = apartmentOwners.map(ao => {
 
             const apartment = apartments.find(apartment => apartment.idSpace === ao.idApartment);
-            const owner = owners.find(ow => ow.idOwner === ow.idOwner);
-
+            const owner = owners.find(ow => ow.idOwner === ao.idOwner);
+            
             return {
                 ...ao.dataValues,
                 apartment,
