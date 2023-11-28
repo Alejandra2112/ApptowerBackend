@@ -7,7 +7,7 @@ route.get('/:idrole', getRolsOne)
 
 route.get('/', getRols)
 route.post('/', validateRols, postRols)
-route.put('/', validateRols, putRols)
+route.put('/:idrole', validateRols, putRols)
 
 
 module.exports = route  

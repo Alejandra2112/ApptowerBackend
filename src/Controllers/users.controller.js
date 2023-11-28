@@ -44,6 +44,23 @@ const getUserOne = async (req, res = response) => {
   }
 };
 
+const postUserEmail = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ where: { email: email } });
+
+    if (!user) {
+      return res.status(404).json({ message: 'No se encontró un usuario con ese correo electrónico.' });
+    }
+
+    return res.json({ message: 'Usuario encontrado exitosamente.' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error al buscar usuario: ' + error.message });
+  }
+};
+
+
 
 const postUser = async (req, res) => {
 
@@ -128,5 +145,6 @@ module.exports = {
   getUser,
   postUser,
   putUser,
-  getUserOne
+  getUserOne,
+  postUserEmail,
 };

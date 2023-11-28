@@ -2,6 +2,7 @@ const express = require('express');
 const sequelize = require('../Database/config');
 const fileUpload = require('express-fileupload')
 
+
 class Server {
   constructor() {
     this.app = express();
@@ -10,6 +11,7 @@ class Server {
     //Users process path
     this.UserPath = '/api/users';
     this.LoginPath = '/api/login';
+    // this.EmailPath = '/api/email';
 
     //Rols process path
     this.RolsPath = '/api/rols';
@@ -36,10 +38,10 @@ class Server {
     // Residents process path
     this.OwnersPath = '/api/owners';
     this.ResidentsPath = '/api/residents';
-    this.ApartmentOwnersPath = '/api/spacesOwners';
-    this.ApartmentResidentsPath = '/api/spaceResidents';
-    this.ApartmentOwnersPath = '/api/spacesOwners';
-    this.ApartmentResidentsPath = '/api/spaceResidents';
+    this.ApartmentOwnersPath = '/api/apartmentOwners';
+    this.ApartmentResidentsPath = '/api/aparmentResidents';
+    // this.ApartmentOwnersPath = '/api/spacesOwners';
+    // this.ApartmentResidentsPath = '/api/spaceResidents';
 
     this.bookingPath = '/api/booking';
     this.GuestIncomeVehiclePath = '/api/guestincomevehicle';
@@ -76,6 +78,7 @@ class Server {
     this.app.use(this.permissionsRolsPath, require('../Routes/permissions.routes'));
     this.app.use(this.permissionsPrivilegesPath, require('../Routes/privileges.routes'));
     this.app.use(this.guardShiftsPath, require('../Routes/guardShifts.routes'))
+    // this.app.use(this.EmailPath, require('../Routes/email.routes'));
 
 
     this.app.use(this.bookingPath, require('../Routes/booking.routes'));
@@ -101,8 +104,8 @@ class Server {
     this.app.use(this.ApartmentResidentsPath, require('../Routes/apartment.residents.routes'))
 
 
-    this.app.use(this.VisitorsPath, require('../Routes/visitors.route'))
-    this.app.use(this.GuestIncomePath, require('../Routes/guest.income.route'))
+    this.app.use(this.VisitorsPath, require('../Routes/visitors.routes'))
+    this.app.use(this.GuestIncomePath, require('../Routes/guest.income.routes'))
     this.app.use(this.FinesPath, require('../Routes/fines.routes'))
   }
 
