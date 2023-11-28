@@ -36,10 +36,10 @@ class Server {
     // Residents process path
     this.OwnersPath = '/api/owners';
     this.ResidentsPath = '/api/residents';
-    this.ApartmentOwnersPath = '/api/spacesOwners';
-    this.ApartmentResidentsPath = '/api/spaceResidents';
-    this.ApartmentOwnersPath = '/api/spacesOwners';
-    this.ApartmentResidentsPath = '/api/spaceResidents';
+    this.ApartmentOwnersPath = '/api/apartmentOwners';
+    this.ApartmentResidentsPath = '/api/aparmentResidents';
+    // this.ApartmentOwnersPath = '/api/spacesOwners';
+    // this.ApartmentResidentsPath = '/api/spaceResidents';
 
     this.bookingPath = '/api/booking';
     this.GuestIncomeVehiclePath = '/api/guestincomevehicle';
