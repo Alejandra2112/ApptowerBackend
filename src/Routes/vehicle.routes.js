@@ -1,10 +1,10 @@
 const {Router} = require('express');
 const route = Router();
-const {getVehicle, postVehicle, putVehicle, getOneVehicleBySpaces} = require('../Controllers/vehicle.controller');
+const {getVehicle, postVehicle, putVehicle, getOneVehicleByAparment} = require('../Controllers/vehicle.controller');
 
 route.get('/', getVehicle);
 route.post('/', postVehicle);
 route.put('/', putVehicle);
-route.get('/:idSpace', getOneVehicleBySpaces);
+route.get('/:idApartment', getOneVehicleByAparment);
 
 module.exports = route;

@@ -1,6 +1,6 @@
 const {response} = require('express');
 const Vehicle = require('../Models/vehicle.model');
-
+const ApartmentModel = require('../Models/apartment.model');
 const getVehicle = async (req, res = response) => {
     try {
         const vehicle = await Vehicle.findAll();
@@ -14,13 +14,16 @@ const getVehicle = async (req, res = response) => {
         });
     }
 }
-const getOneVehicleBySpaces = async (req, res = response) => {
-    const idSpace = req.params.idSpace;
+const getOneVehicleByAparment = async (req, res = response) => {
+    const {idApartment} = req.params;
     try {
         const vehicle = await Vehicle.findAll({
             where: {
-                idSpace: idSpace,
+                idApartment: idApartment,
             },
+            include: [
+                {model: ApartmentModel, attributes: ['apartmentName', 'area', 'status']},
+            ],
         });
 
         res.json({
@@ -74,5 +77,5 @@ module.exports = {
     getVehicle,
     postVehicle,
     putVehicle,
-    getOneVehicleBySpaces,
+    getOneVehicleByAparment,
 }
