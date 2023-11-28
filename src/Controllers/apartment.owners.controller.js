@@ -18,14 +18,14 @@ const getOneApartmentOwners = async (req, res = response) => {
         });
 
         const owners = await OwnersModel.findAll({
-            attributes: ['idOwner', 'docNumber', 'name', 'lastName', 'email', 'phoneNumber'],
+            attributes: ['idOwner', 'docType', 'docNumber', 'name', 'lastName', 'email', 'phoneNumber', "status"],
 
         });
 
         const data = apartmentOwners.map(ao => {
 
-            const apartment = apartments.find(apartment => apartment.idSpace === ao.idApartment);
-            const owner = owners.find(ow => ow.idOwner === ow.idOwner);
+            const apartment = apartments.find(apartment => apartment.idApartment === ao.idApartment);
+            const owner = owners.find(ow => ow.idOwner === ao.idOwner);
 
             return {
                 ...ao.dataValues,
@@ -39,7 +39,7 @@ const getOneApartmentOwners = async (req, res = response) => {
         }
 
         res.json({
-            spaces: data,
+            apartmentOwners: data,
         });
     } catch (error) {
         console.error('Error to get apartment.', error);
@@ -62,15 +62,15 @@ const getAllApartmentOwners = async (req, res) => {
         });
 
         const owners = await OwnersModel.findAll({
-            attributes: ['idOwner', 'docNumber', 'name', 'lastName', 'email', 'phoneNumber'],
+            attributes: ['idOwner', 'docType', 'docNumber', 'name', 'lastName', 'email', 'phoneNumber', 'status'],
 
         });
 
         const data = apartmentOwners.map(ao => {
 
             const apartment = apartments.find(apartment => apartment.idSpace === ao.idApartment);
-            const owner = owners.find(ow => ow.idOwner === ow.idOwner);
-
+            const owner = owners.find(ow => ow.idOwner === ao.idOwner);
+            
             return {
                 ...ao.dataValues,
                 apartment,

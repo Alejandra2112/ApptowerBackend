@@ -9,7 +9,7 @@ const getBooking = async (req, res = response) => {
         const booking = await Booking.findAll({
             include: [
                 { model: User, attributes: ['name', 'lastname', 'email'] },
-                { model: SpacesModel, attributes: ['spaceName', 'spaceType'] }
+                { model: SpacesModel, attributes: ['spaceName', 'spaceType', 'capacity'] }
             ]
         });
 
@@ -23,7 +23,28 @@ const getBooking = async (req, res = response) => {
         });
     }
 }
+const getOneBookingbySpaces = async (req, res = response) => {
+    const { idSpace } = req.params;
 
+    try {
+        const booking = await Booking.findAll({
+            where: { idSpace: idSpace },
+            include: [
+                { model: User, attributes: ['name', 'lastname', 'email'] },
+                { model: SpacesModel, attributes: ['spaceName', 'spaceType','capacity'] }
+            ]
+        });
+
+        res.json({
+            booking,
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: 'Error al obtener reservas',
+        });
+    }
+
+}
 const postBooking = async (req, res) => {
     const body = req.body;
 
@@ -97,4 +118,5 @@ module.exports = {
     getBooking,
     postBooking,
     putBooking,
+    getOneBookingbySpaces
 }

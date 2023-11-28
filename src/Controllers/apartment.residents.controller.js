@@ -7,19 +7,28 @@ const getOneApartmentResidents = async (req, res = response) => {
     try {
         const { idApartment } = req.params;
 
-        const apartmentResidents = await ApartmentModel.findAll({
+        const apartmentResidents = await ApartmentResidentModel.findAll({
             where: { idApartment: idApartment }
         });
-        const residents = await ResidentsModel.findAll({
-            attributes: ['idResident', 'residentType', 'docNumber', 'name', 'lastName', 'email', 'phoneNumber' ],
+
+        const apartments = await ApartmentModel.findAll({
+            attributes: ['idApartment', 'apartmentName', 'area', 'status']
+
         });
 
-        const data = apartmentResidents.map(sp => {
-            const resident = residents.find(re => re.idResident === sp.idResident);
+        const residents = await ResidentsModel.findAll({
+            attributes: ['idResident', 'docType', 'residentType', 'docNumber', 'name', 'lastName', 'email', 'phoneNumber', 'status' ],
+        });
+
+
+        const data = apartmentResidents.map(ar => {
+            const apartment = apartments.find(apartment => apartment.idApartment === ar.idApartment);
+            const resident = residents.find(resident => resident.idResident === ar.idResident);
 
             return {
-                ...sp.dataValues,
-                resident 
+                ...ar.dataValues,
+                resident,
+                apartment
             }
         });
 
@@ -28,7 +37,7 @@ const getOneApartmentResidents = async (req, res = response) => {
         }
 
         res.json({
-            spaceResidents: data,
+            apartmentResidents: data,
         });
     } catch (error) {
         console.error('Error to get apartment residents.', error);
@@ -43,25 +52,25 @@ const getAllApartmentResidents = async (req, res) => {
 
     try {
   
-      const apartmentResidents = await Apart.findAll();
+      const apartmentResidents = await ApartmentResidentModel.findAll();
   
-      const apartments = await SpaceModel.findAll({
+      const apartments = await ApartmentModel.findAll({
         attributes: ['idApartment', 'apartmentName', 'area', 'status']
 
     });
   
       const residents = await ResidentsModel.findAll({
-        attributes: ['idResident', 'residentType', 'docNumber', 'name', 'lastName', 'email', 'phoneNumber' ],
+        attributes: ['idResident', 'docType', 'residentType', 'docNumber', 'name', 'lastName', 'email', 'phoneNumber', 'status' ],
 
     });
       
-    const data = apartmentResidents.map(sr => {
+    const data = apartmentResidents.map(ar => {
         
-        const apartment = apartments.find(apartment => apartment.idSpace === sr.idApartment);
-        const resident = residents.find(re => re.idResident === re.idResident);
+        const apartment = apartments.find(apartment => apartment.idAparment === ar.idApartment);
+        const resident = residents.find(resident => resident.idResident === ar.idResident);
     
         return {
-           ...sr.dataValues,
+           ...ar.dataValues,
            apartment,
            resident
         }
