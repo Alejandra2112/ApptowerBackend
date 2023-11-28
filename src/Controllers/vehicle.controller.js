@@ -1,6 +1,6 @@
 const {response} = require('express');
 const Vehicle = require('../Models/vehicle.model');
-
+const ApartmentModel = require('../Models/apartment.model');
 const getVehicle = async (req, res = response) => {
     try {
         const vehicle = await Vehicle.findAll();
@@ -14,7 +14,27 @@ const getVehicle = async (req, res = response) => {
         });
     }
 }
+const getOneVehicleByAparment = async (req, res = response) => {
+    const {idApartment} = req.params;
+    try {
+        const vehicle = await Vehicle.findAll({
+            where: {
+                idApartment: idApartment,
+            },
+            include: [
+                {model: ApartmentModel, attributes: ['apartmentName', 'area', 'status']},
+            ],
+        });
 
+        res.json({
+            vehicle,
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: 'Error to try get vehicles',
+        });
+    }
+}
 const postVehicle = async (req, res) => {
     let message = '';
     const body = req.body;
@@ -57,4 +77,5 @@ module.exports = {
     getVehicle,
     postVehicle,
     putVehicle,
+    getOneVehicleByAparment,
 }
