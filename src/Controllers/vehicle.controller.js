@@ -14,7 +14,24 @@ const getVehicle = async (req, res = response) => {
         });
     }
 }
+const getOneVehicleBySpaces = async (req, res = response) => {
+    const idSpace = req.params.idSpace;
+    try {
+        const vehicle = await Vehicle.findAll({
+            where: {
+                idSpace: idSpace,
+            },
+        });
 
+        res.json({
+            vehicle,
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: 'Error to try get vehicles',
+        });
+    }
+}
 const postVehicle = async (req, res) => {
     let message = '';
     const body = req.body;
