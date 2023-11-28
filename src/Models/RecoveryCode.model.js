@@ -18,5 +18,4 @@ const RecoveryCode = sequelize.define('RecoveryCode', {
     },
 });
 
-
 module.exports = RecoveryCode;
