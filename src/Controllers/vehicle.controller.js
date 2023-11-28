@@ -74,4 +74,5 @@ module.exports = {
     getVehicle,
     postVehicle,
     putVehicle,
+    getOneVehicleBySpaces,
 }
