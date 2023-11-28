@@ -23,11 +23,6 @@ const Guest_income = sequelize.define('guest_income', {
         type: DataTypes.STRING,
         field: 'person_allows_access',
     },
-    // state:{
-    //     type: DataTypes.STRING,
-    //     field: 'state',	
-    //     allowNull: false,
-    // },
     observations: {
         type: DataTypes.STRING,
         field: 'observations',
@@ -35,21 +30,21 @@ const Guest_income = sequelize.define('guest_income', {
     },
     idVisitor: {
         type: DataTypes.INTEGER,
-        field: 'idvisitor',
+        field: 'idVisitor',
     },
     idApartment: {
         type: DataTypes.INTEGER,
-        field: 'idAPartment',
+        field: 'idApartment',
     }
 
 });
 
 Guest_income.belongsTo(Visitors, {
-    foreignKey: 'idvisitor', as: 'visitor'
+    foreignKey: 'idVisitor', as: 'asociatedVisitor'
 });
 Guest_income.belongsTo(ApartmentModel, {
     foreignKey: 'idApartment',
-    as: 'apartment'
+    as: 'asociatedApartment'
 });
 
 
