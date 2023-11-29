@@ -11,7 +11,7 @@ const validateResult = (req, res, next) => {
 
 const postValidationGuestIncome = [
     check('idVisitor', 'Visitor is required or its value is invalid').not().isEmpty().isInt(),
-    check('idApartment', 'Space is required or its value is invalid').not().isEmpty().isInt(),
+    check('idApartment', 'Apartment is required or its value is invalid').not().isEmpty().isInt(),
     check('startingDate', 'Starting date is required or its value is invalid').not().isEmpty().isISO8601(),
     check('personAllowsAccess', 'Personal allows access is required or its value is invalid').not().isEmpty().isString().isLength({min: 3, max: 50}),
     ( req, res, next ) => {
