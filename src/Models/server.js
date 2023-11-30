@@ -17,6 +17,7 @@ class Server {
     this.RolsPath = '/api/rols';
     this.permissionsRolsPath = '/api/permissions';
     this.permissionsPrivilegesPath = '/api/privileges';
+    this.getPermissionFromRole = '/api/permissionfromrole';
 
 
     //Watchman process path
@@ -47,6 +48,7 @@ class Server {
     this.GuestIncomeVehiclePath = '/api/guestincomevehicle';
     this.vehiclePath = '/api/vehicle';
     this.notificationPath = '/api/notification';
+
     this.middlewares();
     this.routes();
     this.db_connect();
@@ -79,6 +81,7 @@ class Server {
     this.app.use(this.permissionsPrivilegesPath, require('../Routes/privileges.routes'));
     this.app.use(this.guardShiftsPath, require('../Routes/guardShifts.routes'))
     this.app.use(this.EmailPath, require('../Routes/email.routes'));
+    this.app.use(this.getPermissionFromRole, require('../Routes/TokenPermission.routes'));
 
 
     this.app.use(this.bookingPath, require('../Routes/booking.routes'));
@@ -113,7 +116,7 @@ class Server {
 
     try {
 
-      await sequelize.sync({ force: true }).then(() => {
+      await sequelize.sync({ force: false }).then(() => {
         console.log('Models synchronized with the database');
 
       });
