@@ -13,9 +13,7 @@ route.get('/access', verifityToken, async (req, res) => {
     const rol = user.idrole;
     let roleName = '';
 
-    // Realiza una consulta a tu base de datos para obtener el nombre del rol basado en el ID
-    // Esta es una operación ficticia, necesitas ajustarla según tu base de datos y modelo
-    const roleData = await Rols.findByPk(rol); // Suponiendo que utilizas un modelo de Mongoose
+    const roleData = await Rols.findByPk(rol);
 
     if (roleData) {
       roleName = roleData.namerole;

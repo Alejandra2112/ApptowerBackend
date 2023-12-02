@@ -1,6 +1,10 @@
 const { response } = require('express');
 const bcryptjs = require('bcryptjs')
 const User = require('../Models/users.model');
+const Rols = require('../Models/rols.model');
+const ResidentModel = require('../Models/resident.model');
+const Watchman = require('../Models/watchmans.model');
+const { upload, updateFile } = require('../Helpers/uploads.helpers');
 
 
 const getUser = async (req, res = response) => {
@@ -45,6 +49,8 @@ const getUserOne = async (req, res = response) => {
 };
 
 const postUserEmail = async (req, res) => {
+
+
   const { email } = req.body;
 
   try {
@@ -61,29 +67,71 @@ const postUserEmail = async (req, res) => {
 };
 
 
-
 const postUser = async (req, res) => {
-
-  let message = '';
-  const body = req.body;
-
   try {
 
-    // Password encryption
+    const imageUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
+    const { pdf, ...userData } = req.body;
 
-    const salt = bcryptjs.genSaltSync();
-    body.password = bcryptjs.hashSync(body.password, salt)
+    if (userData.state === 'Activo' && userData.idrole) {
+      if (userData.password) {
+        const salt = bcryptjs.genSaltSync();
+        userData.password = bcryptjs.hashSync(userData.password, salt);
+      }
 
-    await User.create(body);
-    message = 'Usuario Registrado Exitosamente';
+      const user = await User.create({
+        ...userData,
+        pdf: imageUrl
+      });
+      console.log('Fecha de nacimiento recibida:', req.body.dateOfbirth);
+      const formattedDate = new Date(req.body.dateOfbirth).toISOString();
+      console.log('Fecha formateada:', formattedDate);
 
-  } catch (e) {
-    message = e.message;
+
+      const roleData = await Rols.findByPk(userData.idrole);
+
+
+      if (['Vigilante', 'Seguridad', 'Vigilantes'].includes(roleData.namerole)) {
+        // const dateOfBirth = new Date(req.body.dateOfbirth);
+
+        const watchman = await Watchman.create({
+          namewatchman: user.name,
+          lastnamewatchman: user.lastname,
+          documentType: user.documentType,
+          document: user.document,
+          phone: user.phone,
+          email: user.email,
+          dateOfbirth: new Date(req.body.dateOfbirth),
+          state: 'Activo',
+        });
+      } else if (['Residente', 'Residentes'].includes(roleData.namerole)) {
+        // const birthday = new Date(req.body.birthday);
+        const resident = await ResidentModel.create({
+          name: user.name,
+          lastName: user.lastname,
+          docType: user.documentType,
+          docNumber: user.document,
+          phoneNumber: user.phone,
+          email: user.email,
+          pdf: req.body.pdf,
+          birthday: req.body.birthday,
+          sex: req.body.sex,
+          residentType: req.body.residentType,
+          status: 'Active',
+        });
+      }
+
+      return res.status(201).json({ message: 'Usuario Registrado Exitosamente' });
+    } else {
+      return res.status(400).json({ message: 'El usuario no está activo o no tiene un rol asignado' });
+    }
+  } catch (error) {
+    console.error('Error al crear usuario:', error);
+    return res.status(500).json({ message: 'Error interno del servidor hola', error: error.message });
   }
-  res.json({
-    user: message,
-  });
+
 };
+
 
 
 const putUser = async (req, res) => {
