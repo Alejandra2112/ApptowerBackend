@@ -1,9 +1,23 @@
 const GuestIncome = require('../Models/guest.income.model');
+const Visitors = require('../Models/visitors.model');
+const ApartmentModel = require('../Models/apartment.model');
 const { response } = require('express');
 
 const getGuestIncomeAll = async (req, res = response) => {
     try {
-        const guestIncome = await GuestIncome.findAll();
+        const guestIncome = await GuestIncome.findAll({
+            include:[
+                {
+                    model: Visitors,
+                    as: 'asociatedVisitor',
+
+                },
+                {
+                    model: ApartmentModel,
+                    as: 'asociatedApartment',
+                }
+            ]
+        });
 
         console.log('ingresos obtenidos correctamente:', guestIncome);
 
@@ -24,7 +38,13 @@ const getGuestIncomeOne = async (req, res = response) => {
     try {
         const { idGuest_income } = req.params;
 
-        const guestIncome = await GuestIncome.findOne({ where: { idGuest_income: idGuest_income } });
+        const guestIncome = await GuestIncome.findOne({ 
+            where: { idGuest_income: idGuest_income },
+            include: [
+                { model: Visitors, as: 'asocaitedVisitor' },
+                { model: ApartmentModel, as: 'asociatedApartment' },
+            ], 
+        });
 
         if (!guestIncome) {
             return res.status(404).json({ error: 'No se encontró un ingreso con ese ID' });

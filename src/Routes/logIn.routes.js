@@ -3,29 +3,32 @@ const route = Router();
 const { logIn } = require('../Controllers/logIn.controller');
 const verifityToken = require('../Middlewares/verifityToken');
 const User = require('../Models/users.model');
+const Rols = require('../Models/rols.model');
 
 route.post('/', logIn);
 
-route.get('/access', verifityToken, (req, res) => {
-  const user = req.user;
-  const rol = user.idrole;
-  let message = '';
+route.get('/access', verifityToken, async (req, res) => {
+  try {
+    const user = req.user;
+    const rol = user.idrole;
+    let roleName = '';
 
-  if (rol == 1) {
-    message = 'Es 1: Administrador';
-  } else if (rol == 2) {
-    message = 'Es 2: residente';
-  } else if (rol == 3) {
-    message = 'Es 3: vigilante';
-  }
-  else {
-    message = '';
-  }
+    const roleData = await Rols.findByPk(rol);
 
-  res.json({
-    message: message,
-  });
+    if (roleData) {
+      roleName = roleData.namerole;
+    }
+
+    res.json({
+      role: roleName,
+      message: `Es ${roleName}`,
+    });
+  } catch (error) {
+    console.error('Error fetching role:', error);
+    res.status(500).json({ message: 'Error fetching role' });
+  }
 });
+
 
 module.exports = route;
 

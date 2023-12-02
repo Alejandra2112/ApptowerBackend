@@ -99,6 +99,7 @@ const postRols = async (req, res) => {
   }
 };
 
+
 const putRols = async (req, res) => {
   const { idrole, detailsRols } = req.body;
 
@@ -111,7 +112,9 @@ const putRols = async (req, res) => {
     await rolsPermissions.destroy({ where: { idrole } });
 
     if (detailsRols && Array.isArray(detailsRols) && detailsRols.length > 0) {
-      const detailInstances = detailsRols.map(async (detail) => {
+      const resolvedInstances = [];
+
+      for (const detail of detailsRols) {
         const { permiso, privilege } = detail;
 
         const permission = await Permission.findOne({ where: { permission: permiso } });
@@ -123,14 +126,12 @@ const putRols = async (req, res) => {
           });
         }
 
-        return {
+        resolvedInstances.push({
           idrole,
           idpermission: permission.idpermission,
           idprivilege: privilegeObj.idprivilege,
-        };
-      });
-
-      const resolvedInstances = await Promise.all(detailInstances);
+        });
+      }
 
       await rolsPermissions.bulkCreate(resolvedInstances);
     }
@@ -141,8 +142,6 @@ const putRols = async (req, res) => {
     res.status(500).json({ error: 'Error al actualizar el rol' });
   }
 };
-
-
 
 
 

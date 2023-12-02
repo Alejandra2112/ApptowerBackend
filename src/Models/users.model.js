@@ -13,10 +13,12 @@ const User = sequelizeUser.define('users', {
     autoIncrement: true,
     field: 'iduser',
   },
+
   documentType: {
     type: DataTypes.STRING,
     field: 'documentType',
   },
+
   document: {
     type: DataTypes.STRING,
     field: 'document',
@@ -30,6 +32,7 @@ const User = sequelizeUser.define('users', {
     type: DataTypes.STRING,
     field: 'name',
   },
+
   lastname: {
     type: DataTypes.STRING,
     field: 'lastname',
@@ -39,14 +42,22 @@ const User = sequelizeUser.define('users', {
     type: DataTypes.INTEGER,
     field: 'idrole'
   },
+
+  pdf: {
+    type: DataTypes.STRING,
+    field: 'pdf',
+  },
+
   email: {
     type: DataTypes.STRING,
     field: 'email',
   },
+
   phone: {
     type: DataTypes.STRING,
     field: 'phone',
   },
+
   password: {
     type: DataTypes.STRING,
     field: 'password',
@@ -58,6 +69,7 @@ const User = sequelizeUser.define('users', {
       },
     },
   },
+
   state: {
     type: DataTypes.STRING,
     field: 'state',
@@ -89,7 +101,7 @@ const User = sequelizeUser.define('users', {
 // //Hooks
 
 // User.afterCreate(async (user) => {
-//   if (user.idrole === 2 && user.state === 'Activo') {
+//   if (user.namerole === 2 && user.state === 'Activo') {
 //     const cretedResident = await ResidentModel.create({
 //       name: user.name,
 //       lastName: user.lastname,
