@@ -8,14 +8,14 @@ const getApartmentWithAssignedParking = async (req, res = response) => {
     try {
         const { idApartment } = req.params;
 
-        const apartment = await AssignedParkingModel.findAll({
+        const assignedParking = await AssignedParkingModel.findAll({
             where: { idApartment: idApartment },
         });
         const parkingSpaces = await ParkingSpaceModel.findAll({
             attributes: ['idParkingSpace', 'parkingName', 'parkingType', 'status'],
         });
 
-        const data = apartment.map(ap => {
+        const data = assignedParking.map(ap => {
             const parkingSpace = parkingSpaces.find(ps => ps.idParkingSpace === ap.idParkingSpace);
 
             return {
@@ -29,8 +29,8 @@ const getApartmentWithAssignedParking = async (req, res = response) => {
         }
 
         res.json({
-            apartment: data,
-        });
+            assignedParking: data,
+        }); 
     } catch (error) {
         console.error('Error to get apartment.', error);
         res.status(500).json({

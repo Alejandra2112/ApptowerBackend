@@ -97,12 +97,12 @@ class Server {
     this.app.use(this.OwnersPath, require('../Routes/owners.routes'))
     this.app.use(this.ApartmentOwnersPath, require('../Routes/apartment.owner.routes'))
     this.app.use(this.ApartmentResidentsPath, require('../Routes/apartment.residents.routes'))
-    this.app.use(this.ApartmentOwnersPath, require('../Routes/apartment.owner.routes'))
-    this.app.use(this.ApartmentResidentsPath, require('../Routes/apartment.residents.routes'))
+    // this.app.use(this.ApartmentOwnersPath, require('../Routes/apartment.owner.routes'))
+    // this.app.use(this.ApartmentResidentsPath, require('../Routes/apartment.residents.routes'))
 
 
-    this.app.use(this.VisitorsPath, require('../Routes/visitors.route'))
-    this.app.use(this.GuestIncomePath, require('../Routes/guest.income.route'))
+    this.app.use(this.VisitorsPath, require('../Routes/visitors.routes'))
+    this.app.use(this.GuestIncomePath, require('../Routes/guest.income.routes'))
     this.app.use(this.FinesPath, require('../Routes/fines.routes'))
   }
 

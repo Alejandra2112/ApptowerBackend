@@ -49,11 +49,38 @@ const postApartment = async (req, res) => {
     let message = '';
     const body = req.body;
 
-    console.log(body)
+    const { tower, apartmentsFloor, floorNumber, ...others } = body
+
+    // console.log("Apartments per floor: " + apartmentsFloor)
+    // console.log("Floor number: " + floorNumber)
 
     try {
-        await ApartmentModel.create(body);
-        message = 'New apartment created.';
+
+        let newAparments = 0;
+
+        for (let floor = 1; floor <= floorNumber; floor++) {
+
+            console.log(newAparments)
+
+            for (let apartmentNumber = 1; apartmentNumber <= apartmentsFloor; apartmentNumber++) {
+                newAparments++
+                await ApartmentModel.create({
+
+                    tower: tower,
+                    apartmentName: (apartmentNumber < 10) ? `${floor}0${apartmentNumber}` : `${floor}${apartmentNumber}`,
+                    ...others
+
+                });
+
+                console.log(`creado: ${newAparments}`)
+
+
+            }
+
+        }
+
+        message = `Creaste ${newAparments} apartamentos en la torre ${tower}.`;
+
     } catch (e) {
         message = e.message;
     }

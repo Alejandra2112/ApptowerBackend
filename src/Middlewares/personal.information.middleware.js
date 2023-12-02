@@ -102,9 +102,9 @@ const postResidentInfoValidation = [
     check('sex')
         .isIn(['M', 'F'])
         .withMessage('Sex is not valid.'),
-    check('residentType')
-        .isIn(['tenant', 'owner'])
-        .withMessage('Status spaces is not valid.'),
+    // check('residentType')
+    //     .isIn(['tenant', 'owner'])
+    //     .withMessage('Status spaces is not valid.'),
 
 ]
 

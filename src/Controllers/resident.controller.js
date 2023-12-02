@@ -1,6 +1,11 @@
 const { response } = require('express');
 const ResidentModel = require('../Models/resident.model');
 const { upload, updateFile } = require('../Helpers/uploads.helpers');
+const ApartmentResidentModel = require('../Models/apartment.residents.model');
+const User = require('../Models/users.model');
+const { body } = require('express-validator');
+const bcryptjs = require('bcryptjs')
+
 
 const getOneResidents = async (req, res = response) => {
     try {
@@ -54,31 +59,69 @@ const getAllResidents = async (req, res = response) => {
 
 }
 
-const postResident = async (req, res) => {
-
-
+postResident = async (req, res) => {
     try {
-
         const imageUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
 
-        const { pdf, status, ...others } = req.body;
+        const {
+            idApartment,
+            residentStartDate,
+            residentEndDate,
+            userBool,
+            ...residentAttributes
+        } = req.body;
 
-        console.log(pdf)
-        console.log(status)
-        console.log(imageUrl)
+        // Criptar contraseña 
+        const salt = bcryptjs.genSaltSync();
+        residentAttributes.password = bcryptjs.hashSync(residentAttributes.password, salt);
 
-
+        // create resident 
         const resident = await ResidentModel.create({
             pdf: imageUrl,
-            status: 'Inactive',
-            ...others
-        })
+            residentType: residentAttributes.residentType = "tenant",
+            status: residentAttributes.status = 'Inactive',
+            ...residentAttributes,
+        });
 
-        res.json({
-            message: 'Resident created'
-        })
+        // create user with rol redent
+        let user;
+        if (userBool) {
+            user = await User.create({
+                documentType: resident.docType,
+                document: resident.docNumber,
+                lastname: resident.lastName,
+                phone: resident.phoneNumber,
+                password: residentAttributes.password,
+                idrole: 2,
+                ...residentAttributes
+            });
+        }
 
-        console.log(resident)
+        // Create apartment per resident 
+
+        if (idApartment) {
+            const apartmentResident = await ApartmentResidentModel.create({
+                idApartment,
+                idResident: resident.idResident,
+                residentStartDate
+            });
+
+            res.json({
+                messageResident: 'Resident created',
+                resident,
+                messageUser: 'User created',
+                user,
+                apartmentResidentMessage: 'Apartment resident created',
+                apartmentResident,
+            });
+        } else {
+            res.json({
+                messageResident: 'Resident created',
+                resident,
+                messageUser: 'User created',
+                user,
+            });
+        }
 
     } catch (e) {
         console.error('Error creating resident:', e);
@@ -86,6 +129,8 @@ const postResident = async (req, res) => {
         res.status(500).json({ message });
     }
 };
+
+
 
 const putResident = async (req, res = response) => {
 
@@ -97,7 +142,7 @@ const putResident = async (req, res = response) => {
             return res.status(400).json({ msg: "Id resident not found." });
         }
 
-        const newPdf = await updateFile(req.files, resident.pdf, ['pdf'], 'Documents' )
+        const newPdf = await updateFile(req.files, resident.pdf, ['pdf'], 'Documents')
         const { pdf, ...others } = req.body
 
         const updatedSpace = await resident.update({

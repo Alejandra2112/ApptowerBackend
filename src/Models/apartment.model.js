@@ -16,10 +16,16 @@ const ApartmentModel = sequelize.define('Apartments', {
         field: 'idApartment',
     },
 
+    tower: {
+
+        type: DataTypes.STRING,
+        field: "tower",
+
+    },
+
     apartmentName: {
         type: DataTypes.STRING,
         field: 'apartmentName',
-        unique: true
         // allowNull: false,
     },
 
