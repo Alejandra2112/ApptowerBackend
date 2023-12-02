@@ -19,9 +19,9 @@ const postDocNumberOwner = [
         .custom(async (value) => {
             const existing = await OwnersModel.findOne({ where: { docNumber: value } });
 
-            if (existing) {
-                throw new Error('Owner document number is already in use');
-            }
+            // if (existing) {
+            //     throw new Error('Owner document number is already in use');
+            // }
 
             return true;
         }),
@@ -39,15 +39,15 @@ const postDocNumberResident = [
         .isLength({ min: 8, max: 12 })
         .withMessage('Document number must be between 8 and 12 characters.')
 
-        .custom(async (value) => {
-            const existing = await ResidentModel.findOne({ where: { docNumber: value } });
+    // .custom(async (value) => {
+    //     const existing = await ResidentModel.findOne({ where: { docNumber: value } });
 
-            if (existing) {
-                throw new Error('Resident document number is already in use');
-            }
+    //     if (existing) {
+    //         throw new Error('Resident document number is already in use');
+    //     }
 
-            return true;
-        }),
+    //     return true;
+    // }),
 ]
 
 // Entity owner and resident Validation
@@ -102,9 +102,9 @@ const postResidentInfoValidation = [
     check('sex')
         .isIn(['M', 'F'])
         .withMessage('Sex is not valid.'),
-    check('residentType')
-        .isIn(['tenant', 'owner'])
-        .withMessage('Status spaces is not valid.'),
+    // check('residentType')
+    //     .isIn(['tenant', 'owner'])
+    //     .withMessage('Status spaces is not valid.'),
 
 ]
 

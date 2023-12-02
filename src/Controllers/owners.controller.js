@@ -65,7 +65,7 @@ const postOwner = async (req, res) => {
             status: 'Inactive',
             ...others
         })
-
+<<
         res.json({
             message: 'Owner created'
         })
