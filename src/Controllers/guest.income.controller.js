@@ -41,7 +41,7 @@ const getGuestIncomeOne = async (req, res = response) => {
         const guestIncome = await GuestIncome.findOne({ 
             where: { idGuest_income: idGuest_income },
             include: [
-                { model: Visitors, as: 'asocaitedVisitor' },
+                { model: Visitors, as: 'asociatedVisitor' },
                 { model: ApartmentModel, as: 'asociatedApartment' },
             ], 
         });
@@ -60,6 +60,33 @@ const getGuestIncomeOne = async (req, res = response) => {
         });
     }
 
+}
+
+const getGuestIncomeByApartment = async (req, res = response) => {
+    try {
+        const { idApartment } = req.body;
+
+        const guestIncome = await GuestIncome.findAll({ 
+            where: { idApartment: idApartment },
+            include: [
+                { model: Visitors, as: 'asociatedVisitor' },
+                { model: ApartmentModel, as: 'asociatedApartment' },
+            ], 
+        });
+
+        if (guestIncome.length === 0) {
+            return res.status(404).json({ error: 'No se encontraron ingresos para ese apartamento' });
+        }
+
+        res.json({
+            guestIncome,
+        });
+    } catch (error) {
+        console.error('Error al obtener ingresos por apartamento:', error);
+        res.status(500).json({
+            error: 'Error al obtener ingresos por apartamento',
+        });
+    }
 }
 
 const postGuestIncome = async (req, res) => {
@@ -109,4 +136,5 @@ module.exports = {
     getGuestIncomeOne,
     postGuestIncome,
     putGuestIncome,
+    getGuestIncomeByApartment,
 };

@@ -3,8 +3,10 @@ const route = Router();
 const {
   getGuestIncomeAll,
   getGuestIncomeOne,
+  getGuestIncomeByApartment,
   postGuestIncome,
   putGuestIncome,
+
 } = require("../Controllers/guest.income.controller");
 const validations = require("../Middlewares/guestIncome.middleware");
 
@@ -26,6 +28,10 @@ route.get(
 //   checkPermissions(privilegesMap.get_guest_income, permissionMap.ingresos),
     getGuestIncomeOne
     );
+route.get(
+  "/byApartment/:idApartment",
+  getGuestIncomeByApartment
+);
 
 route.post(
   "/",
