@@ -53,14 +53,30 @@ const postParkingSpace = async (req, res) => {
 
 
     let message = '';
-    const body = req.body;
+    const { floor, parkingPerFloor, status, ...parkingAtributes} = req.body;
 
-    console.log(body)
-    
+    console.log(parkingPerFloor)   
+
     try {
 
-        await ParkingSpacesModel.create(body);
-        message = 'Parking space create';
+        let newParkingscreated = 0;
+
+        for (let parking = 1; parking <= parkingPerFloor; parking ++ ) {
+
+            await ParkingSpacesModel.create( {
+                parkingName: (parking < 10) ? `${floor}0${parking}` : `${floor}${parking}`,
+                status: "Active",
+                ...parkingAtributes
+
+            });
+            newParkingscreated ++
+
+        }
+
+        message = `Se crearon ${newParkingscreated} parqueaderos nuevos.`;
+
+
+        
 
     } catch (e) {
 

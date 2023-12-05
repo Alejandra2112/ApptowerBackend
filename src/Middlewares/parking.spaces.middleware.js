@@ -3,27 +3,27 @@ const ParkingSpacesModel = require('../Models/parking.spaces.model');
 
 const createParkinValidation = [
 
-    check('parkingName')
-        .isLength({ min: 3 })
-        .withMessage('Parking space name must be at least 3 characters.')
-        .trim()
-        .matches(/^[a-zA-Z0-9\s]+$/)
-        .withMessage('Parking space name must contain only letters and numbers.')
-        .custom(async (value) => {
-            const existingParking = await ParkingSpacesModel.findOne({ where: { parkingName: value } });
+    // check('parkingName')
+    //     .isLength({ min: 3 })
+    //     .withMessage('Parking space name must be at least 3 characters.')
+    //     .trim()
+    //     .matches(/^[a-zA-Z0-9\s]+$/)
+    //     .withMessage('Parking space name must contain only letters and numbers.')
+    //     .custom(async (value) => {
+    //         const existingParking = await ParkingSpacesModel.findOne({ where: { parkingName: value } });
 
-            if (existingParking) {
-                throw new Error('Parking space name is already in use');
-            }
+    //         if (existingParking) {
+    //             throw new Error('Parking space name is already in use');
+    //         }
 
-            return true;
-        }),
+    //         return true;
+    //     }),
     check('parkingType')
         .isIn(['Private', 'Public'])
         .withMessage('Parking space type is not valid.'),
-    check('status')
-        .isIn(['Active', 'Inactive'])
-        .withMessage('Status parking spaces is not valid.')
+    // check('status')
+    //     .isIn(['Active', 'Inactive'])
+    //     .withMessage('Status parking spaces is not valid.')
 
 
 ];

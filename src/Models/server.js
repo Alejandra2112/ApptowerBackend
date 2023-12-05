@@ -1,12 +1,14 @@
 const express = require('express');
 const sequelize = require('../Database/config');
 const fileUpload = require('express-fileupload')
-
-
+const http = require('http')
+const socketio = require('socket.io')
 class Server {
   constructor() {
     this.app = express();
     this.port = 3000;
+    this.server = http.createServer(this.app);
+    this.io = socketio(this.server);
 
     //Users process path
     this.UserPath = '/api/users';
@@ -54,7 +56,7 @@ class Server {
     this.middlewares();
     this.routes();
     this.db_connect();
-
+    this.socketConfig();
   }
 
   middlewares() {
@@ -73,6 +75,7 @@ class Server {
       tempFileDir: '/tmp/',
       createParentPath: true
     }));
+    this.app.use(this.responseMiddleware());
   }
   routes() {
     this.app.use(this.LoginPath, require('../Routes/logIn.routes'))
@@ -131,6 +134,37 @@ class Server {
       console.error('Error connecting PostgreSQL:', err);
 
     }
+  }
+
+  responseMiddleware() {
+    return (req, res, next) => {
+      const originalSend = res.send;
+
+      res.send = (body) => {
+        if ((req.method === 'POST' || req.method === 'PUT') && res.statusCode === 200) {
+          const message = `Solicitud exitosa: ${req.method} a ${req.path}`;
+          this.io.emit('notification', { message });
+        }
+        originalSend.call(res, body);
+      };
+      next();
+    };
+  }
+  socketConfig() {
+    this.io.on('connection', (socket) => {
+      console.log('Nuevo cliente conectado');
+
+
+      socket.on('message', (msg) => {
+        console.log('Mensaje recibido:', msg);
+        this.io.emit('message', msg);
+      });
+
+      socket.on('disconnect', () => {
+        console.log('Cliente desconectado');
+      });
+    });
+
   }
 
   listen() {
