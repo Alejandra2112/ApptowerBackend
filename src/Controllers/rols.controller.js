@@ -101,13 +101,18 @@ const postRols = async (req, res) => {
 
 
 const putRols = async (req, res) => {
-  const { idrole, detailsRols } = req.body;
+  const { detailsRols, ...others } = req.body;
+  const { idrole } = req.params;
+  console.log('ID del rol recibido:', idrole);
 
   try {
     const existingRole = await Rols.findByPk(idrole);
     if (!existingRole) {
       return res.status(404).json({ error: 'No se encontró un rol con ese ID' });
     }
+
+    await existingRole.update(others);
+
 
     await rolsPermissions.destroy({ where: { idrole } });
 

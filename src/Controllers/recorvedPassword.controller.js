@@ -91,7 +91,6 @@ const postEmailUser = async (req, res = response) => {
                     <p>Recibimos una solicitud para restablecer tu contraseña.</p>
                     <p>Tu código de recuperación es: <span class="code">${recoveryCode}</span></p>
                     <p>Utiliza este código para recuperar tu contraseña. Si no solicitaste esto, puedes ignorar este mensaje.</p>
-                    <a class="button" href="https://tuaplicacion.com/recuperar-contrasena">Recuperar contraseña</a>
                     <p class="footer">Gracias por confiar en nosotros,<br />Equipo Apptower</p>
                 </div>
             </body>
@@ -114,7 +113,6 @@ const postEmailUser = async (req, res = response) => {
     }
 };
 
-
 const verifyCode = async (req, res = response) => {
     const { recoveryCode } = req.body;
 
@@ -136,7 +134,8 @@ const verifyCode = async (req, res = response) => {
             if (expirationTime - currentTime <= fiveMinutes) {
                 return res.json({ message: 'Código correcto' });
             } else {
-                return res.status(400).json({ message: 'Código correcto pero ha expirado' });
+                await recoveryRecord.destroy();
+                return res.status(400).json({ message: 'El código ha expirado' });
             }
         } else {
             return res.status(400).json({ message: 'Código incorrecto o ha expirado' });
