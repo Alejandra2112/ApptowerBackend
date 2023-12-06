@@ -1,14 +1,22 @@
 const express = require('express');
 const sequelize = require('../Database/config');
 const fileUpload = require('express-fileupload')
-const http = require('http')
-const socketio = require('socket.io')
-class Server {
+const { createServer } = require('node:http')
+const {Server}= require('socket.io')
+class Servers {
   constructor() {
     this.app = express();
     this.port = 3000;
-    this.server = http.createServer(this.app);
-    this.io = socketio(this.server);
+    this.server = createServer(this.app);
+    this.io = new Server(this.server,{
+      cors: {
+        origin: '*',
+        methods: ["GET", "POST", "PUT", "DELETE"],
+      },
+      connectionStateRecovery: {
+        timeout: 31557600000,
+      },
+    });
 
     //Users process path
     this.UserPath = '/api/users';
@@ -73,7 +81,6 @@ class Server {
       tempFileDir: '/tmp/',
       createParentPath: true
     }));
-    this.app.use(this.responseMiddleware());
   }
   routes() {
     this.app.use(this.LoginPath, require('../Routes/logIn.routes'))
@@ -119,7 +126,7 @@ class Server {
 
     try {
 
-      await sequelize.sync({ force: false }).then(() => {
+      await sequelize.sync({ force: true }).then(() => {
         console.log('Models synchronized with the database');
 
       });
@@ -133,28 +140,18 @@ class Server {
     }
   }
 
-  responseMiddleware() {
-    return (req, res, next) => {
-      const originalSend = res.send;
-
-      res.send = (body) => {
-        if ((req.method === 'POST' || req.method === 'PUT') && res.statusCode === 200) {
-          const message = `Solicitud exitosa: ${req.method} a ${req.path}`;
-          this.io.emit('notification', { message });
-        }
-        originalSend.call(res, body);
-      };
-      next();
-    };
-  }
   socketConfig() {
     this.io.on('connection', (socket) => {
-      console.log('Nuevo cliente conectado');
-
-
-      socket.on('message', (msg) => {
-        console.log('Mensaje recibido:', msg);
-        this.io.emit('message', msg);
+      console.log('Nuevo cliente conectado',socket);
+      socket.on('message_new', async (msg) => {
+        try {
+          const message = await Notification.create({
+            content: msg
+          })  
+          this.io.emit('message', { id: message.id, content: message.content })
+        } catch (error) {
+          console.log(error);
+        }
       });
 
       socket.on('disconnect', () => {
@@ -166,10 +163,11 @@ class Server {
 
   listen() {
 
-    this.app.listen(this.port, () => {
-      console.log(`Listening port ${this.port}`);
+    
+    this.server.listen(this.port, () => {
+      console.log('listening on:'+this.port);
     });
   }
 }
 
-module.exports = Server;
+module.exports = Servers;
