@@ -21,6 +21,8 @@ class Server {
     this.permissionsRolsPath = '/api/permissions';
     this.permissionsPrivilegesPath = '/api/privileges';
     this.getPermissionFromRole = '/api/permissionfromrole';
+    this.getPrivilegeFromRole = '/api/privilegefromrole';
+
 
 
 
@@ -88,7 +90,9 @@ class Server {
     this.app.use(this.EmailPath, require('../Routes/email.routes'));
     this.app.use(this.getPermissionFromRole, require('../Routes/TokenPermission.routes'));
     this.app.use(this.informationUser, require('../Routes/TokenInformationUser.routes'));
+    this.app.use(this.getPrivilegeFromRole, require('../Routes/TokenPrivilege.routes'));
 
+    // routes for booking process
 
     this.app.use(this.bookingPath, require('../Routes/booking.routes'));
     this.app.use(this.GuestIncomeVehiclePath, require('../Routes/guestincomevehicle.routes'));

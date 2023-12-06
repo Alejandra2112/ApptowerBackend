@@ -142,7 +142,7 @@ const putUser = async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
-    
+
 
     const oldRole = await Rols.findByPk(user.idrole);
     const newRole = await Rols.findByPk(idrole);
@@ -160,7 +160,7 @@ const putUser = async (req, res) => {
           lastnamewatchman: user.lastname,
           phone: user.phone,
           email: user.email,
-          dateOfbirth: new Date(req.body.dateOfbirth),
+          dateOfbirth: req.body.dateOfbirth,
           state: 'Activo',
         });
       } else if ((oldRole.namerole === 'Vigilante' || oldRole.namerole === 'Seguridad' || oldRole.namerole === 'Vigilantes') && (newRole.namerole === 'Residente' || newRole.namerole === 'Residentes')) {
