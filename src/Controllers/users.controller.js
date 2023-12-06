@@ -83,9 +83,6 @@ const postUser = async (req, res) => {
         ...userData,
         pdf: imageUrl
       });
-      console.log('Fecha de nacimiento recibida:', req.body.dateOfbirth);
-      const formattedDate = new Date(req.body.dateOfbirth).toISOString();
-      console.log('Fecha formateada:', formattedDate);
 
 
       const roleData = await Rols.findByPk(userData.idrole);
@@ -135,29 +132,70 @@ const postUser = async (req, res) => {
 
 
 const putUser = async (req, res) => {
-  const body = req.body;
   let message = '';
 
   try {
-    const { iduser, idrole, state, password, ...update } = body;
+    const { iduser, idrole, state, password, pdf, ...update } = req.body;
 
     const user = await User.findOne({ where: { iduser: iduser } });
 
     if (!user) {
-      message = 'No se encontró un usuario con ese ID';
-    } else {
-      if (password) {
-        const salt = bcryptjs.genSaltSync(10);
-        const hashedPassword = bcryptjs.hashSync(password, salt);
-
-        update.password = hashedPassword;
-      }
-
-      await user.update({ idrole, state, ...update }, { force: true });
-      await user.reload();
-
-      message = 'Usuario modificado exitosamente.';
+      return res.status(404).json({ error: 'Usuario no encontrado' });
     }
+
+
+    const oldRole = await Rols.findByPk(user.idrole);
+    const newRole = await Rols.findByPk(idrole);
+
+    if (oldRole.id !== newRole.id) {
+      if ((oldRole.namerole === 'Residente' || oldRole.namerole === 'Residentes') && (newRole.namerole === 'Vigilante' || newRole.namerole === 'Seguridad' || newRole.namerole === 'Vigilantes')) {
+        const residente = await ResidentModel.findOne({ where: { docNumber: user.document } });
+        if (residente) {
+          await residente.destroy();
+        }
+        await Watchman.create({
+          documentType: user.documentType,
+          document: user.document,
+          namewatchman: user.name,
+          lastnamewatchman: user.lastname,
+          phone: user.phone,
+          email: user.email,
+          dateOfbirth: req.body.dateOfbirth,
+          state: 'Activo',
+        });
+      } else if ((oldRole.namerole === 'Vigilante' || oldRole.namerole === 'Seguridad' || oldRole.namerole === 'Vigilantes') && (newRole.namerole === 'Residente' || newRole.namerole === 'Residentes')) {
+        const vigilante = await Watchman.findOne({ where: { document: user.document } });
+        if (vigilante) {
+          await vigilante.destroy();
+        }
+        await ResidentModel.create({
+          docType: user.documentType,
+          docNumber: user.document,
+          phoneNumber: user.phone,
+          email: user.email,
+          name: user.name,
+          lastName: user.lastname,
+          pdf: req.body.pdf,
+          birthday: req.body.birthday,
+          sex: req.body.sex,
+          residentType: req.body.residentType,
+          status: 'Active',
+
+        });
+      }
+    }
+
+    const newPdf = await updateFile(req.files, user.pdf, ['pdf'], 'Documents');
+
+    if (password) {
+      const salt = bcryptjs.genSaltSync(10);
+      const hashedPassword = bcryptjs.hashSync(password, salt);
+      update.password = hashedPassword;
+    }
+
+    await user.update({ idrole, state, pdf: newPdf, ...update }, { force: true });
+
+    message = 'Usuario modificado exitosamente.';
   } catch (error) {
     message = 'Error al modificar usuario: ' + error.message;
   }
@@ -166,7 +204,6 @@ const putUser = async (req, res) => {
     user: message,
   });
 };
-
 
 
 // const deleteUser = async (req, res) => {

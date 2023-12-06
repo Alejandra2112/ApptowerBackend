@@ -1,6 +1,9 @@
 const { response } = require('express');
 const OwnersModel = require('../Models/owners.model');
 const { upload, updateFile } = require('../Helpers/uploads.helpers');
+const ApartmentResidentModel = require('../Models/apartment.residents.model');
+const ApartmentOwnerModel = require('../Models/apartment.owners.model');
+const ResidentModel = require('../Models/resident.model');
 
 
 const getOneOwner = async (req, res = response) => {
@@ -55,22 +58,61 @@ const postOwner = async (req, res) => {
 
         const imageUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
 
-        const { pdf, status, ...others } = req.body;
+        const { idApartment,question, pdf, status, ...ownerAtributes } = req.body;
 
-        console.log(pdf)
-        console.log(status)
+        
+        console.log(question)
+        console.log(idApartment)
 
         const owner = await OwnersModel.create({
             pdf: imageUrl,
             status: 'Inactive',
-            ...others
-        })
-<<
-        res.json({
-            message: 'Owner created'
+            ...ownerAtributes
         })
 
-        console.log(owner)
+        const apartmentOwner = await ApartmentOwnerModel.create({
+            idApartment: idApartment,
+            idOwner: owner.idOwner,
+            OwnershipStartDate: "2023-11-03",
+            OwnershipEndDate: "2023-11-03"
+        });
+
+        if (idApartment && question) {
+
+            const resident = await ResidentModel.create({
+                pdf: imageUrl,
+                residentType: "owner",
+                status: 'Inactive',
+                ...ownerAtributes,
+            });
+
+            const apartmentResident = await ApartmentResidentModel.create({
+                idApartment: idApartment,
+                idResident: resident.idResident,
+                residentStartDate: apartmentOwner.OwnershipStartDate
+            });
+    
+
+            res.json({
+                messageOwner: 'Propietario creado',
+                owner,
+                apartmentOwnerMessage: 'Propietario por residente creado',
+                apartmentOwner,
+                ApartmentResidenMenssage: "Residente creado",
+                resident,
+                ApartmentOwnerMenssage: "Propietario creado",
+                apartmentResident,
+            });
+
+
+        } else {
+            res.json({
+                messageOwner: 'Propietario creado',
+                owner,
+                
+            });
+        }
+
 
     } catch (e) {
         console.error('Error creating owner:', e);
@@ -89,7 +131,7 @@ const putOwner = async (req, res = response) => {
             return res.status(400).json({ msg: "Id owner not found." });
         }
 
-        const newPdf = await updateFile(req.files, owner.pdf, ['pdf'], 'Documents' )
+        const newPdf = await updateFile(req.files, owner.pdf, ['pdf'], 'Documents')
         const { pdf, ...others } = req.body
 
         const updatedSpace = await owner.update({

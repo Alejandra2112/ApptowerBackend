@@ -21,6 +21,30 @@ const getWatchman = async (req, res = response) => {
   }
 };
 
+const getWatchmanOne = async (req, res = response) => {
+  try {
+    const { idwatchman } = req.params;
+
+    const watchman = await Watchman.findOne({ where: { idwatchman: idwatchman } });
+    console.log('Vigilante obtenido correctamente:', watchman);
+
+    if (!watchman) {
+      return res.status(404).json({ error: 'No se encontró un vigilante con ese ID' });
+    }
+
+    res.json({
+      watchman,
+    });
+  } catch (error) {
+    console.error('Error al obtener vigilante:', error);
+    res.status(500).json({
+      error: 'Error al obtener vigilante',
+    });
+  }
+};
+
+
+
 
 const postWatchman = async (req, res) => {
   let message = '';
@@ -118,4 +142,5 @@ module.exports = {
   getWatchman,
   postWatchman,
   putWatchman,
+  getWatchmanOne,
 };

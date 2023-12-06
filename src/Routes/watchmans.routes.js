@@ -1,6 +1,6 @@
 const { Router } = require('express')
 const route = Router()
-const { getWatchman, postWatchman, putWatchman } = require('../Controllers/watchmans.controller');
+const { getWatchman, postWatchman, putWatchman, getWatchmanOne } = require('../Controllers/watchmans.controller');
 const validateWatchman = require('../Middlewares/watchman.middleware');
 const checkPermissions = require('../Middlewares/checkPermission');
 // const pr = require('../Helpers/Privileges');
@@ -10,6 +10,7 @@ const checkPermissions = require('../Middlewares/checkPermission');
 // route.use(verifityToken);
 
 route.get('/', getWatchman) // posicion one: privilege, posicion two: permission
+route.get('/:idwatchman', getWatchmanOne)
 
 route.post('/', validateWatchman, postWatchman)
 route.put('/', validateWatchman, putWatchman)
