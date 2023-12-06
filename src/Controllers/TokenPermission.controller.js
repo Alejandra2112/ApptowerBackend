@@ -27,6 +27,25 @@ const getPermissionFromRole = async (req, res) => {
     }
 }
 
+const getInformationUser = async (req, res) => {
+    const user = req.user;
+    const iduser = user.iduser;
+
+    try {
+        const user = await User.findByPk(iduser);
+
+        if (!user) {
+            return res.status(401).json({ message: 'Usuario no válido' });
+        }
+
+        res.json({ user });
+    } catch (error) {
+        console.error('Error al obtener información de usuario:', error);
+        res.status(500).json({ message: 'Error' });
+    }
+}
+
 module.exports = {
-    getPermissionFromRole
+    getPermissionFromRole,
+    getInformationUser,
 }

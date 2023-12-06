@@ -80,23 +80,23 @@ const User = sequelizeUser.define('users', {
   },
 });
 
-// //Relations
-// User.belongsTo(Rols, {
-//   foreignKey: 'idrole',
-//   targetKey: 'idrole',
-// });
+//Relations
+User.belongsTo(Rols, {
+  foreignKey: 'idrole',
+  targetKey: 'idrole',
+});
 
-// User.belongsToMany(Watchmans, {
-//   through: usersforWatchmans,
-//   foreignKey: 'iduser',
-//   otherKey: 'idwatchman',
-// });
+User.belongsToMany(Watchmans, {
+  through: usersforWatchmans,
+  foreignKey: 'iduser',
+  otherKey: 'idwatchman',
+});
 
-// User.belongsToMany(ResidentModel, {
-//   through: usersforResidents,
-//   foreignKey: 'iduser',
-//   otherKey: 'idResident',
-// });
+User.belongsToMany(ResidentModel, {
+  through: usersforResidents,
+  foreignKey: 'iduser',
+  otherKey: 'idResident',
+});
 
 // //Hooks
 

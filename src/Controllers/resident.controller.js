@@ -59,7 +59,7 @@ const getAllResidents = async (req, res = response) => {
 
 }
 
-postResident = async (req, res) => {
+const postResident = async (req, res) => {
     try {
         const imageUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
 
