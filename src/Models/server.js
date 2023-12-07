@@ -1,7 +1,8 @@
 const express = require('express');
 const sequelize = require('../Database/config');
 const fileUpload = require('express-fileupload')
-const http = require('node:http');
+const http = require('http');
+
 
 const { Server } = require('socket.io')
 class Servers {
