@@ -61,7 +61,7 @@ class Servers {
     // this.ApartmentResidentsPath = '/api/spaceResidents';
 
     this.bookingPath = '/api/booking';
-    this.GuestIncomeVehiclePath = '/api/guestincomevehicle';
+    this.GuestIncomeParkingPath = '/api/guestincomeparking';
     this.vehiclePath = '/api/vehicle';
     this.notificationPath = '/api/notification';
 
@@ -104,7 +104,7 @@ class Servers {
     // routes for booking process
 
     this.app.use(this.bookingPath, require('../Routes/booking.routes'));
-    this.app.use(this.GuestIncomeVehiclePath, require('../Routes/guestincomeParking.routes'));
+    this.app.use(this.GuestIncomeParkingPath, require('../Routes/guestincomeParking.routes'));
     this.app.use(this.vehiclePath, require('../Routes/vehicle.routes'));
     this.app.use(this.notificationPath, require('../Routes/notification.routes'));
 
@@ -135,7 +135,7 @@ class Servers {
 
     try {
 
-      await sequelize.sync({ force: true }).then(() => {
+      await sequelize.sync({ force: false }).then(() => {
         console.log('Models synchronized with the database');
 
       });
