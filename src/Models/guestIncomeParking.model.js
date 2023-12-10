@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
 const ParkingSpacesModel = require('./parking.spaces.model');
 const Guest_income = require('./guest.income.model');
-const ParkingSpacesModel = require('./parking.spaces.model');
+
 
 
 const GuestIncomeParking = sequelize.define('guestincomevehicle', {

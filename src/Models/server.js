@@ -104,7 +104,7 @@ class Servers {
     // routes for booking process
 
     this.app.use(this.bookingPath, require('../Routes/booking.routes'));
-    this.app.use(this.GuestIncomeVehiclePath, require('../Routes/guestincomevehicle.routes'));
+    this.app.use(this.GuestIncomeVehiclePath, require('../Routes/guestincomeParking.routes'));
     this.app.use(this.vehiclePath, require('../Routes/vehicle.routes'));
     this.app.use(this.notificationPath, require('../Routes/notification.routes'));
 

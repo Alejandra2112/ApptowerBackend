@@ -5,7 +5,7 @@ const ParkingSpacesModel = require('../Models/parking.spaces.model');
 
 const getGuestIncomeParking = async (req, res = response) => {
     try {
-        const GuestIncomeParking = await GuestIncomeParking.findAll({
+        const guestIncomeParking = await GuestIncomeParking.findAll({
             include: [
                 { model: GuestIncome, as: 'asociatedGuestIncome' },
                 { model: ParkingSpacesModel, as: 'asociatedParkingSpace' },
@@ -13,7 +13,7 @@ const getGuestIncomeParking = async (req, res = response) => {
         });
 
         res.json({
-            guestincomeparking: GuestIncomeParking,
+            guestincomeparking: guestIncomeParking,
         });
     } catch (error) {
         res.status(500).json({
@@ -26,7 +26,7 @@ const getGuestIncomeParkingOne = async (req, res = response) => {
     try {
         const { idGuestIncomeParking } = req.params;
 
-        const GuestIncomeParking = await GuestIncomeParking.findOne({
+        const guestIncomeParking = await GuestIncomeParking.findOne({
             where: { idGuestIncomeParking: idGuestIncomeParking },
             include: [
                 { model: GuestIncome, as: 'asociatedGuestIncome' },
@@ -39,7 +39,7 @@ const getGuestIncomeParkingOne = async (req, res = response) => {
         }
 
         res.json({
-            guestincomeparking: GuestIncomeParking,
+            guestincomeparking: guestIncomeParking,
         });
     } catch (error) {
         res.status(500).json({
@@ -53,7 +53,7 @@ const getGuestIncomeParkingByApartment = async (req, res = response) => {
     try {
         const { idApartment } = req.params;
 
-        const GuestIncomeParking = await GuestIncomeParking.findAll({
+        const guestIncomeParking = await GuestIncomeParking.findAll({
             where: { idApartment: idApartment },
             include: [
                 { model: GuestIncome, as: 'asociatedGuestIncome' },
@@ -66,7 +66,7 @@ const getGuestIncomeParkingByApartment = async (req, res = response) => {
         }
 
         res.json({
-            guestincomeparking: GuestIncomeParking,
+            guestincomeparking: guestIncomeParking,
         });
     } catch (error) {
         res.status(500).json({
@@ -81,14 +81,16 @@ const postGuestIncomeParking = async (req, res) => {
     let message = '';
     const body = req.body;
     try {
-        await GuestIncomeParking.create(body);
+        const guestIncomeParking = await GuestIncomeParking.create(body);
         message = 'Vehiculo del visitante ingresado exitosamente';
+        res.json({
+            guestincomeparking: guestIncomeParking,
+            message,
+        });
     } catch (error) {
         message = error.message;
     }
-    res.json({
-        bookingparking: message,
-    });
+    
 }
 
 
@@ -113,7 +115,7 @@ const putGuestIncomeParking = async (req, res = response) => {
         message = 'Error al modificar ingreso de vehiculo: ' + error.message;
     }
     res.json({
-        bookingparking: message,
+        guestIncomeParking: message,
     });
 }
 
