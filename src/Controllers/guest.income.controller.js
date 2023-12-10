@@ -30,6 +30,7 @@ const getGuestIncomeAll = async (req, res = response) => {
 
         res.status(500).json({
             error: 'Error al obtener ingresos',
+            errormessage: error.message,
         });
     }
 };
