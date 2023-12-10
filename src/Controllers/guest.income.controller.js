@@ -93,14 +93,19 @@ const postGuestIncome = async (req, res) => {
     let message = '';
     const body = req.body;
     try {
-        await GuestIncome.create(body);
+        const createdGuestIncome = await GuestIncome.create(body);
         message = 'Ingreso Registrado Exitosamente';
+        res.json({
+            guestIncome: createdGuestIncome,
+            message,
+        });
     } catch (e) {
-        message = e.message;
+        res.status(500).json({
+            error: e.message
+        })
+        
     }
-    res.json({
-        guestIncome: message,
-    });
+    
 };
 
 const putGuestIncome = async (req, res = response) => {
