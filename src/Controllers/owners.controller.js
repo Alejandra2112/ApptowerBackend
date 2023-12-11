@@ -4,6 +4,9 @@ const { upload, updateFile } = require('../Helpers/uploads.helpers');
 const ApartmentResidentModel = require('../Models/apartment.residents.model');
 const ApartmentOwnerModel = require('../Models/apartment.owners.model');
 const ResidentModel = require('../Models/resident.model');
+const User = require('../Models/users.model');
+const bcryptjs = require('bcryptjs')
+
 
 
 const getOneOwner = async (req, res = response) => {
@@ -58,11 +61,13 @@ const postOwner = async (req, res) => {
 
         const imageUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
 
-        const { idApartment,question, pdf, status, ...ownerAtributes } = req.body;
+        const { idApartment, question, pdf, userBool, status, ...ownerAtributes } = req.body;
 
-        
+
         console.log(question)
         console.log(idApartment)
+
+        // Create owner
 
         const owner = await OwnersModel.create({
             pdf: imageUrl,
@@ -70,14 +75,23 @@ const postOwner = async (req, res) => {
             ...ownerAtributes
         })
 
+        // Create owener per apartment
+
+
         const apartmentOwner = await ApartmentOwnerModel.create({
             idApartment: idApartment,
             idOwner: owner.idOwner,
-            OwnershipStartDate: "2023-11-03",
-            OwnershipEndDate: "2023-11-03"
+            ...ownerAtributes
+
         });
 
-        if (idApartment && question) {
+
+
+        console.log(question)
+
+        if (idApartment && question === "true") {
+
+            // Create owner like resident too
 
             const resident = await ResidentModel.create({
                 pdf: imageUrl,
@@ -86,12 +100,39 @@ const postOwner = async (req, res) => {
                 ...ownerAtributes,
             });
 
+            // Create resident per resident by owner
+
             const apartmentResident = await ApartmentResidentModel.create({
                 idApartment: idApartment,
                 idResident: resident.idResident,
-                residentStartDate: apartmentOwner.OwnershipStartDate
+                residentStartDate: ownerAtributes.OwnershipStartDate
             });
-    
+
+            console.log(userBool)
+
+            let user;
+            // Criptar contraseña 
+
+
+            if (userBool === "true") {
+
+                const salt = bcryptjs.genSaltSync();
+                ownerAtributes.password = bcryptjs.hashSync(ownerAtributes.password, salt);
+
+                user = await User.create({
+                    pdf: imageUrl,
+                    documentType: owner.docType,
+                    document: owner.docNumber,
+                    lastname: owner.lastName,
+                    phone: owner.phoneNumber,
+                    password: ownerAtributes.password,
+                    idrole: 2,
+                    ...ownerAtributes
+                });
+            }
+            
+            console.log(user)
+
 
             res.json({
                 messageOwner: 'Propietario creado',
@@ -100,8 +141,10 @@ const postOwner = async (req, res) => {
                 apartmentOwner,
                 ApartmentResidenMenssage: "Residente creado",
                 resident,
-                ApartmentOwnerMenssage: "Propietario creado",
+                ApartmentOwnerMenssage: " Propietario por apartamento creado",
                 apartmentResident,
+                userMenssage: "Nuevo usuario creado",
+                user
             });
 
 
@@ -109,7 +152,7 @@ const postOwner = async (req, res) => {
             res.json({
                 messageOwner: 'Propietario creado',
                 owner,
-                
+
             });
         }
 
