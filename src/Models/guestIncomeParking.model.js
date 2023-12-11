@@ -7,7 +7,7 @@ const Guest_income = require('./guest.income.model');
 
 const GuestIncomeParking = sequelize.define('guestincomevehicle', {
 
-  idguestincomevehicle: {
+  idGuestIncomeParking: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
