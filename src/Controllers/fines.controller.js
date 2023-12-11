@@ -1,6 +1,7 @@
 const Fines = require('../Models/fines.model');
 const ApartmentModel = require('../Models/apartment.model');
 const { response } = require('express');
+const { upload, updateFile } = require('../Helpers/uploads.helpers');
 
 const getFinesAll = async (req, res = response) => {
     try {
@@ -75,9 +76,17 @@ const getFinesByApartment = async (req, res = response) => {
 
 const postFines = async (req, res) => {
     let message = '';
-    const body = req.body;
+    
+
     try {
-        await Fines.create(body);
+        const imageUrl = await upload(req.files.evidenceFiles, ['pdf','jpg','jpeg','png'], 'Evidences')
+        console.log(imageUrl);
+        const {evidenceFiles, ...finesAtributes } = req.body;
+        await Fines.create({
+            evidenceFiles: imageUrl,
+            ...finesAtributes,
+        
+        });
         message = 'Multa Registrada Exitosamente';
     } catch (e) {
         message = e.message;

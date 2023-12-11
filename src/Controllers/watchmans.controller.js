@@ -43,7 +43,27 @@ const getWatchmanOne = async (req, res = response) => {
   }
 };
 
+const getWatchmanDocument = async (req, res = response) => {
+  try {
+    const document = req.params.document;
 
+    const watchman = await Watchman.findOne({ where: { document: document } });
+    console.log('Vigilante obtenido correctamente:', watchman);
+
+    if (!watchman) {
+      return res.status(404).json({ error: 'No se encontró un vigilante con ese documento' });
+    }
+
+    res.json({
+      watchman,
+    });
+  } catch (error) {
+    console.error('Error al obtener vigilante:', error);
+    res.status(500).json({
+      error: 'Error al obtener vigilante',
+    });
+  }
+};
 
 
 const postWatchman = async (req, res) => {
@@ -62,49 +82,44 @@ const postWatchman = async (req, res) => {
 };
 
 
-
 const putWatchman = async (req, res = response) => {
   const body = req.body;
   let message = '';
 
   try {
-    const { idwatchman, document, state, ...update } = body;
+    const { idwatchman, ...update } = body;
 
     const existingWatchman = await Watchman.findByPk(idwatchman);
 
     if (!existingWatchman) {
       message = 'No se encontró un vigilante con ese ID';
     } else {
-      if (document !== existingWatchman.document) {
-        message = 'No puedes modificar el documento';
-      } else if (state !== existingWatchman.state) {
-        message = 'No puedes modificar el estado';
-      } else {
-        const [updatedRows] = await Watchman.update(update, {
-          where: { idwatchman: idwatchman },
-          force: true
-        });
+      const [updatedRows] = await Watchman.update(update, {
+        where: { idwatchman: idwatchman },
+        force: true
+      });
 
-        if (updatedRows > 0) {
-          await existingWatchman.reload();
+      if (updatedRows > 0) {
+        await existingWatchman.reload();
 
-          const existingUser = await User.findOne({ where: { document: existingWatchman.document } });
-          console.log(existingUser);
+        const existingUser = await User.findOne({ where: { document: existingWatchman.document } });
+        console.log(existingUser);
 
-          if (existingUser) {
-            await existingUser.update({
-              name: existingWatchman.namewatchman,
-              lastname: existingWatchman.lastnamewatchman,
-              documentType: existingWatchman.documentType,
-              phone: existingWatchman.phone,
-              email: existingWatchman.email,
-            });
-          }
-
-          message = 'Vigilante modificado exitosamente.';
-        } else {
-          message = 'No se encontró un vigilante con ese ID';
+        if (existingUser) {
+          await existingUser.update({
+            name: existingWatchman.namewatchman,
+            lastname: existingWatchman.lastnamewatchman,
+            documentType: existingWatchman.documentType,
+            phone: existingWatchman.phone,
+            email: existingWatchman.email,
+            state: existingWatchman.state,
+            document: existingWatchman.document,
+          });
         }
+
+        message = 'Vigilante modificado exitosamente.';
+      } else {
+        message = 'No se encontró un vigilante con ese ID';
       }
     }
   } catch (error) {
@@ -114,7 +129,6 @@ const putWatchman = async (req, res = response) => {
     watchman: message,
   });
 };
-
 
 
 
@@ -143,4 +157,5 @@ module.exports = {
   postWatchman,
   putWatchman,
   getWatchmanOne,
+  getWatchmanDocument
 };

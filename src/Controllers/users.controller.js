@@ -67,6 +67,106 @@ const postUserEmail = async (req, res) => {
 };
 
 
+const resetPassword = async (req, res = response) => {
+  const { email, newPassword } = req.body;
+
+  try {
+    const user = await User.findOne({
+      where: {
+        email: email,
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Usuario no encontrado' });
+    }
+
+    const salt = bcryptjs.genSaltSync();
+    user.password = bcryptjs.hashSync(newPassword, salt);
+
+    await user.save();
+
+    res.json({ message: 'Contraseña actualizada correctamente' });
+  } catch (error) {
+    console.error('Error al restablecer la contraseña:', error);
+    res.status(500).json({ message: 'Error al restablecer la contraseña' });
+  }
+};
+
+
+// const putModifyProfile = async (req, res = response) => {
+//   try {
+//     const { iduser } = req.params;
+//     const { idrole, state, password, pdf, ...update } = req.body;
+
+//     const user = await User.findOne({ where: { iduser: iduser } });
+
+//     if (!user) {
+//       return res.status(404).json({ error: 'Usuario no encontrado' });
+//     }
+
+//     const newPdf = await updateFile(req.files, user.pdf, ['pdf'], 'Documents');
+
+//     if (password) {
+//       const salt = bcryptjs.genSaltSync(10);
+//       const hashedPassword = bcryptjs.hashSync(password, salt);
+//       update.password = hashedPassword;
+//     }
+
+//     await user.update({ idrole, state, pdf: newPdf, ...update }, { force: true });
+
+//     res.json({
+//       user: 'Usuario modificado exitosamente.',
+//     });
+//   } catch (error) {
+//     console.error('Error al modificar usuario:', error);
+//     res.status(500).json({ error: 'Error al modificar usuario' });
+//   }
+// }
+
+
+
+const postUsersforLogin = async (req, res) => {
+  try {
+    const { idrole, state, password, ...userData } = req.body;
+
+    if (userData.idrole === undefined || userData.idrole === null) {
+      userData.idrole = 2;
+      userData.state = 'Inactivo';
+    }
+
+    if (userData.password) {
+      const salt = bcryptjs.genSaltSync();
+      userData.password = bcryptjs.hashSync(userData.password, salt);
+    }
+
+    const user = await User.create({
+      ...userData,
+      idrole: userData.idrole,
+      state: userData.state,
+      password: userData.password,
+    });
+
+    if (user) {
+      res.status(201).json({
+        message: 'Usuario creado exitosamente',
+        user,
+      });
+    } else {
+      res.status(400).json({
+        message: 'Error al crear el usuario',
+      });
+    }
+  } catch (error) {
+    console.error('Error al crear el usuario:', error);
+    res.status(500).json({
+      message: `Error al crear el usuario: ${error.message}`,
+    });
+  }
+};
+
+
+
 const postUser = async (req, res) => {
   try {
 
@@ -130,19 +230,18 @@ const postUser = async (req, res) => {
 };
 
 
-
 const putUser = async (req, res) => {
   let message = '';
 
   try {
-    const { iduser, idrole, state, password, pdf, ...update } = req.body;
+    const { iduser } = req.params;
+    const { idrole, state, password, pdf, ...update } = req.body;
 
     const user = await User.findOne({ where: { iduser: iduser } });
 
     if (!user) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
-
 
     const oldRole = await Rols.findByPk(user.idrole);
     const newRole = await Rols.findByPk(idrole);
@@ -232,4 +331,7 @@ module.exports = {
   putUser,
   getUserOne,
   postUserEmail,
+  postUsersforLogin,
+  resetPassword
+
 };

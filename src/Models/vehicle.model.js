@@ -32,14 +32,15 @@ const Vehicle = sequelize.define('vehicles', {
     },
 
 },
-{
-    timestamps: false,
-},
-);
-Vehicle.belongsTo(ApartmentModel,
     {
-        foreignKey: 'idApartment',
-        targetKey: 'idApartment',
-    }
-)
+        timestamps: false,
+    },
+);
+
+
+Vehicle.belongsTo(ApartmentModel, {
+    foreignKey: 'idApartment',
+    targetKey: 'idApartment',
+
+});
 module.exports = Vehicle;

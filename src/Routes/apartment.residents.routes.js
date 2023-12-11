@@ -1,9 +1,10 @@
 const { Router } = require('express')
 const route = Router()
-const { getOneApartmentResidents, getAllApartmentResidents, postApartmentResident, putApartmentResident, deleteApartmentResident } = require('../Controllers/apartment.residents.controller')
+const { getOneApartmentResidents, getAllApartmentResidents, postApartmentResident, putApartmentResident, deleteApartmentResident, getApartmentsResidents } = require('../Controllers/apartment.residents.controller')
 
 
 route.get('/:idApartment', getOneApartmentResidents)
+route.get('/:idResident', getApartmentsResidents)
 route.get('/', getAllApartmentResidents)
 route.post('/', postApartmentResident)
 route.put('/', putApartmentResident)
