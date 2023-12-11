@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
-const ApartmentResidentModel = require('./apartment.residents.model');
+const ApartmentModel = require('./apartment.model');
 
 const Vehicle = sequelize.define('vehicle', {
     idvehicle: {
@@ -10,14 +10,20 @@ const Vehicle = sequelize.define('vehicle', {
         field: 'idvehicle',
     },
 
-    idApartmentResident: {
+    idApartment: {
         type: DataTypes.INTEGER,
-        field: 'idApartmentResident',
+        field: 'idApartment',
     },
 
-    typeuser: {
+    state: {
         type: DataTypes.STRING,
-        field: 'typeuser',
+        field: 'state',
+        defaultValue: 'Activo',
+
+    },
+    description: {
+        type: DataTypes.STRING,
+        field: 'description',
     },
 
     licenseplate: {
@@ -30,10 +36,10 @@ const Vehicle = sequelize.define('vehicle', {
     timestamps: false,
 },
 );
-Vehicle.belongsTo(ApartmentResidentModel,
+Vehicle.belongsTo(ApartmentModel,
     {
-        foreignKey: 'idApartmentResident',
-        targetKey: 'idApartmentResident',
+        foreignKey: 'idApartment',
+        targetKey: 'idApartment',
     }
 )
 module.exports = Vehicle;

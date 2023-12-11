@@ -73,9 +73,31 @@ const putVehicle = async (req, res = response) => {
     });
 }
 
+const deleteVehucle = async (req, res = response) => {
+    const { idvehicle } = req.params;
+    let message = '';
+
+    try {
+        const deletedRows = await Vehicle.destroy({
+            where: { idvehicle: idvehicle },
+        });
+
+        if (deletedRows > 0) {
+            message = 'Vehicle deleted successfully.';
+        } else {
+            message = 'No vehicle found with that ID';
+        }
+    } catch (error) {
+        message = 'Error to delete vehicle: ' + error.message;
+    }
+    res.json({
+        vehicle: message,
+    });
+}
 module.exports = {
     getVehicle,
     postVehicle,
     putVehicle,
+    deleteVehucle,
     getOneVehicleByAparment,
 }
