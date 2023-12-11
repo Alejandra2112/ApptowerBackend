@@ -114,7 +114,7 @@ const postApartmentResident = async (req, res) => {
     res.json({
 
         apartmentResidents: message,
-
+        
     });
 };
 

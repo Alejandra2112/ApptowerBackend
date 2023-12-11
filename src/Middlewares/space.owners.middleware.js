@@ -32,32 +32,32 @@ const createSpaceOwnersValidation = [
 
 
 
-    check('residentStartDate')
-        .isDate().withMessage('Invalid date format.')
-        .custom((value) => {
-            const date = new Date(value);
-            const today = new Date();
+    // check('residentStartDate')
+    //     .isDate().withMessage('Invalid date format.')
+    //     .custom((value) => {
+    //         const date = new Date(value);
+    //         const today = new Date();
 
-            if (date > today) {
-                throw new Error('The date cannot be in the future.');
-            }
+    //         if (date > today) {
+    //             throw new Error('The date cannot be in the future.');
+    //         }
 
-            return true;
-        }),
+    //         return true;
+    //     }),
 
-    check('residentEndDate')
-        .optional()
-        .isDate().withMessage('Invalid date format.')
-        .custom((value, { req }) => {
-            const endDate = new Date(value);
-            const startDate = new Date(req.body.OwnershipStartDate);
+    // check('residentEndDate')
+    //     .optional()
+    //     .isDate().withMessage('Invalid date format.')
+    //     .custom((value, { req }) => {
+    //         const endDate = new Date(value);
+    //         const startDate = new Date(req.body.OwnershipStartDate);
 
-            if (endDate > startDate) {
-                throw new Error('The end date must be greater than or equal to the start date.');
-            }
+    //         if (endDate > startDate) {
+    //             throw new Error('The end date must be greater than or equal to the start date.');
+    //         }
 
-            return true;
-        }),
+    //         return true;
+    //     }),
     check('status')
         .default('Active')
         .isIn(['Active', 'Inactive'])

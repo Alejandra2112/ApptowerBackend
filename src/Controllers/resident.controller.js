@@ -85,7 +85,7 @@ const postResident = async (req, res) => {
 
         // create user with rol redent
         let user;
-        if (userBool) {
+        if (userBool === "true") {
             user = await User.create({
                 documentType: resident.docType,
                 document: resident.docNumber,
