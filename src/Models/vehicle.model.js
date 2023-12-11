@@ -13,22 +13,26 @@ const Vehicle = sequelize.define('vehicles', {
     idApartment: {
         type: DataTypes.INTEGER,
         field: 'idApartment',
+        required: true,
     },
 
     state: {
         type: DataTypes.STRING,
         field: 'state',
         defaultValue: 'Activo',
+        required: true,
 
     },
     description: {
         type: DataTypes.STRING,
         field: 'description',
+        required: true,
     },
 
     licenseplate: {
         type: DataTypes.STRING,
         field: 'licenseplate',
+        required: true,
     },
 
 },

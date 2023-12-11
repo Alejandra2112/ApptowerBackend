@@ -1,5 +1,5 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = require('../Database/config'); 
+const sequelize = require('../Database/config');
 
 const User = require('./users.model');
 const Space = require('./spaces.model');
@@ -9,31 +9,44 @@ const Booking = sequelize.define('booking', {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
-    field: 'idbooking', 
+    field: 'idbooking',
   },
   idSpace: {
     type: DataTypes.INTEGER,
     field: 'idSpace',
+    required: true,
+
   },
   iduser: {
     type: DataTypes.INTEGER,
     field: 'iduser',
+    required: true,
+
   },
   bookingdate: {
     type: DataTypes.DATE,
-    field: 'bookingdate', 
+    field: 'bookingdate',
+    required: true,
+
   },
   amount: {
     type: DataTypes.INTEGER,
-    field: 'amount', 
+    field: 'amount',
+    required: true,
+
   },
-  status: { type: DataTypes.ENUM, values: ['pendiente', 'cancelado', 'activo', 'finalizado', 'por pagar', 'pagado'] },
+  status: {
+    type: DataTypes.ENUM, values: ['pendiente', 'cancelado', 'activo', 'finalizado', 'por pagar', 'pagado'],
+    required: true,
+  },
   finalDate: {
     type: DataTypes.DATE,
-    field: 'finalDate', 
+    field: 'finalDate',
+    required: true,
+
   },
 },
- //AGREGAR CANTIDAD
+  //AGREGAR CANTIDAD
   //FECHA FINAL
   //ESTATUS
   /* 
@@ -47,17 +60,16 @@ const Booking = sequelize.define('booking', {
     por pagar
     pagado
   */
-{
-  timestamps: true, 
-});
+  {
+    timestamps: true,
+  });
 Booking.belongsTo(Space, {
-  foreignKey: 'idSpace', 
-  targetKey: 'idSpace', 
+  foreignKey: 'idSpace',
+  targetKey: 'idSpace',
 });
 Booking.belongsTo(User, {
-  foreignKey: 'iduser', 
-  targetKey: 'iduser', 
+  foreignKey: 'iduser',
+  targetKey: 'iduser',
 });
 
 module.exports = Booking;
-  
