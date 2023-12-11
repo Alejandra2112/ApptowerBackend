@@ -4,7 +4,7 @@ const { getOneApartmentResidents, getAllApartmentResidents, postApartmentResiden
 
 
 route.get('/:idApartment', getOneApartmentResidents)
-route.get('/:idResident', getApartmentsResidents)
+route.get('/resident/:idResident', getApartmentsResidents)
 route.get('/', getAllApartmentResidents)
 route.post('/', postApartmentResident)
 route.put('/', putApartmentResident)

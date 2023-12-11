@@ -92,28 +92,23 @@ const getAllApartmentResidents = async (req, res) => {
 }
 
 
-
-const getApartmentsResidents = async (req, res) => {
+const getApartmentsResidents = async (req, res = response) => {
     try {
         const { idResident } = req.params;
-        const apartmentResidents = await ApartmentResidentModel.findAll({
-            where: { idResident: idResident },
-            include: [ApartmentModel]
-        });
 
-        if (!apartmentResidents || apartmentResidents.length === 0) {
-            return res.status(404).json({ error: 'No se encontró un residente con ese ID' });
+        const apartmentResidents = await ApartmentResidentModel.findOne({ where: { idResident: idResident } });
+
+        if (!apartmentResidents) {
+            return res.status(404).json({ error: 'No se encontró un ID' });
         }
-        const apartmentNames = apartmentResidents.map(ar => ar.Apartment.apartmentName);
 
         res.json({
-            apartmentNames,
+            apartmentResidents,
         });
     } catch (error) {
-        console.error('Error al obtener apartamentos:', error);
+        console.error('Error al obtener resident:', error);
         res.status(500).json({
-            error: 'Error al obtener apartamentos',
-            errorMessage: error.toString(),
+            error: 'Error al obtener resident',
         });
     }
 };
@@ -141,7 +136,7 @@ const postApartmentResident = async (req, res) => {
     res.json({
 
         apartmentResidents: message,
-        
+
     });
 };
 
