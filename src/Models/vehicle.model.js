@@ -36,7 +36,7 @@ const Vehicle = sequelize.define('vehicles', {
     timestamps: false,
 },
 );
-Vehicle.belongsToMany(ApartmentModel,
+Vehicle.belongsTo(ApartmentModel,
     {
         foreignKey: 'idApartment',
         targetKey: 'idApartment',
