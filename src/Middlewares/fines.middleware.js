@@ -14,7 +14,8 @@ const postFinesValidation = [
     check('amount', 'Amount is required or its value is invalid').not().isEmpty().isInt(),
     check('idApartment', 'Aparment is required or its value is invalid').not().isEmpty().isInt(),
     check('state', 'State is required or its value is invalid').not().isEmpty().isString().isLength({min: 3, max: 50}),
-    check('evidenceFiles', 'Evidence files is required or its value is invalid').not().isEmpty().isString().isLength({min: 3, max: 50}),    (req, res, next)=>{
+    // check('evidenceFiles', 'Evidence files is required or its value is invalid').not().isEmpty(),    
+    (req, res, next)=>{
         validateResult(req, res, next);
     }
 ];
