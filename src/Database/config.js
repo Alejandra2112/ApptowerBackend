@@ -3,6 +3,7 @@ const { Sequelize } = require('sequelize');
 
 
 const sequelize = new Sequelize(process.env.externalDbUrl, {
+  timezone: 'America/Bogota',
   dialect: 'postgres',
   dialectOptions: {
     ssl: {

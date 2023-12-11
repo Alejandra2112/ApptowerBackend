@@ -11,7 +11,7 @@ const validateUser = [
     .isString()
     .isLength({ min: 8, max: 10 })
     .withMessage('El campo "document" debe ser una cadena de 8 a 10 caracteres'),
-
+  
 
   check('name')
     .isString()

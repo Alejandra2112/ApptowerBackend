@@ -1,6 +1,20 @@
 const { response } = require('express');
 const { hotmailTransporter } = require('../Helpers/emailConfig');
 const RecoveryCode = require('../Models/RecoveryCode.model');
+const { Op } = require('sequelize');
+
+
+setInterval(async () => {
+    const now = new Date();
+    await RecoveryCode.destroy({
+        where: {
+            expiresAt: {
+                [Op.lt]: now,
+            },
+        },
+    });
+}, 60 * 1000);
+
 
 const postEmailUser = async (req, res = response) => {
     const { email } = req.body;
@@ -11,17 +25,20 @@ const postEmailUser = async (req, res = response) => {
 
     const recoveryCode = generateSixDigitCode();
 
+
     const expirationDate = new Date(Date.now() + 5 * 60 * 1000);
 
     res.cookie('recoveryCode', recoveryCode, { maxAge: 60000 });
 
 
     try {
-        await RecoveryCode.create({
+        const recovery = await RecoveryCode.create({
             code: recoveryCode,
             userEmail: email,
             expiresAt: expirationDate,
         });
+
+
 
         const mailOptions = {
             from: 'apptower@outlook.com',
@@ -117,9 +134,10 @@ const verifyCode = async (req, res = response) => {
     const { recoveryCode } = req.body;
 
     try {
+        const code = String(recoveryCode);
         const recoveryRecord = await RecoveryCode.findOne({
             where: {
-                code: recoveryCode,
+                code: code,
                 expiresAt: {
                     [Op.gt]: new Date(),
                 },
@@ -127,21 +145,12 @@ const verifyCode = async (req, res = response) => {
         });
 
         if (recoveryRecord) {
-            const expirationTime = new Date(recoveryRecord.expiresAt).getTime();
-            const currentTime = new Date().getTime();
-            const fiveMinutes = 5 * 60 * 1000;
-
-            if (expirationTime - currentTime <= fiveMinutes) {
-                return res.json({ message: 'Código correcto' });
-            } else {
-                await recoveryRecord.destroy();
-                return res.status(400).json({ message: 'El código ha expirado' });
-            }
+            return res.json({ message: 'Código correcto' });
         } else {
             return res.status(400).json({ message: 'Código incorrecto o ha expirado' });
         }
     } catch (error) {
-        console.error('Error al verificar el código en la base de datos:', error);
+        console.error('Error al verificar el código en la base de dato:', error);
         return res.status(500).json({ message: 'Error al verificar el código en la base de datos' });
     }
 };
