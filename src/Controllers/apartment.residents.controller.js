@@ -17,7 +17,7 @@ const getOneApartmentResidents = async (req, res = response) => {
         });
 
         const residents = await ResidentsModel.findAll({
-            attributes: ['idResident', 'docType', 'residentType', 'docNumber', 'name', 'lastName', 'email', 'phoneNumber', 'status' ],
+            attributes: ['idResident', 'docType', 'residentType', 'docNumber', 'name', 'lastName', 'email', 'phoneNumber', 'status'],
         });
 
 
@@ -51,45 +51,72 @@ const getOneApartmentResidents = async (req, res = response) => {
 const getAllApartmentResidents = async (req, res) => {
 
     try {
-  
-      const apartmentResidents = await ApartmentResidentModel.findAll();
-  
-      const apartments = await ApartmentModel.findAll({
-        attributes: ['idApartment', 'apartmentName', 'area', 'status']
 
-    });
-  
-      const residents = await ResidentsModel.findAll({
-        attributes: ['idResident', 'docType', 'residentType', 'docNumber', 'name', 'lastName', 'email', 'phoneNumber', 'status' ],
+        const apartmentResidents = await ApartmentResidentModel.findAll();
 
-    });
-      
-    const data = apartmentResidents.map(ar => {
-        
-        const apartment = apartments.find(apartment => apartment.idAparment === ar.idApartment);
-        const resident = residents.find(resident => resident.idResident === ar.idResident);
-    
-        return {
-           ...ar.dataValues,
-           apartment,
-           resident
-        }
-    })
-  
-      res.json({
+        const apartments = await ApartmentModel.findAll({
+            attributes: ['idApartment', 'apartmentName', 'area', 'status']
 
-        apartmentResidents: data
+        });
 
-    });
-  
+        const residents = await ResidentsModel.findAll({
+            attributes: ['idResident', 'docType', 'residentType', 'docNumber', 'name', 'lastName', 'email', 'phoneNumber', 'status'],
+
+        });
+
+        const data = apartmentResidents.map(ar => {
+
+            const apartment = apartments.find(apartment => apartment.idAparment === ar.idApartment);
+            const resident = residents.find(resident => resident.idResident === ar.idResident);
+
+            return {
+                ...ar.dataValues,
+                apartment,
+                resident
+            }
+        })
+
+        res.json({
+
+            apartmentResidents: data
+
+        });
+
     } catch (error) {
-  
-      console.error(error);
-      res.status(500).json({ error: 'Error getting space owners' });
-  
+
+        console.error(error);
+        res.status(500).json({ error: 'Error getting space owners' });
+
     }
-  
-  }
+
+}
+
+
+
+const getApartmentsResidents = async (req, res) => {
+    try {
+        const { idResident } = req.params;
+        const apartmentResidents = await ApartmentResidentModel.findAll({
+            where: { idResident: idResident },
+            include: [ApartmentModel]
+        });
+
+        if (!apartmentResidents || apartmentResidents.length === 0) {
+            return res.status(404).json({ error: 'No se encontró un residente con ese ID' });
+        }
+        const apartmentNames = apartmentResidents.map(ar => ar.Apartment.apartmentName);
+
+        res.json({
+            apartmentNames,
+        });
+    } catch (error) {
+        console.error('Error al obtener apartamentos:', error);
+        res.status(500).json({
+            error: 'Error al obtener apartamentos',
+            errorMessage: error.toString(),
+        });
+    }
+};
 
 
 
@@ -100,7 +127,7 @@ const postApartmentResident = async (req, res) => {
     const body = req.body;
 
     console.log(body)
-    
+
     try {
 
         await ApartmentResidentModel.create(body);
@@ -191,4 +218,5 @@ module.exports = {
     postApartmentResident,
     putApartmentResident,
     deleteApartmentResident,
+    getApartmentsResidents
 };

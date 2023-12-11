@@ -3,6 +3,7 @@ const sequelize = require('../Database/config');
 const Watchman = require('./watchmans.model');
 
 
+
 const guardShifts = sequelize.define('guardShifts', {
   idshifts: {
     type: DataTypes.INTEGER,
@@ -31,6 +32,8 @@ guardShifts.belongsTo(Watchman, {
   foreignKey: 'idwatchman',
   targetKey: 'idwatchman',
 });
+
+
 
 module.exports = guardShifts;
 

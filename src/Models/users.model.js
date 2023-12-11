@@ -25,7 +25,7 @@ const User = sequelizeUser.define('users', {
     unique: {
       msg: 'El documento ya se encuentra asignado a un usuario'
     },
-    allowNull: true,
+    allowNull: false,
   },
 
   name: {
@@ -46,10 +46,14 @@ const User = sequelizeUser.define('users', {
   pdf: {
     type: DataTypes.STRING,
     field: 'pdf',
+    allowNull: true
   },
 
   email: {
     type: DataTypes.STRING,
+    unique: {
+      msg: 'El correo ya se encuentra asignado a un usuario'
+    },
     field: 'email',
   },
 

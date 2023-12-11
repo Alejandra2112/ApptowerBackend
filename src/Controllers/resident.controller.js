@@ -59,6 +59,32 @@ const getAllResidents = async (req, res = response) => {
 
 }
 
+
+const getResidentDocument = async (req, res = response) => {
+    try {
+        const document = req.params.document;
+
+        const residente = await ResidentModel.findOne({ where: { docNumber: document } });
+        console.log('Residente obtenido correctamente:', residente);
+
+        if (!residente) {
+            return res.status(404).json({ error: 'No se encontró un residente con ese documento' });
+        }
+
+        res.json({
+            residente,
+        });
+    } catch (error) {
+        console.error('Error al obtener residente:', error);
+        res.status(500).json({
+            error: 'Error al obtener residente',
+            errorMessage: error.toString(), // Cambia esto
+        });
+    }
+}
+
+
+
 const postResident = async (req, res) => {
     try {
         const imageUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
@@ -125,8 +151,7 @@ const postResident = async (req, res) => {
 
     } catch (e) {
         console.error('Error creating resident:', e);
-        const message = e.message || 'Error creating resident.';
-        res.status(500).json({ message });
+        res.status(500).json({ message: e.message, stack: e.stack });
     }
 };
 
@@ -200,4 +225,5 @@ module.exports = {
     postResident,
     putResident,
     deleteResident,
+    getResidentDocument
 };
