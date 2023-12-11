@@ -1,8 +1,8 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
 const ApartmentModel = require('./apartment.model');
 
-const Vehicle = sequelize.define('vehicle', {
+const Vehicle = sequelize.define('vehicles', {
     idvehicle: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -36,7 +36,7 @@ const Vehicle = sequelize.define('vehicle', {
     timestamps: false,
 },
 );
-Vehicle.belongsTo(ApartmentModel,
+Vehicle.belongsToMany(ApartmentModel,
     {
         foreignKey: 'idApartment',
         targetKey: 'idApartment',

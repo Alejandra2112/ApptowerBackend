@@ -3,14 +3,19 @@ const Vehicle = require('../Models/vehicle.model');
 const ApartmentModel = require('../Models/apartment.model');
 const getVehicle = async (req, res = response) => {
     try {
-        const vehicle = await Vehicle.findAll();
+        const vehicle = await Vehicle.findAll({
+            include: [
+                {model: ApartmentModel, attributes: ['apartmentName', 'area', 'status']},
+            ],
+        
+        });
 
         res.json({
             vehicle,
         });
     } catch (error) {
         res.status(500).json({
-            error: 'Error to try get vehicles',
+            error: 'Error to try get vehicles'+error.message,
         });
     }
 }
