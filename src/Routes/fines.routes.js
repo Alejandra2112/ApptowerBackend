@@ -3,6 +3,7 @@ const route = Router();
 const {
   getFinesAll,
   getFinesOne,
+  getFinesByApartment,
   postFines,
   putFines,
 } = require("../Controllers/fines.controller");
@@ -23,6 +24,12 @@ route.get(
   "/:idfines",
   // checkPermissions(privilegesMap.get_fines, permissionMap.multas),
   getFinesOne);
+route.get(
+
+  "/byApartment/:idApartment",
+  // checkPermissions(privilegesMap.get_fines, permissionMap.multas),
+  getFinesByApartment
+);
 route.post(
   "/",
   validations.postFinesValidation,

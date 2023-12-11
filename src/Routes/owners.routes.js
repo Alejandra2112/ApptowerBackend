@@ -9,5 +9,5 @@ route.get('/', getAllOwners)
 route.post('/', postPersonalInfoValidation, postDocNumberOwner, validation, postOwner)
 route.put('/', putDocNumberOwner, putPersonalInfoValidation, validation, putOwner)
 // route.delete('/', deleteOwner)
-
+ 
 module.exports = route  

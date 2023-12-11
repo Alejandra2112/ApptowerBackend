@@ -131,7 +131,7 @@ const putApartmentOwner = async (req, res = response) => {
 
         const [updatedRows] = await ApartmentOwnerModel.update(update, {
 
-            where: { idSpaceOwner: idSpaceOwner },
+            where: { idApartmentOwner: idApartmentOwner },
 
         });
 

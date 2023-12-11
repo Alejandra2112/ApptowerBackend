@@ -1,14 +1,16 @@
 const express = require('express');
 const sequelize = require('../Database/config');
 const fileUpload = require('express-fileupload')
-const { createServer } = require('node:http')
-const {Server}= require('socket.io')
+const http = require('http');
+
+
+const { Server } = require('socket.io')
 class Servers {
   constructor() {
     this.app = express();
     this.port = 3000;
-    this.server = createServer(this.app);
-    this.io = new Server(this.server,{
+    this.server = http.createServer(this.app);
+    this.io = new Server(this.server, {
       cors: {
         origin: '*',
         methods: ["GET", "POST", "PUT", "DELETE"],
@@ -59,7 +61,7 @@ class Servers {
     // this.ApartmentResidentsPath = '/api/spaceResidents';
 
     this.bookingPath = '/api/booking';
-    this.GuestIncomeVehiclePath = '/api/guestincomevehicle';
+    this.GuestIncomeParkingPath = '/api/guestincomeparking';
     this.vehiclePath = '/api/vehicle';
     this.notificationPath = '/api/notification';
 
@@ -102,7 +104,7 @@ class Servers {
     // routes for booking process
 
     this.app.use(this.bookingPath, require('../Routes/booking.routes'));
-    this.app.use(this.GuestIncomeVehiclePath, require('../Routes/guestincomevehicle.routes'));
+    this.app.use(this.GuestIncomeParkingPath, require('../Routes/guestincomeParking.routes'));
     this.app.use(this.vehiclePath, require('../Routes/vehicle.routes'));
     this.app.use(this.notificationPath, require('../Routes/notification.routes'));
 
@@ -149,12 +151,12 @@ class Servers {
 
   socketConfig() {
     this.io.on('connection', (socket) => {
-      console.log('Nuevo cliente conectado',socket);
+      console.log('Nuevo cliente conectado', socket);
       socket.on('message_new', async (msg) => {
         try {
           const message = await Notification.create({
             content: msg
-          })  
+          })
           this.io.emit('message', { id: message.id, content: message.content })
         } catch (error) {
           console.log(error);
@@ -170,9 +172,9 @@ class Servers {
 
   listen() {
 
-    
+
     this.server.listen(this.port, () => {
-      console.log('listening on:'+this.port);
+      console.log('listening on:' + this.port);
     });
   }
 }

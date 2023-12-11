@@ -1,9 +1,17 @@
 const Fines = require('../Models/fines.model');
+const ApartmentModel = require('../Models/apartment.model');
 const { response } = require('express');
 
 const getFinesAll = async (req, res = response) => {
     try {
-        const fines = await Fines.findAll();
+        const fines = await Fines.findAll({
+            include: [
+                {
+                    model: ApartmentModel,
+                    as: 'apartment',
+                },
+            ],
+        });
 
         console.log('Multas obtenidas correctamente:', fines);
 
@@ -24,7 +32,7 @@ const getFinesOne = async (req, res = response) => {
     try {
         const { idfines } = req.params;
 
-        const fines = await Fines.findOne({ where: { idfines: idfines } });
+        const fines = await Fines.findOne({ where: { idfines: idfines }, include: [{ model: ApartmentModel, as: 'apartment' }] });
 
         if (!fines) {
             return res.status(404).json({ error: 'No se encontró una multa con ese ID' });
@@ -39,6 +47,29 @@ const getFinesOne = async (req, res = response) => {
             error: 'Error al obtener multa',
         });
     }
+
+}
+
+const getFinesByApartment = async (req, res = response) => {
+    try {
+        const { idApartment } = req.params;
+
+        const fines = await Fines.findAll({ where: { idApartment: idApartment }, include: [{ model: ApartmentModel, as: 'apartment' }] });
+
+        if (!fines) {
+            return res.status(404).json({ error: 'No se encontró una multa con ese ID' });
+        }
+
+        res.json({
+            fines,
+        });
+    } catch (error) {
+        console.error('Error al obtener multa:', error);
+        res.status(500).json({
+            error: 'Error al obtener multa',
+        });
+    }
+
 
 }
 
@@ -88,6 +119,7 @@ const putFines = async (req, res = response) => {
 module.exports = {
     getFinesAll,
     getFinesOne,
+    getFinesByApartment,
     postFines,
     putFines,
 };
