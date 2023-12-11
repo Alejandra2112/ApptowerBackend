@@ -9,7 +9,7 @@ const Guest_income = sequelize.define('guest_income', {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-        field: 'idguest_income',
+        field: 'idGuest_income',
     },
     startingDate: {
         type: DataTypes.DATE,
