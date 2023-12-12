@@ -160,6 +160,10 @@ const postResident = async (req, res) => {
 const putResident = async (req, res = response) => {
 
     try {
+
+        console.log(`Editar:` )
+        console.log(req.body)
+
         const resident = await ResidentModel.findByPk(req.body.idResident);
 
 

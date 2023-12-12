@@ -187,11 +187,11 @@ const putPersonalInfoValidation = [
         .withMessage('Last name mush be between 3 and 20 characters.')
         .trim(),
 
-    check('birthday')
-        .notEmpty()
-        .withMessage('Birthday date is required.')
-        .isISO8601()
-        .withMessage('Birthday date mush be Year/Moth/day.'),
+    // check('birthday')
+    //     .notEmpty()
+    //     .withMessage('Birthday date is required.')
+    //     .isISO8601()
+    //     .withMessage('Birthday date mush be Year/Moth/day.'),
 
     check('email')
         .notEmpty()
@@ -215,9 +215,9 @@ const putResidentInfoValidation = [
     check('sex')
         .isIn(['M', 'F'])
         .withMessage('Sex is not valid.'),
-    check('residentType')
-        .isIn(['tenant', 'owner'])
-        .withMessage('Status spaces is not valid.'),
+    // check('residentType')
+    //     .isIn(['tenant', 'owner'])
+    //     .withMessage('Status spaces is not valid.'),
 
 
 ]
