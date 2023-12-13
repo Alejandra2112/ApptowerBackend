@@ -33,13 +33,9 @@ class Servers {
     this.getPermissionFromRole = '/api/permissionfromrole';
     this.getPrivilegeFromRole = '/api/privilegefromrole';
 
-
-
-
     //Watchman process path
     this.WatchmanPath = '/api/watchman';
     this.guardShiftsPath = '/api/guardshifts';
-
 
     this.VisitorsPath = '/api/visitors';
     this.GuestIncomePath = '/api/guestincome';
@@ -49,6 +45,7 @@ class Servers {
     this.ApartmentsPath = '/api/apartments';
     this.ApartmentsPath = '/api/apartments';
     this.SpacesPath = '/api/spaces';
+    this.towerPath = '/api/towers';
     this.ParkingSpacesPath = '/api/parkingSpaces';
     this.AssignedParkingPath = '/api/assignedParkingSpaces';
 
@@ -114,6 +111,7 @@ class Servers {
     this.app.use(this.SpacesPath, require('../Routes/spaces.routes'))
     this.app.use(this.ParkingSpacesPath, require('../Routes/parking.spaces.routes'))
     this.app.use(this.AssignedParkingPath, require('../Routes/assigned.parking.routes'))
+    this.app.use(this.towerPath, require('../Routes/tower.routes'))
 
 
     // routes for residents process 

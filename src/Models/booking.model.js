@@ -17,9 +17,9 @@ const Booking = sequelize.define('booking', {
     required: true,
 
   },
-  iduser: {
+  idUser: {
     type: DataTypes.INTEGER,
-    field: 'iduser',
+    field: 'idUser',
     required: true,
 
   },
@@ -68,8 +68,8 @@ Booking.belongsTo(Space, {
   targetKey: 'idSpace',
 });
 Booking.belongsTo(User, {
-  foreignKey: 'iduser',
-  targetKey: 'iduser',
+  foreignKey: 'idUser',
+  targetKey: 'idUser',
 });
 
 module.exports = Booking;

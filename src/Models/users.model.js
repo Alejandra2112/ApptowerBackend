@@ -1,27 +1,40 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelizeUser = require('../Database/config');
+const sequelize = require('../Database/config');
 const Rols = require('./rols.model');
 const Watchmans = require('./watchmans.model');
 const usersforWatchmans = require('./user.watchman.model');
-const usersforResidents = require('./user.residents');
-const ResidentModel = require('./resident.model')
 
-const User = sequelizeUser.define('users', {
-  iduser: {
+const UserModel = sequelize.define('users', {
+
+  idUser: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
-    field: 'iduser',
+    field: 'idUser',
   },
 
-  documentType: {
+  userImg: {
+
     type: DataTypes.STRING,
-    field: 'documentType',
+    field: 'userImg',
+    allowNull: true
+
   },
 
-  document: {
+  pdf: {
     type: DataTypes.STRING,
-    field: 'document',
+    field: 'pdf',
+    allowNull: true
+  },
+
+  docType: {
+    type: DataTypes.STRING,
+    field: 'docType',
+  },
+
+  docNumber: {
+    type: DataTypes.STRING,
+    field: 'docNumber',
     unique: {
       msg: 'El documento ya se encuentra asignado a un usuario'
     },
@@ -33,21 +46,26 @@ const User = sequelizeUser.define('users', {
     field: 'name',
   },
 
-  lastname: {
+  lastName: {
     type: DataTypes.STRING,
-    field: 'lastname',
+    field: 'lastName',
 
   },
+
+  sex: {
+
+    type: DataTypes.STRING,
+    field: 'sex',
+    validate: {
+      isIn: [['M', 'F']],
+    },
+  },
+
   idrole: {
     type: DataTypes.INTEGER,
     field: 'idrole'
   },
 
-  pdf: {
-    type: DataTypes.STRING,
-    field: 'pdf',
-    allowNull: true
-  },
 
   email: {
     type: DataTypes.STRING,
@@ -62,45 +80,51 @@ const User = sequelizeUser.define('users', {
     field: 'phone',
   },
 
-  password: {
+  status: {
     type: DataTypes.STRING,
-    field: 'password',
-    allowNull: true,
+    field: 'status',
     validate: {
-      notEmpty: {
-        args: true,
-        msg: 'La contraseña no puede estar vacía',
-      },
+      isIn: [['Active', 'Inactive']],
     },
+    defaultValue: 'Active',
   },
 
-  state: {
-    type: DataTypes.STRING,
-    field: 'state',
-    validate: {
-      isIn: [['Activo', 'Inactivo']],
-    },
-    defaultValue: 'Activo',
-  },
+  // password: {
+  //   type: DataTypes.STRING,
+  //   field: 'password',
+  //   allowNull: true,
+  //   validate: {
+  //     notEmpty: {
+  //       args: true,
+  //       msg: 'La contraseña no puede estar vacía',
+  //     },
+  //   },
+  // },
+
+
 });
 
 //Relations
-User.belongsTo(Rols, {
+UserModel.belongsTo(Rols, {
   foreignKey: 'idrole',
   targetKey: 'idrole',
 });
 
-User.belongsToMany(Watchmans, {
+UserModel.belongsToMany(Watchmans, {
   through: usersforWatchmans,
-  foreignKey: 'iduser',
+  foreignKey: 'idUser',
   otherKey: 'idwatchman',
 });
 
-User.belongsToMany(ResidentModel, {
-  through: usersforResidents,
-  foreignKey: 'iduser',
-  otherKey: 'idResident',
-});
+// User.belongsToMany(ResidentModel, {
+//   through: usersforResidents,
+//   foreignKey: 'iduser',
+//   otherKey: 'idResident',
+// });
+
+
+module.exports = UserModel;
+
 
 // //Hooks
 
@@ -233,6 +257,3 @@ User.belongsToMany(ResidentModel, {
 //     }
 //   }
 // });
-
-module.exports = User;
-

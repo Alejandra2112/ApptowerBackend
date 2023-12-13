@@ -59,107 +59,113 @@ const postOwner = async (req, res) => {
 
     try {
 
-        const imageUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
+        res.json({
 
-        const { idApartment, question, pdf, userBool, status, ...ownerAtributes } = req.body;
+            msg: "Aqui crearia un usuario si tuviera un rol."
 
-
-        console.log(question)
-        console.log(idApartment)
-
-        // Create owner
-
-        const owner = await OwnersModel.create({
-            pdf: imageUrl,
-            status: 'Inactive',
-            ...ownerAtributes
         })
 
-        // Create owener per apartment
+        // const imageUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
+
+        // const { idApartment, question, pdf, userBool, status, ...ownerAtributes } = req.body;
 
 
-        const apartmentOwner = await ApartmentOwnerModel.create({
-            idApartment: idApartment,
-            idOwner: owner.idOwner,
-            ...ownerAtributes
+        // console.log(question)
+        // console.log(idApartment)
 
-        });
+        // // Create owner
 
+        // const owner = await OwnersModel.create({
+        //     pdf: imageUrl,
+        //     status: 'Inactive',
+        //     ...ownerAtributes
+        // })
 
-
-        console.log(question)
-
-        if (idApartment && question === "true") {
-
-            // Create owner like resident too
-
-            const resident = await ResidentModel.create({
-                pdf: imageUrl,
-                residentType: "owner",
-                status: 'Inactive',
-                ...ownerAtributes,
-            });
-
-            // Create resident per resident by owner
-
-            const apartmentResident = await ApartmentResidentModel.create({
-                idApartment: idApartment,
-                idResident: resident.idResident,
-                residentStartDate: ownerAtributes.OwnershipStartDate
-            });
-
-            console.log(userBool)
-
-            let user;
-            // Criptar contraseña 
+        // // Create owener per apartment
 
 
-            if (userBool === "true") {
+        // const apartmentOwner = await ApartmentOwnerModel.create({
+        //     idApartment: idApartment,
+        //     idOwner: owner.idOwner,
+        //     ...ownerAtributes
 
-                const salt = bcryptjs.genSaltSync();
-                ownerAtributes.password = bcryptjs.hashSync(ownerAtributes.password, salt);
-
-                user = await User.create({
-                    pdf: imageUrl,
-                    documentType: owner.docType,
-                    document: owner.docNumber,
-                    lastname: owner.lastName,
-                    phone: owner.phoneNumber,
-                    password: ownerAtributes.password,
-                    idrole: 2,
-                    ...ownerAtributes
-                });
-            }
-            
-            console.log(user)
+        // });
 
 
-            res.json({
-                messageOwner: 'Propietario creado',
-                owner,
-                apartmentOwnerMessage: 'Propietario por residente creado',
-                apartmentOwner,
-                ApartmentResidenMenssage: "Residente creado",
-                resident,
-                ApartmentOwnerMenssage: " Propietario por apartamento creado",
-                apartmentResident,
-                userMenssage: "Nuevo usuario creado",
-                user
-            });
+
+        // console.log(question)
+
+        // if (idApartment && question === "true") {
+
+        //     // Create owner like resident too
+
+        //     const resident = await ResidentModel.create({
+        //         pdf: imageUrl,
+        //         residentType: "owner",
+        //         status: 'Inactive',
+        //         ...ownerAtributes,
+        //     });
+
+        //     // Create resident per resident by owner
+
+        //     const apartmentResident = await ApartmentResidentModel.create({
+        //         idApartment: idApartment,
+        //         idResident: resident.idResident,
+        //         residentStartDate: ownerAtributes.OwnershipStartDate
+        //     });
+
+        //     console.log(userBool)
+
+        //     let user;
+        //     // Criptar contraseña 
 
 
-        } else {
-            res.json({
-                messageOwner: 'Propietario creado',
-                owner,
+        //     if (userBool === "true") {
 
-            });
-        }
+        //         const salt = bcryptjs.genSaltSync();
+        //         ownerAtributes.password = bcryptjs.hashSync(ownerAtributes.password, salt);
+
+        //         user = await User.create({
+        //             pdf: imageUrl,
+        //             documentType: owner.docType,
+        //             document: owner.docNumber,
+        //             lastname: owner.lastName,
+        //             phone: owner.phoneNumber,
+        //             password: ownerAtributes.password,
+        //             idrole: 2,
+        //             ...ownerAtributes
+        //         });
+        //     }
+
+        //     console.log(user)
+
+
+        //     res.json({
+        //         messageOwner: 'Propietario creado',
+        //         owner,
+        //         apartmentOwnerMessage: 'Propietario por residente creado',
+        //         apartmentOwner,
+        //         ApartmentResidenMenssage: "Residente creado",
+        //         resident,
+        //         ApartmentOwnerMenssage: " Propietario por apartamento creado",
+        //         apartmentResident,
+        //         userMenssage: "Nuevo usuario creado",
+        //         user
+        //     });
+
+
+        // } else {
+        //     res.json({
+        //         messageOwner: 'Propietario creado',
+        //         owner,
+
+        //     });
+        // }
 
 
     } catch (e) {
-        console.error('Error creating owner:', e);
-        const message = e.message || 'Error creating owner.';
+        console.error('Error creando propietario:', e);
+        const message = e.message || 'Error creando propietario.';
         res.status(500).json({ message });
     }
 };
@@ -167,27 +173,33 @@ const postOwner = async (req, res) => {
 const putOwner = async (req, res = response) => {
 
     try {
-        const owner = await OwnersModel.findByPk(req.body.idOwner);
-
-
-        if (!owner) {
-            return res.status(400).json({ msg: "Id owner not found." });
-        }
-
-        const newPdf = await updateFile(req.files, owner.pdf, ['pdf'], 'Documents')
-        const { pdf, ...others } = req.body
-
-        const updatedSpace = await owner.update({
-            pdf: newPdf,
-            ...others
-        }, {
-            where: { idOwner: req.body.idOwner }
-        });
 
         res.json({
-            spaces: 'Owner update',
-            // updatedSpace: updatedSpace.toJSON()
-        });
+
+            msg: "Aqui editaria un porpietario si tuviera un rol."
+
+        })
+        // const owner = await OwnersModel.findByPk(req.body.idOwner);
+
+
+        // if (!owner) {
+        //     return res.status(400).json({ msg: "Id owner not found." });
+        // }
+
+        // const newPdf = await updateFile(req.files, owner.pdf, ['pdf'], 'Documents')
+        // const { pdf, ...others } = req.body
+
+        // const updatedSpace = await owner.update({
+        //     pdf: newPdf,
+        //     ...others
+        // }, {
+        //     where: { idOwner: req.body.idOwner }
+        // });
+
+        // res.json({
+        //     spaces: 'Owner update',
+        //     // updatedSpace: updatedSpace.toJSON()
+        // });
     } catch (error) {
         console.error(error);
         res.status(500).json({ msg: "Internal server error" });

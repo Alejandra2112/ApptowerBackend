@@ -6,6 +6,7 @@ const ApartmentOwnerModel = require('./apartment.owners.model')
 const OwnersModel = require('./owners.model');
 const ResidentModel = require('./resident.model');
 const ApartmentResidentModel = require('./apartment.residents.model');
+const TowerModel = require('./tower.model');
 
 const ApartmentModel = sequelize.define('Apartments', {
 
@@ -16,20 +17,22 @@ const ApartmentModel = sequelize.define('Apartments', {
         field: 'idApartment',
     },
 
-    tower: {
+    idTower: {
 
-        type: DataTypes.STRING,
-        field: "tower",
+        type: DataTypes.INTEGER,
+        field: "idTower",
 
     },
 
     apartmentName: {
+
         type: DataTypes.STRING,
         field: 'apartmentName',
-        // allowNull: false,
+
     },
 
     area: {
+
         type: DataTypes.DOUBLE,
         field: 'area',
         allowNull: true,
@@ -51,6 +54,17 @@ const ApartmentModel = sequelize.define('Apartments', {
         timestamps: false,
     }
 );
+
+ApartmentModel.belongsTo(TowerModel, {
+    foreignKey: 'idTower', 
+    targetKey: 'idTower', 
+});
+
+TowerModel.hasMany(ApartmentModel, {
+    foreignKey: 'idTower', 
+    sourceKey: 'idTower',  
+});
+
 
 ApartmentModel.belongsToMany(
     ParkingSpaceModel, {
