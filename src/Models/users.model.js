@@ -89,17 +89,17 @@ const UserModel = sequelize.define('users', {
     defaultValue: 'Active',
   },
 
-  // password: {
-  //   type: DataTypes.STRING,
-  //   field: 'password',
-  //   allowNull: true,
-  //   validate: {
-  //     notEmpty: {
-  //       args: true,
-  //       msg: 'La contraseña no puede estar vacía',
-  //     },
-  //   },
-  // },
+  password: {
+    type: DataTypes.STRING,
+    field: 'password',
+    allowNull: true,
+    validate: {
+      notEmpty: {
+        args: true,
+        msg: 'La contraseña no puede estar vacía',
+      },
+    },
+  },
 
 
 });

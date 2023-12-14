@@ -166,68 +166,111 @@ const postUsersforLogin = async (req, res) => {
 };
 
 
+// Post Emmanuel
 
 const postUser = async (req, res) => {
   try {
 
-    const imageUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
-    const { pdf, ...userData } = req.body;
+    const pdfUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
+    const imgUrl = await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images')
 
-    if (userData.state === 'Activo' && userData.idrole) {
-      if (userData.password) {
-        const salt = bcryptjs.genSaltSync();
-        userData.password = bcryptjs.hashSync(userData.password, salt);
-      }
+    const { pdf, userImg, ...userData } = req.body;
 
-      const user = await User.create({
-        ...userData,
-        pdf: imageUrl
-      });
+    const salt = bcryptjs.genSaltSync();
+    userData.password = bcryptjs.hashSync(userData.password, salt);
+
+    const user = await UserModel.create({
+
+      pdf: pdfUrl,
+      userImg: imgUrl,
+      idrole: 2, // resident rol 
+      password: userData.password,
+      ...userData
+
+    })
+
+    const roleData = await Rols.findByPk(userData.idrole);
+
+    res.json({
+
+      msgUser: "Usuario creado",
+      user,
+      role: roleData
+    })
+
+    
 
 
-      const roleData = await Rols.findByPk(userData.idrole);
-
-
-      if (['Vigilante', 'Seguridad', 'Vigilantes'].includes(roleData.namerole)) {
-        // const dateOfBirth = new Date(req.body.dateOfbirth);
-
-        const watchman = await Watchman.create({
-          namewatchman: user.name,
-          lastnamewatchman: user.lastname,
-          documentType: user.documentType,
-          document: user.document,
-          phone: user.phone,
-          email: user.email,
-          dateOfbirth: new Date(req.body.dateOfbirth),
-          state: 'Activo',
-        });
-      } else if (['Residente', 'Residentes'].includes(roleData.namerole)) {
-        // const birthday = new Date(req.body.birthday);
-        const resident = await ResidentModel.create({
-          name: user.name,
-          lastName: user.lastname,
-          docType: user.documentType,
-          docNumber: user.document,
-          phoneNumber: user.phone,
-          email: user.email,
-          pdf: req.body.pdf,
-          birthday: req.body.birthday,
-          sex: req.body.sex,
-          residentType: req.body.residentType,
-          status: 'Active',
-        });
-      }
-
-      return res.status(201).json({ message: 'Usuario Registrado Exitosamente' });
-    } else {
-      return res.status(400).json({ message: 'El usuario no está activo o no tiene un rol asignado' });
-    }
   } catch (error) {
     console.error('Error al crear usuario:', error);
     return res.status(500).json({ message: 'Error interno del servidor hola', error: error.message });
   }
 
 };
+
+// Post Alejandra
+
+// const postUser = async (req, res) => {
+//   try {
+
+//     const imageUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
+//     const { pdf, ...userData } = req.body;
+
+//     if (userData.state === 'Activo' && userData.idrole) {
+//       if (userData.password) {
+//         const salt = bcryptjs.genSaltSync();
+//         userData.password = bcryptjs.hashSync(userData.password, salt);
+//       }
+
+//       const user = await User.create({
+//         ...userData,
+//         pdf: imageUrl
+//       });
+
+
+//       const roleData = await Rols.findByPk(userData.idrole);
+
+
+//       if (['Vigilante', 'Seguridad', 'Vigilantes'].includes(roleData.namerole)) {
+//         // const dateOfBirth = new Date(req.body.dateOfbirth);
+
+//         const watchman = await Watchman.create({
+//           namewatchman: user.name,
+//           lastnamewatchman: user.lastname,
+//           documentType: user.documentType,
+//           document: user.document,
+//           phone: user.phone,
+//           email: user.email,
+//           dateOfbirth: new Date(req.body.dateOfbirth),
+//           state: 'Activo',
+//         });
+//       } else if (['Residente', 'Residentes'].includes(roleData.namerole)) {
+//         // const birthday = new Date(req.body.birthday);
+//         const resident = await ResidentModel.create({
+//           name: user.name,
+//           lastName: user.lastname,
+//           docType: user.documentType,
+//           docNumber: user.document,
+//           phoneNumber: user.phone,
+//           email: user.email,
+//           pdf: req.body.pdf,
+//           birthday: req.body.birthday,
+//           sex: req.body.sex,
+//           residentType: req.body.residentType,
+//           status: 'Active',
+//         });
+//       }
+
+//       return res.status(201).json({ message: 'Usuario Registrado Exitosamente' });
+//     } else {
+//       return res.status(400).json({ message: 'El usuario no está activo o no tiene un rol asignado' });
+//     }
+//   } catch (error) {
+//     console.error('Error al crear usuario:', error);
+//     return res.status(500).json({ message: 'Error interno del servidor hola', error: error.message });
+//   }
+
+// };
 
 
 const putUser = async (req, res) => {
