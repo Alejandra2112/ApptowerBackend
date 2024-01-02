@@ -289,27 +289,34 @@ const putUser = async (req, res) => {
     const oldRole = await Rols.findByPk(user.idrole);
     const newRole = await Rols.findByPk(idrole);
 
+    // Actualizar usuario con el nuevo rol
+    const newPdf = await updateFile(req.files, user.pdf, ['pdf'], 'Documents');
+    if (password) {
+      const salt = bcryptjs.genSaltSync(10);
+      const hashedPassword = bcryptjs.hashSync(password, salt);
+      update.password = hashedPassword;
+    }
+    await user.update({ idrole, state, pdf: newPdf, ...update }, { force: true });
+
     if (oldRole.id !== newRole.id) {
-      if ((oldRole.namerole === 'Residente' || oldRole.namerole === 'Residentes') && (newRole.namerole === 'Vigilante' || newRole.namerole === 'Seguridad' || newRole.namerole === 'Vigilantes')) {
+      // Eliminar residente si cambia a vigilante
+      if (oldRole.namerole === 'Residente' && newRole.namerole !== 'Residente') {
         const residente = await ResidentModel.findOne({ where: { docNumber: user.document } });
         if (residente) {
           await residente.destroy();
         }
-        await Watchman.create({
-          documentType: user.documentType,
-          document: user.document,
-          namewatchman: user.name,
-          lastnamewatchman: user.lastname,
-          phone: user.phone,
-          email: user.email,
-          dateOfbirth: req.body.dateOfbirth,
-          state: 'Activo',
-        });
-      } else if ((oldRole.namerole === 'Vigilante' || oldRole.namerole === 'Seguridad' || oldRole.namerole === 'Vigilantes') && (newRole.namerole === 'Residente' || newRole.namerole === 'Residentes')) {
+      }
+
+      // Eliminar vigilante si cambia a residente
+      if (oldRole.namerole !== 'Residente' && newRole.namerole === 'Residente') {
         const vigilante = await Watchman.findOne({ where: { document: user.document } });
         if (vigilante) {
           await vigilante.destroy();
         }
+      }
+
+      // Crear nuevo residente si cambia a residente
+      if (newRole.namerole === 'Residente') {
         await ResidentModel.create({
           docType: user.documentType,
           docNumber: user.document,
@@ -322,20 +329,36 @@ const putUser = async (req, res) => {
           sex: req.body.sex,
           residentType: req.body.residentType,
           status: 'Active',
+        });
+      }
 
+      // Crear nuevo vigilante si cambia a vigilante
+      if (newRole.namerole !== 'Residente') {
+        await Watchman.create({
+          documentType: user.documentType,
+          document: user.document,
+          namewatchman: user.name,
+          lastnamewatchman: user.lastname,
+          phone: user.phone,
+          email: user.email,
+          dateOfbirth: req.body.dateOfbirth,
+          state: 'Activo',
         });
       }
     }
 
-    const newPdf = await updateFile(req.files, user.pdf, ['pdf'], 'Documents');
-
-    if (password) {
-      const salt = bcryptjs.genSaltSync(10);
-      const hashedPassword = bcryptjs.hashSync(password, salt);
-      update.password = hashedPassword;
+    // Actualizar datos según el nuevo rol
+    if (newRole.namerole === 'Residente') {
+      const resident = await ResidentModel.findOne({ where: { docNumber: user.document } });
+      if (resident) {
+        await resident.update({ name: user.name, lastName: user.lastname, phoneNumber: user.phone, email: user.email });
+      }
+    } else {
+      const watchman = await Watchman.findOne({ where: { document: user.document } });
+      if (watchman) {
+        await watchman.update({ namewatchman: user.name, lastnamewatchman: user.lastname, phone: user.phone, email: user.email });
+      }
     }
-
-    await user.update({ idrole, state, pdf: newPdf, ...update }, { force: true });
 
     message = 'Usuario modificado exitosamente.';
   } catch (error) {
@@ -346,7 +369,6 @@ const putUser = async (req, res) => {
     user: message,
   });
 };
-
 
 // const deleteUser = async (req, res) => {
 //   const { iduser } = req.body;
