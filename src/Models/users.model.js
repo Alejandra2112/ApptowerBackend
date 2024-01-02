@@ -6,11 +6,11 @@ const usersforWatchmans = require('./user.watchman.model');
 
 const UserModel = sequelize.define('users', {
 
-  idUser: {
+  iduser: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
-    field: 'idUser',
+    field: 'iduser',
   },
 
   userImg: {
@@ -32,9 +32,9 @@ const UserModel = sequelize.define('users', {
     field: 'docType',
   },
 
-  docNumber: {
+  document: {
     type: DataTypes.STRING,
-    field: 'docNumber',
+    field: 'document',
     unique: {
       msg: 'El documento ya se encuentra asignado a un usuario'
     },
@@ -84,9 +84,9 @@ const UserModel = sequelize.define('users', {
     type: DataTypes.STRING,
     field: 'status',
     validate: {
-      isIn: [['Active', 'Inactive']],
+      isIn: [['Activo', 'Inactivo']],
     },
-    defaultValue: 'Active',
+    defaultValue: 'Activo',
   },
 
   password: {
@@ -112,7 +112,7 @@ UserModel.belongsTo(Rols, {
 
 UserModel.belongsToMany(Watchmans, {
   through: usersforWatchmans,
-  foreignKey: 'idUser',
+  foreignKey: 'iduser',
   otherKey: 'idwatchman',
 });
 

@@ -16,7 +16,7 @@ const logIn = async (req, res) => {
       return res.status(401).json({ message: 'Contraseña incorrecta' });
     }
 
-    if (user.state !== 'Activo') {
+    if (user.status !== 'Activo') {
       return res.status(401).json({ message: 'Ha ocurrido un problema, comunícate con el Administrador' });
     }
 

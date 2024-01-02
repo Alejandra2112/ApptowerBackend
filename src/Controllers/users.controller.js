@@ -1,6 +1,6 @@
 const { response } = require('express');
 const bcryptjs = require('bcryptjs')
-const User = require('../Models/users.model');
+const UserModel = require('../Models/users.model');
 const Rols = require('../Models/rols.model');
 const ResidentModel = require('../Models/resident.model');
 const Watchman = require('../Models/watchmans.model');
@@ -10,7 +10,7 @@ const { upload, updateFile } = require('../Helpers/uploads.helpers');
 const getUser = async (req, res = response) => {
   try {
 
-    const user = await User.findAll();
+    const user = await UserModel.findAll();
     console.log('usuarios obtenidos correctamente:', user);
 
     res.json({
@@ -31,7 +31,7 @@ const getUserOne = async (req, res = response) => {
   try {
     const { iduser } = req.params;
 
-    const user = await User.findOne({ where: { iduser: iduser } });
+    const user = await UserModel.findOne({ where: { iduser: iduser } });
 
     if (!user) {
       return res.status(404).json({ error: 'No se encontró un usuario con ese ID' });
@@ -54,7 +54,7 @@ const postUserEmail = async (req, res) => {
   const { email } = req.body;
 
   try {
-    const user = await User.findOne({ where: { email: email } });
+    const user = await UserModel.findOne({ where: { email: email } });
 
     if (!user) {
       return res.status(404).json({ message: 'No se encontró un usuario con ese correo electrónico.' });
@@ -71,7 +71,7 @@ const resetPassword = async (req, res = response) => {
   const { email, newPassword } = req.body;
 
   try {
-    const user = await User.findOne({
+    const user = await UserModel.findOne({
       where: {
         email: email,
       },
@@ -140,7 +140,7 @@ const postUsersforLogin = async (req, res) => {
       userData.password = bcryptjs.hashSync(userData.password, salt);
     }
 
-    const user = await User.create({
+    const user = await UserModel.create({
       ...userData,
       idrole: userData.idrole,
       state: userData.state,

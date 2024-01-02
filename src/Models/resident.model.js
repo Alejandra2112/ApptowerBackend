@@ -13,10 +13,10 @@ const ResidentModel = sequelize.define('Residents', {
 
     },
 
-    idUser: {
+    iduser: {
 
         type: DataTypes.INTEGER,
-        field: "idUser"
+        field: "iduser"
     },
 
     residentType: {
@@ -46,13 +46,13 @@ const ResidentModel = sequelize.define('Residents', {
 
 
 UserModel.hasMany(ResidentModel, {
-    foreignKey: 'idUser',
-    sourceKey: 'idUser',
+    foreignKey: 'iduser',
+    sourceKey: 'iduser',
 });
 
 ResidentModel.belongsTo(UserModel, {
-    foreignKey: 'idUser',
-    targetKey: 'idUser',
+    foreignKey: 'iduser',
+    targetKey: 'iduser',
 });
 
 

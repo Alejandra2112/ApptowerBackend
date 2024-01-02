@@ -13,10 +13,10 @@ const OwnersModel = sequelize.define('Owners', {
 
     },
     
-    idUser: {
+    iduser: {
 
         type: DataTypes.INTEGER,
-        field: "idUser"
+        field: "iduser"
     },
 
     status: {
@@ -36,13 +36,13 @@ const OwnersModel = sequelize.define('Owners', {
 
 
 UserModel.hasMany(OwnersModel, {
-    foreignKey: 'idUser',
-    sourceKey: 'idUser',
+    foreignKey: 'iduser',
+    sourceKey: 'iduser',
 });
 
 OwnersModel.belongsTo(UserModel, {
-    foreignKey: 'idUser',
-    targetKey: 'idUser',
+    foreignKey: 'iduser',
+    targetKey: 'iduser',
 });
 
 module.exports = OwnersModel;
