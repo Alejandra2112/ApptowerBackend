@@ -1,6 +1,6 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes, INTEGER } = require('sequelize');
 const sequelize = require('../Database/config');
-const OwnersModel = require('./owners.model');
+const UserModel = require('./users.model');
 
 const ResidentModel = sequelize.define('Residents', {
 
@@ -13,80 +13,10 @@ const ResidentModel = sequelize.define('Residents', {
 
     },
 
-    pdf: {
-        type: DataTypes.STRING, 
-        field: 'pdf',
-    },
+    iduser: {
 
-    docType: {
-
-        type: DataTypes.STRING(5),
-        field: 'docType',
-        validate: {
-            isIn: [['CC', 'CE']]
-        }
-        // allowNull: false
-
-    },
-
-    docNumber: {
-
-        type: DataTypes.STRING(15),
-        field: 'docNumber',
-        // allowNull: false
-
-    },
-
-    
-
-    name: {
-
-        type: DataTypes.STRING(255),
-        field: 'name',
-        // allowNull: false
-
-    },
-
-    lastName: {
-
-        type: DataTypes.STRING(255),
-        field: 'lastName',
-        // allowNull: false
-
-    },
-
-    sex: {
-
-        type: DataTypes.STRING(1),
-        field: 'sex',
-        validate: {
-            isIn: [['M', 'F']]
-        }
-        // allowNull: false
-
-    },
-
-    birthday: {
-
-        type: DataTypes.DATE,
-        field: 'birthday',
-        // allowNull: false
-
-    },
-
-    email: {
-
-        type: DataTypes.STRING(80),
-        field: 'email',
-        // allowNull: false
-
-    },
-
-    phoneNumber: {
-
-        type: DataTypes.STRING(15),
-        field: 'phoneNumber',
-
+        type: DataTypes.INTEGER,
+        field: "iduser"
     },
 
     residentType: {
@@ -102,7 +32,7 @@ const ResidentModel = sequelize.define('Residents', {
     status: {
 
         type: DataTypes.STRING(20),
-        defaultValue: 'Active',
+        defaultValue: 'Inactive',
         field: 'status',
         validate: {
             isIn: [['Active', 'Inactive']]
@@ -110,9 +40,22 @@ const ResidentModel = sequelize.define('Residents', {
     }
 }, {
 
-    timestamps: false
+    timestamps: true
 
 });
+
+
+UserModel.hasMany(ResidentModel, {
+    foreignKey: 'iduser',
+    sourceKey: 'iduser',
+});
+
+ResidentModel.belongsTo(UserModel, {
+    foreignKey: 'iduser',
+    targetKey: 'iduser',
+});
+
+
 
 // Hooks for create and update owners
 

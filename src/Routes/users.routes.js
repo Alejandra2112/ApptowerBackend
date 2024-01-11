@@ -8,7 +8,7 @@ route.get('/:iduser', getUserOne);
 
 
 route.get('/', getUser)
-route.post('/', validateUser, postUser)
+route.post('/', postUser)
 route.post('/reset', resetPassword)
 route.post('/login', validateUser, postUsersforLogin)
 route.put('/:iduser', putUser)
