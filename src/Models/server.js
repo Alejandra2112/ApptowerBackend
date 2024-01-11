@@ -39,6 +39,8 @@ class Servers {
     //Watchman process path
     this.WatchmanPath = '/api/watchman';
     this.guardShiftsPath = '/api/guardshifts';
+    this.EnterpriceSecurityPath = '/api/enterpricesecurity';
+
 
 
     this.VisitorsPath = '/api/visitors';
@@ -96,6 +98,7 @@ class Servers {
     this.app.use(this.permissionsRolsPath, require('../Routes/permissions.routes'));
     this.app.use(this.permissionsPrivilegesPath, require('../Routes/privileges.routes'));
     this.app.use(this.guardShiftsPath, require('../Routes/guardShifts.routes'))
+    this.app.use(this.EnterpriceSecurityPath, require('../Routes/enterprice.security.routes'));
     this.app.use(this.EmailPath, require('../Routes/email.routes'));
     this.app.use(this.getPermissionFromRole, require('../Routes/TokenPermission.routes'));
     this.app.use(this.informationUser, require('../Routes/TokenInformationUser.routes'));

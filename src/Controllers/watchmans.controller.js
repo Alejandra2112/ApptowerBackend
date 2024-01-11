@@ -54,6 +54,7 @@ const getWatchmanDocument = async (req, res = response) => {
       return res.status(404).json({ error: 'No se encontró un vigilante con ese documento' });
     }
 
+
     res.json({
       watchman,
     });
@@ -99,28 +100,12 @@ const putWatchman = async (req, res = response) => {
         force: true
       });
 
-      if (updatedRows > 0) {
-        await existingWatchman.reload();
-
-        const existingUser = await User.findOne({ where: { document: existingWatchman.document } });
-        console.log(existingUser);
-
-        if (existingUser) {
-          await existingUser.update({
-            name: existingWatchman.namewatchman,
-            lastname: existingWatchman.lastnamewatchman,
-            documentType: existingWatchman.documentType,
-            phone: existingWatchman.phone,
-            email: existingWatchman.email,
-            state: existingWatchman.state,
-            document: existingWatchman.document,
-          });
-        }
-
-        message = 'Vigilante modificado exitosamente.';
-      } else {
-        message = 'No se encontró un vigilante con ese ID';
+      const userEdit = await User.findOne({ where: { document: existingWatchman.document } });
+      if (userEdit) {
+        await userEdit.update({ name: existingWatchman.namewatchman, lastname: existingWatchman.lastnamewatchman, documentType: existingWatchman.documentType, phone: existingWatchman.phone, email: existingWatchman.email, state: existingWatchman.state, document: existingWatchman.document });
       }
+
+      message = 'Vigilante modificado exitosamente.';
     }
   } catch (error) {
     message = 'Error al modificar vigilante: ' + error.message;

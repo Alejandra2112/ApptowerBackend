@@ -12,6 +12,7 @@ route.post('/', validateUser, postUser)
 route.post('/reset', resetPassword)
 route.post('/login', validateUser, postUsersforLogin)
 route.put('/:iduser', putUser)
+route.put('/edited', putUser)
 route.post('/email', postUserEmail)
 
 

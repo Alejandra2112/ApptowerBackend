@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
+const EnterpriseSecurity = require('./enterprice.security.model');
 
 const Watchman = sequelize.define('watchmans', {
   idwatchman: {
@@ -7,6 +8,11 @@ const Watchman = sequelize.define('watchmans', {
     primaryKey: true,
     autoIncrement: true,
     field: 'idwatchman',
+  },
+  idEnterpriseSecurity: {
+    type: DataTypes.INTEGER,
+    field: 'idEnterpriseSecurity',
+
   },
   namewatchman: {
     type: DataTypes.STRING,
@@ -50,6 +56,11 @@ const Watchman = sequelize.define('watchmans', {
     defaultValue: 'Activo'
   },
 });
+
+
+Watchman.belongsTo(EnterpriseSecurity, { foreignKey: 'idEnterpriseSecurity', targetKey: 'idEnterpriseSecurity', });
+
+
 
 
 module.exports = Watchman
