@@ -172,17 +172,16 @@ const postUser = async (req, res) => {
   try {
 
     const pdfUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
-    const imgUrl = await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images')
+    // const imgUrl = await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images')
 
-    const { pdf, userImg, ...userData } = req.body;
+    const { pdf, ...userData } = req.body;
 
     const salt = bcryptjs.genSaltSync();
     userData.password = bcryptjs.hashSync(userData.password, salt);
 
     const user = await UserModel.create({
-
       pdf: pdfUrl,
-      userImg: imgUrl,
+      // userImg: imgUrl,
       idrole: 2, // resident rol 
       password: userData.password,
       ...userData
@@ -198,7 +197,7 @@ const postUser = async (req, res) => {
       role: roleData
     })
 
-    
+
 
 
   } catch (error) {

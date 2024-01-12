@@ -35,7 +35,7 @@ const updateFile = async (newFile, oldFile, allowedFileExtensions = ['png', 'jpg
 
                 const urlArr = oldFile.split('/')
                 const arr = urlArr[urlArr.length - 1]
-                const {public_id} = arr.split('.')
+                const { public_id } = arr.split('.')
                 const publicId = public_id
 
                 await cloudinary.uploader.destroy(publicId);
@@ -50,7 +50,7 @@ const updateFile = async (newFile, oldFile, allowedFileExtensions = ['png', 'jpg
                 const publicId = arr
 
                 await cloudinary.uploader.destroy(publicId);
-                return imageUrl = await upload(newFile.pdf ,allowedFileExtensions, folder);
+                return imageUrl = await upload(newFile.pdf, allowedFileExtensions, folder);
             }
 
         }

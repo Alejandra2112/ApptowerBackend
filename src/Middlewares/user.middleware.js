@@ -3,7 +3,7 @@ const Rols = require('../Models/rols.model');
 const User = require('../Models/users.model');
 
 const validateUser = [
-  check('documentType')
+  check('docType')
     .isIn(['CC', 'CE'])
     .withMessage('El campo "documentType" debe ser "CC" o "CE'),
 
@@ -11,7 +11,7 @@ const validateUser = [
     .isString()
     .isLength({ min: 8, max: 10 })
     .withMessage('El campo "document" debe ser una cadena de 8 a 10 caracteres'),
-  
+
 
   check('name')
     .isString()

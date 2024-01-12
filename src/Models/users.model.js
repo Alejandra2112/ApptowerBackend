@@ -59,6 +59,7 @@ const UserModel = sequelize.define('users', {
     validate: {
       isIn: [['M', 'F']],
     },
+    allowNull: true
   },
 
   idrole: {
