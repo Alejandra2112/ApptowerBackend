@@ -49,7 +49,7 @@ const postTower = async (req, res) => {
 
         const { ...towerAtributes } = req.body;
 
-        const tower = await TowerModel.create({...towerAtributes})
+        const tower = await TowerModel.create({ ...towerAtributes })
 
         res.json({
             msg: 'Torre creada ',
@@ -68,7 +68,7 @@ const putTower = async (req, res = response) => {
     try {
 
 
-        const {idTower, ...towerAtributes} = req.body
+        const { idTower, ...towerAtributes } = req.body
 
 
         const [tower] = await TowerModel.update(towerAtributes, {
