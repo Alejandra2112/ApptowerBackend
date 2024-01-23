@@ -172,7 +172,7 @@ const postUser = async (req, res) => {
   try {
 
     const pdfUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
-    // const imgUrl = await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images')
+    const imgUrl = await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images')
 
     const { pdf, ...userData } = req.body;
 
@@ -181,7 +181,7 @@ const postUser = async (req, res) => {
 
     const user = await UserModel.create({
       pdf: pdfUrl,
-      // userImg: imgUrl,
+      userImg: imgUrl,
       idrole: 2, // resident rol 
       password: userData.password,
       ...userData
