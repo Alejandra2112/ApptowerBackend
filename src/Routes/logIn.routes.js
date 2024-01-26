@@ -10,19 +10,19 @@ route.post('/', logIn);
 route.get('/access', verifityToken, async (req, res) => {
   try {
     const user = req.user;
-    const rol = user.idrole;
+    const rol = user.rol;
     let roleName = '';
 
     const roleData = await Rols.findByPk(rol);
 
     if (roleData) {
       roleName = roleData.namerole;
-      console.log('Role Data:', roleData);
-      console.log('Role Name:', roleName);
+      console.log(roleName);
     }
 
     res.json({
-      message: `Bienvenido`,
+      role: roleName,
+      message: `Es ${roleName}`,
     });
   } catch (error) {
     console.error('Error fetching role:', error);
