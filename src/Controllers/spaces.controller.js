@@ -97,7 +97,7 @@ const putSpace = async (req, res = response) => {
             spaceName: newData.spaceName,
             spaceType: newData.spaceType,
             image: newImg,
-            area: newData,
+            area: newData.area,
             capacity: newData.capacity,
             status: newData.status
         });
