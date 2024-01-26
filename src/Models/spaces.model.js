@@ -20,8 +20,9 @@ const SpacesModel = sequelize.define('Spaces', {
     },
 
     image: {
-        type: DataTypes.STRING, 
+        type: DataTypes.STRING,
         field: 'image',
+        allowNull: true
     },
 
     spaceName: {

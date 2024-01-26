@@ -1,7 +1,7 @@
 const { response } = require('express');
 const TowerModel = require('../Models/tower.model');
 const { body } = require('express-validator');
-const { upload } = require('../Helpers/uploads.helpers');
+const { upload, updateFile } = require('../Helpers/uploads.helpers');
 const ApartmentModel = require('../Models/apartment.model');
 
 const getOneTower = async (req, res = response) => {
@@ -59,7 +59,11 @@ const postTower = async (req, res) => {
 
         const { ...towerAtributes } = req.body;
 
-        const imgUrl = await upload(req.files.towerImg, ['png', 'jpg', 'jpeg'], 'Images')
+        console.log(req.files)
+
+        const imgUrl = req.files !== null ? await upload(req.files.towerImg, ['png', 'jpg', 'jpeg'], 'Images') : null
+
+        console.log(imgUrl)
 
         const tower = await TowerModel.create({
             towerImg: imgUrl,
@@ -79,38 +83,44 @@ const postTower = async (req, res) => {
     }
 };
 
+
 const putTower = async (req, res = response) => {
     try {
+        const { idTower, ...newData } = req.body;
 
+        console.log(req.files.towerImg, "file")
 
-        const { idTower, ...towerAtributes } = req.body
+        const tower = await TowerModel.findOne({ where: { idTower: idTower } });
 
+        const newImg = tower.towerImg == "" || tower.towerImg == null ?
+            await upload(req.files.towerImg, ['png', 'jpg', 'jpeg'], 'Images') :
+            await updateFile(req.files, tower.towerImg, ['png', 'jpg', 'jpeg'], 'Images', "towerImg")
 
-        const [tower] = await TowerModel.update(towerAtributes, {
-            where: { idTower: idTower },
-        });
+        console.log(tower.towerImg, "Old img")
+        console.log(newImg, "newImg")
 
-        if (tower > 0) {
-
-            msg = 'Torre actualizada.';
-
-        } else {
-
-            msg = 'Torre no encontrada.';
-
+        if (!tower) {
+            return res.status(404).json({ msg: 'Torre no encontrada.' });
         }
 
+        // Actualizar la torre con los nuevos datos
+        const updatedTower = await tower.update({
+            towerName: newData.towerName,
+            towerImg: newImg,
+            status: newData.status
+        }); 
+
+        res.json({
+            msg: "Torre actualizada",
+            tower: updatedTower
+        });
+
     } catch (error) {
-
-        msg = 'Error modificando torre: ' + error.message;
-
+        console.error('Error al editar torre:', error);
+        return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
     }
-    res.json({
-
-        msg: msg,
-
-    });
 };
+
 
 
 
