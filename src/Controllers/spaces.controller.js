@@ -54,7 +54,7 @@ const postSpace = async (req, res) => {
 
         console.log(image)
 
-        
+
         const space = await SpacesModel.create({
             image: imageUrl,
             ...others
@@ -75,36 +75,41 @@ const postSpace = async (req, res) => {
 
 const putSpace = async (req, res = response) => {
     try {
-        const space = await SpacesModel.findByPk(req.body.idSpace);
+        const { idSpace, ...newData } = req.body;
+
+        console.log(req.files , "MOSTRA pues")
+
+        const space = await SpacesModel.findOne({ where: { idSpace: idSpace } });
+
+        // console.log(space.image, "Old img")
+
+        const newImg = space.image == "" || space.image == null ?
+            await upload(req.files.image, ['png', 'jpg', 'jpeg'], 'Images') :
+            await updateFile(req.files, space.image, ['png', 'jpg', 'jpeg'], 'Images')
 
 
         if (!space) {
-            return res.status(400).json({ msg: "Id space not found." });
+            return res.status(404).json({ msg: 'Zona comun no encontrada.' });
         }
-
-        const imageUrl = await updateFile(req.files, space.image)
 
 
         const updatedSpace = await space.update({
-            spaceType: req.body.spaceType,
-            image: imageUrl,
-            spaceName: req.body.spaceName,
-            area: req.body.area,
-            capacity: req.body.capacity,
-            status: req.body.status,
-
-        }, {
-            where: { idSpace: req.body.idSpace }
+            spaceName: newData.spaceName,
+            spaceType: newData.spaceType,
+            image: newImg,
+            area: newData,
+            capacity: newData.capacity,
+            status: newData.status
         });
 
         res.json({
-            spaces: 'Spaces update',
-            // updatedSpace: updatedSpace.toJSON()
+            msg: "Zona comun actualizada",
+            tower: updatedSpace
         });
-    }  catch (e) {
-        console.error('Error creating space:', e);
-        const message = e.message || 'Error creating space.';
-        res.status(500).json({ message, errorDetails: e }); 
+
+    } catch (error) {
+        console.error('Error al editar zona comun:', error);
+        return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
     }
 };
 

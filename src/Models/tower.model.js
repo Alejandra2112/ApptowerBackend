@@ -12,6 +12,14 @@ const TowerModel = sequelize.define('Towers', {
 
     },
 
+    towerImg: {
+
+        type: DataTypes.STRING,
+        field: 'towerImg',
+        allowNull: true
+
+    },
+
     towerName: {
 
         type: DataTypes.STRING(20),
@@ -27,7 +35,7 @@ const TowerModel = sequelize.define('Towers', {
         field: 'status',
         validate: {
             isIn: [['Active', 'Inactive']]
-        } 
+        }
     }
 
 }, {

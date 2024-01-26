@@ -7,6 +7,7 @@ const upload = async (file, allowedFileExtensions = ['png', 'jpg', 'jpeg'], fold
         return null;
     }
     try {
+        console.log(file.name, "upload file")
         const shortNameImage = file.name.split('.');
         const extension = shortNameImage[shortNameImage.length - 1];
 
@@ -29,11 +30,13 @@ const upload = async (file, allowedFileExtensions = ['png', 'jpg', 'jpeg'], fold
     }
 };
 
-const updateFile = async (newFile, oldFile, allowedFileExtensions = ['png', 'jpg', 'jpeg'], folder = '') => {
+const updateFile = async (newFile, oldFile, allowedFileExtensions = ['png', 'jpg', 'jpeg'], folder = '', atribute = "newImg") => {
+
     if (!newFile) {
         return null;
     }
-    if (newFile && newFile.image || newFile && newFile.pdf) {
+
+    if (newFile || newFile && newFile.pdf) {
         if (oldFile) {
 
             if (oldFile.includes(['.png', '.jpg', '.jpeg'])) {
@@ -44,18 +47,17 @@ const updateFile = async (newFile, oldFile, allowedFileExtensions = ['png', 'jpg
                 const publicId = public_id
 
                 await cloudinary.uploader.destroy(publicId);
-                return imageUrl = await upload(newFile.image, allowedFileExtensions, folder);
+                return imageUrl = await upload(newFile[atribute], allowedFileExtensions, folder);
 
             }
 
             else {
                 const urlArr = oldFile.split('/')
-                console.log(urlArr + "Que vqaina no?")
                 const arr = urlArr[urlArr.length - 1]
                 const publicId = arr
 
                 await cloudinary.uploader.destroy(publicId);
-                return imageUrl = await upload(newFile.pdf, allowedFileExtensions, folder);
+                return imageUrl = await upload(newFile[atribute], allowedFileExtensions, folder);
             }
 
         }
