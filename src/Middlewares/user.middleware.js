@@ -17,8 +17,8 @@ const validateUser = [
     .isString()
     .withMessage('El campo "name" debe ser una cadena'),
 
-  check('lastname')
-    .isString()
+  check('lastName')
+    .isString() 
     .withMessage('El campo "lastname" debe ser una cadena'),
 
   check('idrole')

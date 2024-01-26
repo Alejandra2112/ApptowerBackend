@@ -1,10 +1,13 @@
 const { Router } = require('express')
 const route = Router()
-const { getUser, postUser, putUser, getUserOne, postUserEmail, postUsersforLogin, resetPassword } = require('../Controllers/users.controller.js')
+const { getUser, postUser, putUser, getUserOne, postUserEmail, postUsersforLogin, resetPassword, getUserDocument, getEmailUser } = require('../Controllers/users.controller.js')
 const validateUser = require('../Middlewares/user.middleware.js')
 
 
 route.get('/:iduser', getUserOne);
+route.get('/document/:document', getUserDocument);
+route.get('/email/:email', getEmailUser);
+
 
 
 route.get('/', getUser)

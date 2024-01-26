@@ -3,6 +3,7 @@ const Rols = require('../Models/rols.model');
 const Permission = require('../Models/permissions.model');
 const rolsPermissions = require('../Models/rolsPermissions.model');
 const Privileges = require('../Models/privileges.model');
+const { Sequelize } = require('sequelize');
 
 const getRols = async (req, res = response) => {
   try {
@@ -58,10 +59,38 @@ const getRolsOne = async (req, res = response) => {
 };
 
 
+const getRolsNameRole = async (req, res = response) => {
+  try {
+    const { namerole } = req.params;
+
+    const rols = await Rols.findOne({
+      where: Sequelize.where(
+        Sequelize.fn('lower', Sequelize.col('namerole')),
+        Sequelize.fn('lower', namerole)
+      )
+    });
+
+    if (rols) {
+      return res.status(409).json({ message: 'Ya existe un rol con ese nombre.' });
+    }
+
+    res.status(200).json({
+      rols,
+    });
+
+  } catch (error) {
+    console.error('Error al obtener roles:', error);
+    res.status(500).json({
+      error: 'Error al obtener roles',
+    });
+  }
+}
+
 const postRols = async (req, res) => {
   let message = '';
   const { namerole, description, detailsRols } = req.body;
   console.log(detailsRols, 'detailsRols')
+  
 
   try {
     if (!detailsRols || !Array.isArray(detailsRols)) {
@@ -175,5 +204,6 @@ module.exports = {
   getRols,
   postRols,
   putRols,
-  getRolsOne
+  getRolsOne,
+  getRolsNameRole
 };

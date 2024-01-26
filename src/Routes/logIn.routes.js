@@ -17,13 +17,12 @@ route.get('/access', verifityToken, async (req, res) => {
 
     if (roleData) {
       roleName = roleData.namerole;
-      console.log('Role Data:', roleData); // Verificar si roleData se obtiene correctamente
-      console.log('Role Name:', roleName); // Verificar si roleName se obtiene correctamente
+      console.log('Role Data:', roleData);
+      console.log('Role Name:', roleName);
     }
 
     res.json({
-      role: roleName,
-      message: `Es ${roleName}`,
+      message: `Bienvenido`,
     });
   } catch (error) {
     console.error('Error fetching role:', error);

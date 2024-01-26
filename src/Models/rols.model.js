@@ -13,6 +13,7 @@ const Rols = sequelize.define('rols', {
   namerole: {
     type: DataTypes.STRING,
     field: 'namerole',
+    unique: true,
   },
   description: {
     type: DataTypes.STRING,

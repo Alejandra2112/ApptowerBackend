@@ -4,7 +4,7 @@ const Permission = require('../Models/permissions.model');
 const getPermissions = async (req, res = response) => {
   try {
     const permission = await Permission.findAll();
-    console.log('datos de permisos obtenidos correctamente:', permission );
+    console.log('datos de permisos obtenidos correctamente:', permission);
 
     res.json({
       permission
@@ -19,10 +19,10 @@ const getPermissions = async (req, res = response) => {
 
 const postPermissions = async (req, res) => {
   let message = '';
-  const body = req.body; 
+  const permissions = req.body;
   try {
-    await Permission.create(body); 
-    message = 'Permiso Registrado Exitosamente';
+    await Permission.bulkCreate(permissions);
+    message = 'Permisos registrados exitosamente';
   } catch (e) {
     message = e.message;
   }

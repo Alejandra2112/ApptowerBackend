@@ -20,15 +20,17 @@ const validateWatchman = [
     .withMessage('El campo "document" debe tener entre 8 y 10 caracteres'),
 
   check('phone')
+    .optional()
     .isString()
     .withMessage('El campo "phone" debe ser una cadena')
-    .isLength({ min: 10, max: 10 })
-    .withMessage('El campo "phone" debe tener 10 caracteres'),
+    .isLength({ min: 0, max: 10 })
+    .withMessage('El campo "phone" debe tener entre 0 y 10 caracteres'),
 
   check('email')
     .isEmail()
     .withMessage('El campo "email" debe ser un correo electrónico válido'),
   check('dateOfbirth')
+    .optional()
     .custom((value) => {
       const birthDate = new Date(value);
       const today = new Date();
@@ -41,6 +43,7 @@ const validateWatchman = [
       return true;
     })
     .withMessage('El usuario debe tener al menos 18 años'),
+
 
 
   (req, res, next) => {

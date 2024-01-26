@@ -2,13 +2,21 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../Models/users.model');
 const Rols = require('../Models/rols.model');
+const { Op } = require('sequelize');
 
 const logIn = async (req, res) => {
   const { usuario, password } = req.body;
 
   try {
-    const user = await User.findOne({ where: { document: usuario } });
-
+    const user = await User.findOne({
+      where: {
+        [Op.or]: [
+          { document: usuario },
+          { email: usuario }
+        ]
+      }
+    });
+    
     if (!user) {
       return res.status(401).json({ message: 'Usuario no encontrado' });
     }

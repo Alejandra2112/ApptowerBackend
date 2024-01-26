@@ -3,6 +3,9 @@ const cloudinary = require("cloudinary").v2;
 cloudinary.config(process.env.CLOUDINARY_URL);
 
 const upload = async (file, allowedFileExtensions = ['png', 'jpg', 'jpeg'], folder = '') => {
+    if (!file) {
+        return null;
+    }
     try {
         const shortNameImage = file.name.split('.');
         const extension = shortNameImage[shortNameImage.length - 1];
@@ -27,7 +30,9 @@ const upload = async (file, allowedFileExtensions = ['png', 'jpg', 'jpeg'], fold
 };
 
 const updateFile = async (newFile, oldFile, allowedFileExtensions = ['png', 'jpg', 'jpeg'], folder = '') => {
-
+    if (!newFile) {
+        return null;
+    }
     if (newFile && newFile.image || newFile && newFile.pdf) {
         if (oldFile) {
 

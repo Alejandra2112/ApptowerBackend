@@ -48,6 +48,53 @@ const getUserOne = async (req, res = response) => {
   }
 };
 
+
+const getUserDocument = async (req, res = response) => {
+  try {
+    const { document } = req.params;
+
+    const user = await UserModel.findOne({ where: { document: document } });
+
+    if (user) {
+      return res.status(409).json({ message: 'Ya existe un usuario con este documento.' });
+    }
+
+    res.status(200).json({
+      user,
+    });
+
+  } catch (error) {
+    console.error('Error al obtener usuario:', error);
+    res.status(500).json({
+      error: 'Error al obtener usuario',
+    });
+  }
+}
+
+
+const getEmailUser = async (req, res = response) => {
+  try {
+    const { email } = req.params;
+
+    const user = await UserModel.findOne({ where: { email: email } });
+
+    if (user) {
+      return res.status(409).json({ message: 'Ya existe un usuario con este correo.' });
+    }
+
+    res.status(200).json({
+      user,
+    });
+
+  } catch (error) {
+    console.error('Error al obtener usuario:', error);
+    res.status(500).json({
+      error: 'Error al obtener usuario',
+    });
+
+  }
+}
+
 const postUserEmail = async (req, res) => {
 
 
@@ -166,13 +213,14 @@ const postUsersforLogin = async (req, res) => {
 };
 
 
+
 // Post Emmanuel
 
 const postUser = async (req, res) => {
   try {
 
     const pdfUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
-    // const imgUrl = await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images')
+    const imgUrl = req.files !== null ? await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images') : null
 
     const { pdf, ...userData } = req.body;
 
@@ -181,7 +229,7 @@ const postUser = async (req, res) => {
 
     const user = await UserModel.create({
       pdf: pdfUrl,
-      // userImg: imgUrl,
+      userImg: imgUrl,
       idrole: 2, // resident rol 
       password: userData.password,
       ...userData
@@ -281,7 +329,7 @@ const putUser = async (req, res) => {
     const { iduser } = req.params;
     const { idrole, state, password, pdf, ...update } = req.body;
 
-    const user = await User.findOne({ where: { iduser: iduser } });
+    const user = await UserModel.findOne({ where: { iduser: iduser } });
 
     if (!user) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
@@ -393,11 +441,13 @@ const putUser = async (req, res) => {
 
 module.exports = {
   getUser,
+  getUserDocument,
   postUser,
   putUser,
   getUserOne,
   postUserEmail,
   postUsersforLogin,
-  resetPassword
+  resetPassword,
+  getEmailUser,
 
 };
