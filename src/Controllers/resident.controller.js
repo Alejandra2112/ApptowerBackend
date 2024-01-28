@@ -112,7 +112,7 @@ const postResident = async (req, res) => {
             userImg: imgUrl,
             idrole: 2, // resident rol 
             password: userData.password,
-            status: userData.status,
+            status: "Activo",
             ...userData
 
         })
@@ -124,6 +124,15 @@ const postResident = async (req, res) => {
             status: "Inactive"
         })
 
+
+        const apartmentResident = userData.idApartment ? await ApartmentResidentModel.create({
+
+            idApartment: userData.idApartment,
+            idResident: resident.idResident,
+            residentStartDate: userData.residentStartDate
+
+        }): ""
+
         const roleData = await Rols.findByPk(userData.idrole);
 
         res.json({
@@ -132,7 +141,8 @@ const postResident = async (req, res) => {
             user,
             role: roleData,
             msgResident: "Residente creado",
-            resident
+            resident,
+            apartmentResident
         })
 
 
@@ -185,7 +195,7 @@ const putResident = async (req, res = response) => {
 
         })
 
-        
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ msg: "Error al editar residente" });
