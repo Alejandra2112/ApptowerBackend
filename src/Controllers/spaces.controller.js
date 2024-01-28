@@ -47,28 +47,28 @@ const getAllSpaces = async (req, res = response) => {
 const postSpace = async (req, res) => {
     try {
 
-        console.log(req.files.image)
-        const imageUrl = await upload(req.files.image)
+        const { ...spaceAtributes } = req.body;
 
-        const { image, status, ...others } = req.body;
+        console.log(req.files)
 
-        console.log(image)
+        const imgUrl = req.files !== null ? await upload(req.files.image, ['png', 'jpg', 'jpeg'], 'Images') : null
 
+        console.log(imgUrl)
 
         const space = await SpacesModel.create({
-            image: imageUrl,
-            ...others
+            image: imgUrl,
+            ...spaceAtributes
         })
 
         res.json({
-            message: 'Space created'
+            msg: 'Espacio creado ',
+            space
         })
 
-        console.log(space)
 
     } catch (e) {
-        console.error('Error creating space:', e);
-        const message = e.message || 'Error creating space.';
+        console.error('Error al crear la espacio:', e);
+        const message = e.message || 'Error al crear la espacio.';
         res.status(500).json({ message });
     }
 };
@@ -77,15 +77,15 @@ const putSpace = async (req, res = response) => {
     try {
         const { idSpace, ...newData } = req.body;
 
-        console.log(req.files , "MOSTRA pues")
+        console.log(req.files, "MOSTRA pues")
 
         const space = await SpacesModel.findOne({ where: { idSpace: idSpace } });
 
-        // console.log(space.image, "Old img")
+        console.log(space.image)
 
-        const newImg = space.image == "" || space.image == null ?
-            await upload(req.files.image, ['png', 'jpg', 'jpeg'], 'Images') :
-            await updateFile(req.files, space.image, ['png', 'jpg', 'jpeg'], 'Images')
+        const newImg = space.image == "" && req.files ?
+            await upload(req.files.image, ['png', 'jpg', 'jpeg'], 'Images') :   
+            req.files ? await updateFile(req.files, space.image, ['png', 'jpg', 'jpeg'], 'Images', "image") : ""
 
 
         if (!space) {
@@ -96,7 +96,7 @@ const putSpace = async (req, res = response) => {
         const updatedSpace = await space.update({
             spaceName: newData.spaceName,
             spaceType: newData.spaceType,
-            image: newImg,
+            image: newImg == "" ? newData.image : newImg,
             area: newData.area,
             capacity: newData.capacity,
             status: newData.status

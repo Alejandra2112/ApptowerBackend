@@ -52,14 +52,48 @@ const getAllParkingSpace = async (req, res = response) => {
 const postParkingSpace = async (req, res) => {
 
 
-    let message = '';
-    const { floor, parkingPerFloor, status, ...parkingAtributes} = req.body;
+    // let message = '';
+    // const { floor, parkingPerFloor, status, ...parkingAtributes} = req.body;
 
-    console.log(parkingPerFloor)   
+    // console.log(parkingPerFloor)   
+
+    // try {
+
+    //     let newParkingscreated = 0;
+
+    //     for (let parking = 1; parking <= parkingPerFloor; parking ++ ) {
+
+    //         await ParkingSpacesModel.create( {
+    //             parkingName: (parking < 10) ? `${floor}0${parking}` : `${floor}${parking}`,
+    //             status: "Active",
+    //             ...parkingAtributes
+
+    //         });
+    //         newParkingscreated ++
+
+    //     }
+
+    //     message = `Se crearon ${newParkingscreated} parqueaderos nuevos.`;
+
+
+        
+
+    // } catch (e) {
+
+    //     message = e.message;
+
+    // }
+    // res.json({
+
+    //     parkingSpaces: message,
+        
+    // });
 
     try {
 
         let newParkingscreated = 0;
+
+        const { floor, parkingPerFloor, status, ...parkingAtributes} = req.body;
 
         for (let parking = 1; parking <= parkingPerFloor; parking ++ ) {
 
@@ -72,22 +106,21 @@ const postParkingSpace = async (req, res) => {
             newParkingscreated ++
 
         }
-
         message = `Se crearon ${newParkingscreated} parqueaderos nuevos.`;
 
+        res.json({
 
-        
+            parkingSpaces: message,
+            
+        });
+
+
 
     } catch (e) {
-
-        message = e.message;
-
+        console.error('Error al crear la parqueadero:', e);
+        const message = e.message || 'Error al crear parqueadero.';
+        res.status(500).json({ message });
     }
-    res.json({
-
-        parkingSpaces: message,
-        
-    });
 };
 
 

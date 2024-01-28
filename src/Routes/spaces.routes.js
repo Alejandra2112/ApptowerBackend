@@ -7,7 +7,7 @@ const { UploadValidation } = require("../Middlewares/uploads.middleware")
 
 route.get('/:idSpace', getOneSpace);
 route.get('/', getAllSpaces)
-route.post('/', UploadValidation, spacesCreateValidation, validation, postSpace)
+route.post('/', postSpace)
 route.put('/', putSpace)
 // route.delete('/', deleteSpace)
 
