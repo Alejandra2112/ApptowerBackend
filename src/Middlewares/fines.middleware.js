@@ -22,7 +22,7 @@ const postFinesValidation = [
 
 const putFinesValidation = [
     check('idfines', 'Fines is required or its value is invalid').not().isEmpty().isInt(),
-    check('paymentproof', 'Payment proof is required or its value is invalid').not().isEmpty().isString().isLength({min: 3, max: 50}),
+    // check('paymentproof', 'Payment proof is required or its value is invalid').not().isEmpty(),
     check('state', 'State is required or its value is invalid').not().isEmpty().isString().isLength({min: 3, max: 50}),
     ( req, res, next ) => {
         validateResult(req, res, next);

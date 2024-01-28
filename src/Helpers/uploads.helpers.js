@@ -32,38 +32,31 @@ const upload = async (file, allowedFileExtensions = ['png', 'jpg', 'jpeg'], fold
 
 const updateFile = async (newFile, oldFile, allowedFileExtensions = ['png', 'jpg', 'jpeg'], folder = '', atribute = "newImg") => {
 
-    if (!newFile) {
+    if (!newFile || !newFile.pdf) {
         return null;
     }
 
-    if (newFile || newFile && newFile.pdf) {
-        if (oldFile) {
+    if (oldFile) {
+        let publicId;
 
-            if (oldFile.includes(['.png', '.jpg', '.jpeg'])) {
-
-                const urlArr = oldFile.split('/')
-                const arr = urlArr[urlArr.length - 1]
-                const { public_id } = arr.split('.')
-                const publicId = public_id
-
-                await cloudinary.uploader.destroy(publicId);
-                return imageUrl = await upload(newFile[atribute], allowedFileExtensions, folder);
-
-            }
-
-            else {
-                const urlArr = oldFile.split('/')
-                const arr = urlArr[urlArr.length - 1]
-                const publicId = arr
-
-                await cloudinary.uploader.destroy(publicId);
-                return imageUrl = await upload(newFile[atribute], allowedFileExtensions, folder);
-            }
-
+        if (oldFile.endsWith('.png') || oldFile.endsWith('.jpg') || oldFile.endsWith('.jpeg')) {
+            const urlArr = oldFile.split('/');
+            const arr = urlArr[urlArr.length - 1];
+            const { public_id } = arr.split('.');
+            publicId = public_id;
+        } else {
+            const urlArr = oldFile.split('/');
+            const arr = urlArr[urlArr.length - 1];
+            publicId = arr;
         }
 
+        await cloudinary.uploader.destroy(publicId);
+        return await upload(newFile[atribute], allowedFileExtensions, folder);
     }
-}
+
+    // Handle the case when oldFile is not provided
+    return await upload(newFile[atribute], allowedFileExtensions, folder);
+};
 
 
 module.exports = {
