@@ -255,51 +255,111 @@ const postUser = async (req, res) => {
 
 };
 
-// Post Alejandra
+const putUser = async (req, res) => {
+  try {
+    const { iduser } = req.params;
+    const { idrole, state, pdf, ...update } = req.body;
 
-// const postUser = async (req, res) => {
+    const user = await UserModel.findOne({ where: { iduser: iduser } });
+
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    const newPdf = await updateFile(req.files, user.pdf, ['pdf'], 'Documents')
+    const newImageUser = await updateFile(req.files, user.userImg, ['png', 'jpg', 'jpeg'], 'Images', 'userImg')
+
+
+    // if (password) {
+    //   const salt = bcryptjs.genSaltSync();
+    //   update.password = bcryptjs.hashSync(password, salt);
+    // }
+
+
+    await user.update({
+      pdf: newPdf,
+      userImg: newImageUser,
+      ...update
+    });
+
+    const updatedRole = await Rols.findByPk(user.idrole);
+
+    const nameRole = updatedRole.namerole;
+
+    if (nameRole === 'Vigilante' || nameRole === 'Seguridad' || nameRole === 'Vigilantes') {
+      const watchman = await Watchman.findOne({ where: { document: user.document } });
+      if (watchman) {
+        await watchman.update({ namewatchman: user.name, lastnamewatchman: user.lastName, phone: user.phone, email: user.email, documentType: user.docType, document: user.document });
+      }
+    }
+
+    return res.status(200).json({
+      message: 'Usuario actualizado correctamente',
+      user
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Error al actualizar el usuario',
+      error: error.message
+    });
+  }
+};
+
+
+
+
+// const putUser = async (req, res) => {
+//   let message = '';
+
 //   try {
+//     const { iduser } = req.params;
+//     const { idrole, state, password, pdf, ...update } = req.body;
 
-//     const imageUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
-//     const { pdf, ...userData } = req.body;
+//     const user = await UserModel.findOne({ where: { iduser: iduser } });
 
-//     if (userData.state === 'Activo' && userData.idrole) {
-//       if (userData.password) {
-//         const salt = bcryptjs.genSaltSync();
-//         userData.password = bcryptjs.hashSync(userData.password, salt);
+//     if (!user) {
+//       return res.status(404).json({ error: 'Usuario no encontrado' });
+//     }
+
+//     const oldRole = await Rols.findByPk(user.idrole);
+//     const newRole = await Rols.findByPk(idrole);
+
+//     // Actualizar usuario con el nuevo rol
+//     const newPdf = await updateFile(req.files, user.pdf, ['png', 'jpg', 'jpeg', 'pdf'], 'Documents');
+//     if (password) {
+//       const salt = bcryptjs.genSaltSync(10);
+//       const hashedPassword = bcryptjs.hashSync(password, salt);
+//       update.password = hashedPassword;
+//     }
+//     await user.update({ idrole, state, pdf: newPdf, ...update }, { force: true });
+
+//     if (oldRole.id !== newRole.id) {
+//       // Eliminar residente si cambia a vigilante
+//       if (oldRole.namerole === 'Residente' && newRole.namerole !== 'Residente') {
+//         const residente = await ResidentModel.findOne({ where: { docNumber: user.document } });
+//         if (residente) {
+//           await residente.destroy();
+//         }
 //       }
 
-//       const user = await User.create({
-//         ...userData,
-//         pdf: imageUrl
-//       });
+//       // Eliminar vigilante si cambia a residente
+//       if (oldRole.namerole !== 'Residente' && newRole.namerole === 'Residente') {
+//         const vigilante = await Watchman.findOne({ where: { document: user.document } });
+//         if (vigilante) {
+//           await vigilante.destroy();
+//         }
+//       }
 
-
-//       const roleData = await Rols.findByPk(userData.idrole);
-
-
-//       if (['Vigilante', 'Seguridad', 'Vigilantes'].includes(roleData.namerole)) {
-//         // const dateOfBirth = new Date(req.body.dateOfbirth);
-
-//         const watchman = await Watchman.create({
-//           namewatchman: user.name,
-//           lastnamewatchman: user.lastname,
-//           documentType: user.documentType,
-//           document: user.document,
-//           phone: user.phone,
-//           email: user.email,
-//           dateOfbirth: new Date(req.body.dateOfbirth),
-//           state: 'Activo',
-//         });
-//       } else if (['Residente', 'Residentes'].includes(roleData.namerole)) {
-//         // const birthday = new Date(req.body.birthday);
-//         const resident = await ResidentModel.create({
-//           name: user.name,
-//           lastName: user.lastname,
+//       // Crear nuevo residente si cambia a residente
+//       if (newRole.namerole === 'Residente') {
+//         await ResidentModel.create({
 //           docType: user.documentType,
 //           docNumber: user.document,
 //           phoneNumber: user.phone,
 //           email: user.email,
+//           name: user.name,
+//           lastName: user.lastname,
 //           pdf: req.body.pdf,
 //           birthday: req.body.birthday,
 //           sex: req.body.sex,
@@ -308,116 +368,43 @@ const postUser = async (req, res) => {
 //         });
 //       }
 
-//       return res.status(201).json({ message: 'Usuario Registrado Exitosamente' });
-//     } else {
-//       return res.status(400).json({ message: 'El usuario no está activo o no tiene un rol asignado' });
+//       // Crear nuevo vigilante si cambia a vigilante
+//       if (newRole.namerole !== 'Residente') {
+//         await Watchman.create({
+//           documentType: user.documentType,
+//           document: user.document,
+//           namewatchman: user.name,
+//           lastnamewatchman: user.lastname,
+//           phone: user.phone,
+//           email: user.email,
+//           dateOfbirth: req.body.dateOfbirth,
+//           state: 'Activo',
+//         });
+//       }
 //     }
+
+//     // Actualizar datos según el nuevo rol
+//     if (newRole.namerole === 'Residente') {
+//       const resident = await ResidentModel.findOne({ where: { docNumber: user.document } });
+//       if (resident) {
+//         await resident.update({ name: user.name, lastName: user.lastname, phoneNumber: user.phone, email: user.email });
+//       }
+//     } else {
+//       const watchman = await Watchman.findOne({ where: { document: user.document } });
+//       if (watchman) {
+//         await watchman.update({ namewatchman: user.name, lastnamewatchman: user.lastname, phone: user.phone, email: user.email });
+//       }
+//     }
+
+//     message = 'Usuario modificado exitosamente.';
 //   } catch (error) {
-//     console.error('Error al crear usuario:', error);
-//     return res.status(500).json({ message: 'Error interno del servidor hola', error: error.message });
+//     message = 'Error al modificar usuario: ' + error.message;
 //   }
 
+//   res.json({
+//     user: message,
+//   });
 // };
-
-
-
-
-const putUser = async (req, res) => {
-  let message = '';
-
-  try {
-    const { iduser } = req.params;
-    const { idrole, state, password, pdf, ...update } = req.body;
-
-    const user = await UserModel.findOne({ where: { iduser: iduser } });
-
-    if (!user) {
-      return res.status(404).json({ error: 'Usuario no encontrado' });
-    }
-
-    const oldRole = await Rols.findByPk(user.idrole);
-    const newRole = await Rols.findByPk(idrole);
-
-    // Actualizar usuario con el nuevo rol
-    const newPdf = await updateFile(req.files, user.pdf, ['pdf'], 'Documents');
-    if (password) {
-      const salt = bcryptjs.genSaltSync(10);
-      const hashedPassword = bcryptjs.hashSync(password, salt);
-      update.password = hashedPassword;
-    }
-    await user.update({ idrole, state, pdf: newPdf, ...update }, { force: true });
-
-    if (oldRole.id !== newRole.id) {
-      // Eliminar residente si cambia a vigilante
-      if (oldRole.namerole === 'Residente' && newRole.namerole !== 'Residente') {
-        const residente = await ResidentModel.findOne({ where: { docNumber: user.document } });
-        if (residente) {
-          await residente.destroy();
-        }
-      }
-
-      // Eliminar vigilante si cambia a residente
-      if (oldRole.namerole !== 'Residente' && newRole.namerole === 'Residente') {
-        const vigilante = await Watchman.findOne({ where: { document: user.document } });
-        if (vigilante) {
-          await vigilante.destroy();
-        }
-      }
-
-      // Crear nuevo residente si cambia a residente
-      if (newRole.namerole === 'Residente') {
-        await ResidentModel.create({
-          docType: user.documentType,
-          docNumber: user.document,
-          phoneNumber: user.phone,
-          email: user.email,
-          name: user.name,
-          lastName: user.lastname,
-          pdf: req.body.pdf,
-          birthday: req.body.birthday,
-          sex: req.body.sex,
-          residentType: req.body.residentType,
-          status: 'Active',
-        });
-      }
-
-      // Crear nuevo vigilante si cambia a vigilante
-      if (newRole.namerole !== 'Residente') {
-        await Watchman.create({
-          documentType: user.documentType,
-          document: user.document,
-          namewatchman: user.name,
-          lastnamewatchman: user.lastname,
-          phone: user.phone,
-          email: user.email,
-          dateOfbirth: req.body.dateOfbirth,
-          state: 'Activo',
-        });
-      }
-    }
-
-    // Actualizar datos según el nuevo rol
-    if (newRole.namerole === 'Residente') {
-      const resident = await ResidentModel.findOne({ where: { docNumber: user.document } });
-      if (resident) {
-        await resident.update({ name: user.name, lastName: user.lastname, phoneNumber: user.phone, email: user.email });
-      }
-    } else {
-      const watchman = await Watchman.findOne({ where: { document: user.document } });
-      if (watchman) {
-        await watchman.update({ namewatchman: user.name, lastnamewatchman: user.lastname, phone: user.phone, email: user.email });
-      }
-    }
-
-    message = 'Usuario modificado exitosamente.';
-  } catch (error) {
-    message = 'Error al modificar usuario: ' + error.message;
-  }
-
-  res.json({
-    user: message,
-  });
-};
 
 // const deleteUser = async (req, res) => {
 //   const { iduser } = req.body;

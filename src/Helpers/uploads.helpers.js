@@ -30,39 +30,22 @@ const upload = async (file, allowedFileExtensions = ['png', 'jpg', 'jpeg'], fold
     }
 };
 
-const updateFile = async (newFile, oldFile, allowedFileExtensions = ['png', 'jpg', 'jpeg'], folder = '', atribute = "newImg") => {
 
-    if (!newFile) {
+const updateFile = async (newFile, oldFile, allowedFileExtensions = ['png', 'jpg', 'jpeg', 'pdf'], folder = '', atribute = "pdf") => {
+
+    if (!newFile || !newFile[atribute]) {
         return null;
     }
 
-    if (newFile || newFile && newFile.pdf) {
-        if (oldFile) {
+    if (oldFile) {
+        const urlArr = oldFile.split('/')
+        const arr = urlArr[urlArr.length - 1]
+        const publicId = arr.includes('.') ? arr.split('.')[0] : arr
 
-            if (oldFile.includes(['.png', '.jpg', '.jpeg'])) {
-
-                const urlArr = oldFile.split('/')
-                const arr = urlArr[urlArr.length - 1]
-                const { public_id } = arr.split('.')
-                const publicId = public_id
-
-                await cloudinary.uploader.destroy(publicId);
-                return imageUrl = await upload(newFile[atribute], allowedFileExtensions, folder);
-
-            }
-
-            else {
-                const urlArr = oldFile.split('/')
-                const arr = urlArr[urlArr.length - 1]
-                const publicId = arr
-
-                await cloudinary.uploader.destroy(publicId);
-                return imageUrl = await upload(newFile[atribute], allowedFileExtensions, folder);
-            }
-
-        }
-
+        await cloudinary.uploader.destroy(publicId);
     }
+
+    return imageUrl = await upload(newFile[atribute], allowedFileExtensions, folder);
 }
 
 
