@@ -139,6 +139,7 @@ const getApartmentsResidents = async (req, res = response) => {
 
 const postApartmentResident = async (req, res) => {
 
+    
 
     let message = '';
     const body = req.body;

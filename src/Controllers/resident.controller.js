@@ -7,6 +7,8 @@ const bcryptjs = require('bcryptjs');
 const UserModel = require('../Models/users.model');
 const Rols = require('../Models/rols.model');
 const ApartmentModel = require('../Models/apartment.model');
+const OwnersModel = require('../Models/owners.model');
+const ApartmentOwnerModel = require('../Models/apartment.owners.model');
 
 
 const getOneResidents = async (req, res = response) => {
@@ -47,48 +49,50 @@ const getOneResidents = async (req, res = response) => {
 
 const getAllResidents = async (req, res = response) => {
     try {
-
         const residents = await ResidentModel.findAll({
-
             include: [
                 {
                     model: UserModel,
                     as: 'user'
                 },
-
             ]
         });
 
-
         const residentList = await Promise.all(residents.map(async (resident) => {
-
             const apartments = await ApartmentResidentModel.findAll({
                 where: { idResident: resident.idResident },
             });
 
-            resident.dataValues.apartments = apartments.length == 0 ? "No apartamentos" : apartments[0]
+            let apartmentName = "";
+
+            if (apartments.length > 0) {
+                const apartment = await ApartmentModel.findOne({
+                    where: { idApartment: apartments[0].idApartment }
+                }); 
+
+                if (apartment) {
+                    apartmentName = apartment.dataValues;
+                }   
+            }
+
+            resident.dataValues.apartments = apartments;
+            resident.dataValues.apartmentInfo = apartmentName;
 
             return resident;
         }));
 
         res.json({
-
             residents: residentList
-
         });
 
     } catch (error) {
-
         console.error('Error al obtener residentes:', error);
-
         res.status(500).json({
-
             error: 'Error al obtener residentes',
+        });
+    }
+};
 
-        })
-    };
-
-}
 
 
 
@@ -110,7 +114,7 @@ const postResident = async (req, res) => {
         const user = await UserModel.create({
             pdf: pdfUrl,
             userImg: imgUrl,
-            idrole: 2, // resident rol 
+            idrole: 1, // resident rol 
             password: userData.password,
             status: "Activo",
             ...userData
@@ -182,6 +186,21 @@ const putResident = async (req, res = response) => {
             return res.status(400).json({ msg: "Residente no enconytrado." });
         }
 
+        console.log(resident)
+
+
+        const newOwner = resident.residentType != "owner" && residentAtributes.residentType == "owner" ?
+            await OwnersModel.create({
+                iduser: resident.iduser,
+                ...residentAtributes
+            }) : ""
+
+        // const newApartmentOwner = resident.residentType != "owner" && residentAtributes.residentType == "owner" && newOwner?
+        // await ApartmentOwnerModel.create({
+        //     id
+        // })
+
+
         const updatedResident = await resident.update({
 
             residentType: residentAtributes.residentType,
@@ -191,7 +210,8 @@ const putResident = async (req, res = response) => {
 
         res.json({
 
-            resident: updatedResident
+            resident: updatedResident,
+            newOwner
 
         })
 
