@@ -30,7 +30,7 @@ const upload = async (file, allowedFileExtensions = ['png', 'jpg', 'jpeg'], fold
     }
 };
 
-const updateFile = async (newFile, oldFile, allowedFileExtensions = ['png', 'jpg', 'jpeg'], folder = '', atribute = "newImg") => {
+const updateFile = async (newFile, oldFile, allowedFileExtensions = ['png', 'jpg', 'jpeg'], folder = '', atribute = "image") => {
 
     if (!newFile || !newFile.pdf) {
         return null;
