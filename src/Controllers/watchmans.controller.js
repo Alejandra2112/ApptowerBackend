@@ -1,10 +1,21 @@
 const { response } = require('express');
 const Watchman = require('../Models/watchmans.model');
 const User = require('../Models/users.model');
+const UserModel = require('../Models/users.model');
+const Rols = require('../Models/rols.model');
+const bcryptjs = require('bcryptjs')
+
 
 const getWatchman = async (req, res = response) => {
   try {
-    const watchman = await Watchman.findAll();
+    const watchman = await Watchman.findAll({
+      include: [
+        {
+          model: UserModel,
+          as: 'user'
+        },
+      ]
+    });
 
     console.log('vigilantes obtenidos correctamente:', watchman);
 
@@ -21,11 +32,19 @@ const getWatchman = async (req, res = response) => {
   }
 };
 
+
+
 const getWatchmanOne = async (req, res = response) => {
   try {
     const { idwatchman } = req.params;
 
-    const watchman = await Watchman.findOne({ where: { idwatchman: idwatchman } });
+    const watchman = await Watchman.findOne({
+      where: { idwatchman: idwatchman },
+      include: [{
+        model: UserModel,
+        as: "user"
+      }]
+    });
     console.log('Vigilante obtenido correctamente:', watchman);
 
     if (!watchman) {
@@ -68,51 +87,96 @@ const getWatchmanDocument = async (req, res = response) => {
 
 
 const postWatchman = async (req, res) => {
-  let message = '';
-  const body = req.body;
-  console.log(req.body);
+
   try {
-    await Watchman.create(body);
-    message = 'Vigilante Registrado Exitosamente';
+    const pdfUrl = req.files !== null ? await upload(req.files.pdf, ['pdf'], 'Documents') : null
+    const imgUrl = req.files !== null ? await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images') : null
+
+    const { pdf, userImg, password, idEnterpriseSecurity, ...userData } = req.body;
+
+    const salt = bcryptjs.genSaltSync();
+    userData.password = bcryptjs.hashSync(userData.password, salt);
+
+    const user = await UserModel.create({
+      pdf: pdfUrl,
+      userImg: imgUrl,
+      password: password,
+      status: "Activo",
+      ...userData
+
+    })
+
+    const role = await Rols.findOne({ where: { idrole: userData.idrole } });
+    const roleName = role ? role.namerole.toLowerCase() : null;
+
+    let watchman;
+
+    if (roleName && (roleName.includes('vigilante') || roleName.includes('seguridad') || roleName.includes('vigilancia'))) {
+      watchman = await Watchman.create({
+        iduser: user.iduser,
+        state: "Activo",
+        idEnterpriseSecurity: idEnterpriseSecurity,
+      });
+    }
+
+    const roleData = await Rols.findByPk(userData.idrole);
+
+    res.json({
+      msgUser: "Usuario creado",
+      user,
+      role: roleData,
+      msgResident: "Vigilante creado",
+      watchman
+    });
+
   } catch (e) {
-    message = e.message;
+    console.error(e);
+    res.status(500).json({
+      error: 'Error al crear el vigilante',
+      details: e.message
+    });
   }
-  res.json({
-    watchman: message,
-  });
+
 };
 
 
-const putWatchman = async (req, res = response) => {
-  const body = req.body;
-  let message = '';
+
+const putWatchman = async (req, res) => {
+  const { user: userUpdate, ...watchmanUpdate } = req.body;
 
   try {
-    const { idwatchman, ...update } = body;
+    const user = await UserModel.findOne({ where: { iduser: userUpdate.iduser } });
 
-    const existingWatchman = await Watchman.findByPk(idwatchman);
-
-    if (!existingWatchman) {
-      message = 'No se encontró un vigilante con ese ID';
-    } else {
-      const [updatedRows] = await Watchman.update(update, {
-        where: { idwatchman: idwatchman },
-        force: true
-      });
-
-      const userEdit = await User.findOne({ where: { document: existingWatchman.document } });
-      if (userEdit) {
-        await userEdit.update({ name: existingWatchman.namewatchman, lastname: existingWatchman.lastnamewatchman, documentType: existingWatchman.documentType, phone: existingWatchman.phone, email: existingWatchman.email, state: existingWatchman.state, document: existingWatchman.document });
-      }
-
-      message = 'Vigilante modificado exitosamente.';
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
     }
+
+    await user.update({
+      ...userUpdate
+    });
+
+    const updatedRole = await Rols.findByPk(user.idrole);
+
+    const nameRole = updatedRole.namerole;
+
+    if (nameRole === 'Vigilante' || nameRole === 'Seguridad' || nameRole === 'Vigilantes') {
+      const watchman = await Watchman.findOne({ where: { idwatchman: watchmanUpdate.idwatchman } });
+      if (watchman) {
+        await watchman.update(watchmanUpdate);
+      }
+    }
+
+    return res.status(200).json({
+      message: 'Usuario y vigilante actualizados correctamente',
+      user
+    });
+
   } catch (error) {
-    message = 'Error al modificar vigilante: ' + error.message;
+    return res.status(500).json({
+      message: 'Error al actualizar el usuario y el vigilante',
+      error: error.message
+    });
   }
-  res.json({
-    watchman: message,
-  });
 };
 
 

@@ -6,6 +6,7 @@ const { body } = require('express-validator');
 const bcryptjs = require('bcryptjs');
 const UserModel = require('../Models/users.model');
 const Rols = require('../Models/rols.model');
+const ApartmentModel = require('../Models/apartment.model');
 
 
 const getOneResidents = async (req, res = response) => {
@@ -53,15 +54,27 @@ const getAllResidents = async (req, res = response) => {
                 {
                     model: UserModel,
                     as: 'user'
-                }
+                },
+
             ]
         });
 
 
+        const residentList = await Promise.all(residents.map(async (resident) => {
+
+            const apartments = await ApartmentResidentModel.findAll({
+                where: { idResident: resident.idResident },
+            });
+
+            resident.dataValues.apartments = apartments.length == 0 ? "No apartamentos" : apartments[0]
+
+            return resident;
+        }));
 
         res.json({
 
-            residents,
+            residents: residentList
+
         });
 
     } catch (error) {
@@ -99,7 +112,7 @@ const postResident = async (req, res) => {
             userImg: imgUrl,
             idrole: 2, // resident rol 
             password: userData.password,
-            status: userData.status,
+            status: "Activo",
             ...userData
 
         })
@@ -111,6 +124,15 @@ const postResident = async (req, res) => {
             status: "Inactive"
         })
 
+
+        const apartmentResident = userData.idApartment ? await ApartmentResidentModel.create({
+
+            idApartment: userData.idApartment,
+            idResident: resident.idResident,
+            residentStartDate: userData.residentStartDate
+
+        }) : ""
+
         const roleData = await Rols.findByPk(userData.idrole);
 
         res.json({
@@ -119,7 +141,8 @@ const postResident = async (req, res) => {
             user,
             role: roleData,
             msgResident: "Residente creado",
-            resident
+            resident,
+            apartmentResident
         })
 
 
@@ -139,38 +162,43 @@ const putResident = async (req, res = response) => {
 
     try {
 
+        const { idResident, ...residentAtributes } = req.body
+
+
+        const resident = await ResidentModel.findOne(
+            {
+                where: { idResident: idResident },
+
+                // include: [{
+
+                //     model: UserModel,
+                //     as: "user"
+                // }]
+            }
+
+        );
+
+        if (!resident) {
+            return res.status(400).json({ msg: "Residente no enconytrado." });
+        }
+
+        const updatedResident = await resident.update({
+
+            residentType: residentAtributes.residentType,
+            status: residentAtributes.status,
+
+        });
+
         res.json({
 
-            msg: 'Editar residente'
+            resident: updatedResident
+
         })
 
-        // console.log(`Editar:` )
-        // console.log(req.body)
 
-        // const resident = await ResidentModel.findByPk(req.body.idResident);
-
-
-        // if (!resident) {
-        //     return res.status(400).json({ msg: "Id resident not found." });
-        // }
-
-        // const newPdf = await updateFile(req.files, resident.pdf, ['pdf'], 'Documents')
-        // const { pdf, ...others } = req.body
-
-        // const updatedSpace = await resident.update({
-        //     pdf: newPdf,
-        //     ...others
-        // }, {
-        //     where: { idResident: req.body.idResident }
-        // });
-
-        // res.json({
-        //     spaces: 'Resident update',
-        //     // updatedSpace: updatedSpace.toJSON()
-        // });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ msg: "Internal server error" });
+        res.status(500).json({ msg: "Error al editar residente" });
     }
 };
 

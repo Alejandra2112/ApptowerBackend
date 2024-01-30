@@ -2,7 +2,6 @@ const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
 const Rols = require('./rols.model');
 const Watchmans = require('./watchmans.model');
-const usersforWatchmans = require('./user.watchman.model');
 
 const UserModel = sequelize.define('users', {
 
@@ -50,6 +49,12 @@ const UserModel = sequelize.define('users', {
     type: DataTypes.STRING,
     field: 'lastName',
 
+  },
+
+  birthday: {
+
+    type: DataTypes.DATE,
+    field: 'birthday',
   },
 
   sex: {
@@ -111,11 +116,23 @@ UserModel.belongsTo(Rols, {
   targetKey: 'idrole',
 });
 
-UserModel.belongsToMany(Watchmans, {
-  through: usersforWatchmans,
+UserModel.hasMany(Watchmans, {
   foreignKey: 'iduser',
-  otherKey: 'idwatchman',
+  sourceKey: 'iduser',
 });
+
+Watchmans.belongsTo(UserModel, {
+  foreignKey: 'iduser',
+  targetKey: 'iduser',
+});
+
+// Comente esta relaicon por que ya no tenia sentido que existiera
+
+// UserModel.belongsToMany(Watchmans, {
+//   through: usersforWatchmans,
+//   foreignKey: 'iduser',
+//   otherKey: 'idwatchman',
+// });
 
 // User.belongsToMany(ResidentModel, {
 //   through: usersforResidents,

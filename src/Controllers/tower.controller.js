@@ -88,27 +88,30 @@ const putTower = async (req, res = response) => {
     try {
         const { idTower, ...newData } = req.body;
 
-        console.log(req.files.towerImg, "file")
+        console.log(req.files, "file")
 
         const tower = await TowerModel.findOne({ where: { idTower: idTower } });
-
-        const newImg = tower.towerImg == "" || tower.towerImg == null ?
-            await upload(req.files.towerImg, ['png', 'jpg', 'jpeg'], 'Images') :
-            await updateFile(req.files, tower.towerImg, ['png', 'jpg', 'jpeg'], 'Images', "towerImg")
-
-        console.log(tower.towerImg, "Old img")
-        console.log(newImg, "newImg")
 
         if (!tower) {
             return res.status(404).json({ msg: 'Torre no encontrada.' });
         }
 
+        const newImg = tower.towerImg == "" && req.files ?
+            await upload(req.files.towerImg, ['png', 'jpg', 'jpeg'], 'Images') :
+            req.files ? await updateFile(req.files, tower.towerImg, ['png', 'jpg', 'jpeg'], 'Images', "towerImg"): ""
+            
+
+        console.log(tower.towerImg, "Old img")
+        console.log(newImg, "newImg")
+
+
+
         // Actualizar la torre con los nuevos datos
         const updatedTower = await tower.update({
             towerName: newData.towerName,
-            towerImg: newImg,
+            towerImg: newImg == "" ? newData.towerImg : newImg,
             status: newData.status
-        }); 
+        });
 
         res.json({
             msg: "Torre actualizada",

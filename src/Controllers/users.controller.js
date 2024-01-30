@@ -214,15 +214,13 @@ const postUsersforLogin = async (req, res) => {
 
 
 
-// Post Emmanuel
-
 const postUser = async (req, res) => {
   try {
 
-    const pdfUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
+    const pdfUrl = req.files !== null ? await upload(req.files.pdf, ['pdf'], 'Documents') : null
     const imgUrl = req.files !== null ? await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images') : null
 
-    const { pdf, ...userData } = req.body;
+    const { pdf, userImg, idEnterpriseSecurity, ...userData } = req.body;
 
     const salt = bcryptjs.genSaltSync();
     userData.password = bcryptjs.hashSync(userData.password, salt);
@@ -230,22 +228,52 @@ const postUser = async (req, res) => {
     const user = await UserModel.create({
       pdf: pdfUrl,
       userImg: imgUrl,
-      idrole: 2, // resident rol 
       password: userData.password,
       ...userData
 
     })
 
+    const role = await Rols.findOne({ where: { idrole: userData.idrole } });
+    const roleName = role ? role.namerole.toLowerCase() : null;
+
+    let watchman;
+    if (roleName && (roleName.includes('vigilante') || roleName.includes('seguridad') || roleName.includes('vigilancia'))) {
+      watchman = await Watchman.create({
+        iduser: user.iduser,
+        state: "Activo",
+        idEnterpriseSecurity: idEnterpriseSecurity,
+      });
+    }
+
+    let resident;
+
+    if (roleName && roleName.includes('residente')) {
+      resident = await ResidentModel.create({
+        iduser: user.iduser,
+        residentType: "tenant",
+        status: "Inactive"
+      })
+    }
+
     const roleData = await Rols.findByPk(userData.idrole);
 
-    res.json({
-
+    const response = {
       msgUser: "Usuario creado",
       user,
-      role: roleData
-    })
+      role: roleData,
+    };
 
+    if (watchman) {
+      response.msgWatchman = "Vigilante creado";
+      response.watchman = watchman;
+    }
 
+    if (resident) {
+      response.msgResident = "Residente creado";
+      response.resident = resident;
+    }
+
+    res.json(response);
 
 
   } catch (error) {
@@ -255,10 +283,11 @@ const postUser = async (req, res) => {
 
 };
 
+
 const putUser = async (req, res) => {
   try {
     const { iduser } = req.params;
-    const { idrole, state, pdf, ...update } = req.body;
+    const { idrole, status, pdf, idEnterpriseSecurity, ...update } = req.body;
 
     const user = await UserModel.findOne({ where: { iduser: iduser } });
 
@@ -266,14 +295,8 @@ const putUser = async (req, res) => {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
 
-    const newPdf = await updateFile(req.files, user.pdf, ['pdf'], 'Documents')
-    const newImageUser = await updateFile(req.files, user.userImg, ['png', 'jpg', 'jpeg'], 'Images', 'userImg')
-
-
-    // if (password) {
-    //   const salt = bcryptjs.genSaltSync();
-    //   update.password = bcryptjs.hashSync(password, salt);
-    // }
+    const newPdf = req.files !== null ? await updateFile(req.files, user.pdf, ['pdf'], 'Documents') : null
+    const newImageUser = req.files !== null ? await updateFile(req.files, user.userImg, ['png', 'jpg', 'jpeg'], 'Images', 'userImg') : null
 
 
     await user.update({
@@ -282,21 +305,34 @@ const putUser = async (req, res) => {
       ...update
     });
 
-    const updatedRole = await Rols.findByPk(user.idrole);
 
-    const nameRole = updatedRole.namerole;
+    const role = await Rols.findOne({ where: { idrole: idrole } });
+    const roleName = role ? role.namerole.toLowerCase() : null;
 
-    if (nameRole === 'Vigilante' || nameRole === 'Seguridad' || nameRole === 'Vigilantes') {
-      const watchman = await Watchman.findOne({ where: { document: user.document } });
-      if (watchman) {
-        await watchman.update({ namewatchman: user.name, lastnamewatchman: user.lastName, phone: user.phone, email: user.email, documentType: user.docType, document: user.document });
-      }
+    let watchman;
+    if (roleName && (roleName.includes('vigilante') || roleName.includes('seguridad') || roleName.includes('vigilancia'))) {
+      watchman = await Watchman.update({
+        state: status,
+        idEnterpriseSecurity: idEnterpriseSecurity,
+      }, {
+        where: { iduser: iduser }
+      });
     }
 
-    return res.status(200).json({
-      message: 'Usuario actualizado correctamente',
-      user
-    });
+
+    const response = {
+      msgUser: "Usuario Modificado",
+      user,
+    };
+
+    if (watchman) {
+      response.msgWatchman = "Vigilante Modificado";
+      response.watchman = watchman;
+    }
+
+    res.json(response);
+
+
 
   } catch (error) {
     return res.status(500).json({
