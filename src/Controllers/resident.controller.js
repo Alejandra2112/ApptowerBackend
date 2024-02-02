@@ -59,30 +59,26 @@ const getAllResidents = async (req, res = response) => {
         });
 
         const residentList = await Promise.all(residents.map(async (resident) => {
-            const apartments = await ApartmentResidentModel.findAll({
+            const apartmentResidents = await ApartmentResidentModel.findAll({
                 where: { idResident: resident.idResident },
             });
 
-            let apartmentName = "";
+            const apartmentList = await Promise.all(apartmentResidents.map(async (apartment) => {
+                const apartmentInfo = await ApartmentModel.findOne({
+                    where: { idApartment: apartment.idApartment }
+                });
+                console.log(apartmentInfo);
+                return apartmentInfo;
+            }));
 
-            if (apartments.length > 0) {
-                const apartment = await ApartmentModel.findOne({
-                    where: { idApartment: apartments[0].idApartment }
-                }); 
-
-                if (apartment) {
-                    apartmentName = apartment.dataValues;
-                }   
-            }
-
-            resident.dataValues.apartments = apartments;
-            resident.dataValues.apartmentInfo = apartmentName;
+            resident.dataValues.apartments = apartmentList;
+            resident.dataValues.apartmentResidents = apartmentResidents;
 
             return resident;
         }));
 
         res.json({
-            residents: residentList
+            residents: residentList,
         });
 
     } catch (error) {
@@ -92,6 +88,8 @@ const getAllResidents = async (req, res = response) => {
         });
     }
 };
+
+
 
 
 
@@ -166,7 +164,7 @@ const putResident = async (req, res = response) => {
 
     try {
 
-        const { idResident, ...residentAtributes } = req.body
+        const { idResident, idApartment, ...residentAtributes } = req.body
 
 
         const resident = await ResidentModel.findOne(
@@ -183,22 +181,37 @@ const putResident = async (req, res = response) => {
         );
 
         if (!resident) {
-            return res.status(400).json({ msg: "Residente no enconytrado." });
+            return res.status(400).json({ msg: "Residente no encontrado." });
         }
 
         console.log(resident)
 
 
-        const newOwner = resident.residentType != "owner" && residentAtributes.residentType == "owner" ?
-            await OwnersModel.create({
+        // const newOwner = resident.residentType != "owner" && residentAtributes.residentType == "owner" ?
+        //     await OwnersModel.create({
+        //         iduser: resident.iduser,
+        //         ...residentAtributes
+        //     }) : ""
+
+        let newOwner = "";
+
+        if (resident.residentType != "owner" && residentAtributes.residentType == "owner") {
+            newOwner = await OwnersModel.create({
                 iduser: resident.iduser,
                 ...residentAtributes
-            }) : ""
+            });
 
-        // const newApartmentOwner = resident.residentType != "owner" && residentAtributes.residentType == "owner" && newOwner?
-        // await ApartmentOwnerModel.create({
-        //     id
-        // })
+            console.log(idApartment, "id apartamento");
+
+            if (idApartment != "") {
+                await ApartmentOwnerModel.create({
+                    idOwner: newOwner.idOwner,
+                    idApartment: idApartment,
+                    OwnershipStartDate: new Date(),
+                    status: "Active"
+                });
+            }
+        }
 
 
         const updatedResident = await resident.update({
