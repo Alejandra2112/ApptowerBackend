@@ -1,52 +1,71 @@
 const { response } = require('express');
 const ParkingSpacesModel = require('../Models/parking.spaces.model');
+const GuestIncomeParking = require('../Models/guestIncomeParking.model');
+const { where } = require('sequelize');
+const AssignedParking = require('../Models/assigned.parking.model');
+const Vehicle = require('../Models/vehicle.model');
+const ApartmentModel = require('../Models/apartment.model');
 
 const getOneParkingSpace = async (req, res = response) => {
     try {
-      const { idParkingSpace } = req.params;
-  
-      const parkinSpace = await ParkingSpacesModel.findOne({ where: { idParkingSpace: idParkingSpace } });
-  
-      if (!parkinSpace) {
-        return res.status(404).json({ error: 'Id parking space not found.' });
-      }
-  
-      res.json({
-        parkinSpace,
-      });
-    } catch (error) {
-      console.error('Error to get parking space.', error);
-      res.status(500).json({
-        error: 'Error to get parking space.',
-      });
-    }
-  };
+        const { idParkingSpace } = req.params;
 
-const getAllParkingSpace = async (req, res = response) => {
+        const parkinSpace = await ParkingSpacesModel.findOne({ where: { idParkingSpace: idParkingSpace } });
 
-    try {
-
-        const parkingSpaces = await ParkingSpacesModel.findAll();
-
-        console.log('Parking space get ok', parkingSpaces);
+        if (!parkinSpace) {
+            return res.status(404).json({ error: 'Id parking space not found.' });
+        }
 
         res.json({
+            parkinSpace,
+        });
+    } catch (error) {
+        console.error('Error to get parking space.', error);
+        res.status(500).json({
+            error: 'Error to get parking space.',
+        });
+    }
+};
+const getAllParkingSpace = async (req, res = response) => {
+    try {
+        const parkingSpaces = await ParkingSpacesModel.findAll();
+        const parkingSpacesList = await Promise.all(parkingSpaces.map(async (parking) => {
+            const vehiclesInParking = await GuestIncomeParking.findOne({
+                where: { idParkingSpace: parking.idParkingSpace },
+            });
 
-            parkingSpaces,
+            const apartmentWithParking = await AssignedParking.findOne({
+                where: { idParkingSpace: parking.idParkingSpace },
+            });
 
+            let apartmentInfo = null;
+            if (apartmentWithParking) {
+                apartmentInfo = await ApartmentModel.findOne({
+                    where: { idApartment: apartmentWithParking.idApartment }
+                });
+            }
+
+            parking.dataValues.apartmentAssigned = {
+                apartmentWithParking,
+                apartmentInfo,
+            };
+            parking.dataValues.vehicleAssigned = vehiclesInParking;
+
+            return parking 
+        }));
+
+        res.json({
+            parkingSpaces: parkingSpacesList
         });
 
     } catch (error) {
-
         console.error('Error get parking spaces', error);
-
         res.status(500).json({
             error: 'Error get parking spaces 500',
-        })
-
-    };
-
+        });
+    }
 }
+
 
 
 const postParkingSpace = async (req, res) => {
@@ -76,7 +95,7 @@ const postParkingSpace = async (req, res) => {
     //     message = `Se crearon ${newParkingscreated} parqueaderos nuevos.`;
 
 
-        
+
 
     // } catch (e) {
 
@@ -86,24 +105,24 @@ const postParkingSpace = async (req, res) => {
     // res.json({
 
     //     parkingSpaces: message,
-        
+
     // });
 
     try {
 
         let newParkingscreated = 0;
 
-        const { floor, parkingPerFloor, status, ...parkingAtributes} = req.body;
+        const { floor, parkingPerFloor, status, ...parkingAtributes } = req.body;
 
-        for (let parking = 1; parking <= parkingPerFloor; parking ++ ) {
+        for (let parking = 1; parking <= parkingPerFloor; parking++) {
 
-            await ParkingSpacesModel.create( {
+            await ParkingSpacesModel.create({
                 parkingName: (parking < 10) ? `${floor}0${parking}` : `${floor}${parking}`,
                 status: "Active",
                 ...parkingAtributes
 
             });
-            newParkingscreated ++
+            newParkingscreated++
 
         }
         message = `Se crearon ${newParkingscreated} parqueaderos nuevos.`;
@@ -111,7 +130,7 @@ const postParkingSpace = async (req, res) => {
         res.json({
 
             parkingSpaces: message,
-            
+
         });
 
 

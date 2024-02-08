@@ -16,15 +16,43 @@ const getOneOwner = async (req, res = response) => {
     try {
         const { idOwner } = req.params;
 
-        const owner = await OwnersModel.findOne({ where: { idOwner: idOwner } });
+        const owner = await OwnersModel.findOne({
+            where: { idOwner: idOwner },
+            include: [{
+                model: UserModel,
+                as: 'user'
+            }]
+        });
+
+        const apartmentOwners = await ApartmentOwnerModel.findAll({
+
+            where: { idOwner: idOwner },
+            
+        })
+
+        const apartments = await ApartmentModel.findAll();
+
+        const data = apartmentOwners.map(ao => {
+
+            const apartment = apartments.find(apartment => apartment.idApartment === ao.idApartment);
+
+
+            return {
+                ...ao.dataValues,
+                apartment,
+            }
+        })
+
 
         if (!owner) {
-            return res.status(404).json({ error: 'Id owner not found.' });
+            return res.status(404).json({ error: 'Id no encontrado' });
         }
 
         res.json({
             owner,
+            apartments: data
         });
+        
     } catch (error) {
         console.error('Error to get owner.', error);
         res.status(500).json({
@@ -112,7 +140,7 @@ const postOwner = async (req, res) => {
 
         }) : ""
 
-        let resident = null;  
+        let resident = null;
 
         if (isResident === true || isResident === "true") {
 

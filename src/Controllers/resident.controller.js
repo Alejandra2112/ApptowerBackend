@@ -28,6 +28,25 @@ const getOneResidents = async (req, res = response) => {
 
         );
 
+        const apartmentResidents = await ApartmentResidentModel.findAll({
+
+            where: { idResident: idResident },
+
+        })
+
+        const apartments = await ApartmentModel.findAll();
+
+        const data = apartmentResidents.map(ao => {
+
+            const apartment = apartments.find(apartment => apartment.idApartment === ao.idApartment);
+
+
+            return {
+                ...ao.dataValues,
+                apartment,
+            }
+        })
+
         if (!resident) {
             return res.status(404).json({ error: 'Id residente no esta encontrado' });
         }
@@ -36,6 +55,8 @@ const getOneResidents = async (req, res = response) => {
 
         res.json({
             resident,
+            apartments: data
+
         });
 
     } catch (error) {
