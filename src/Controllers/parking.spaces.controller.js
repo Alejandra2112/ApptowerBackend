@@ -5,6 +5,7 @@ const { where } = require('sequelize');
 const AssignedParking = require('../Models/assigned.parking.model');
 const Vehicle = require('../Models/vehicle.model');
 const ApartmentModel = require('../Models/apartment.model');
+const Guest_income = require('../Models/guest.income.model');
 
 const getOneParkingSpace = async (req, res = response) => {
     try {
@@ -26,13 +27,23 @@ const getOneParkingSpace = async (req, res = response) => {
         });
     }
 };
+
 const getAllParkingSpace = async (req, res = response) => {
     try {
         const parkingSpaces = await ParkingSpacesModel.findAll();
         const parkingSpacesList = await Promise.all(parkingSpaces.map(async (parking) => {
+
             const vehiclesInParking = await GuestIncomeParking.findOne({
                 where: { idParkingSpace: parking.idParkingSpace },
             });
+
+            let guestIncomeInfo = null;
+
+            if (vehiclesInParking) {
+                guestIncomeInfo = await Guest_income.findOne({
+                    where: { idGuest_income: vehiclesInParking.idGuest_income },
+                });
+            }
 
             const apartmentWithParking = await AssignedParking.findOne({
                 where: { idParkingSpace: parking.idParkingSpace },
@@ -49,9 +60,10 @@ const getAllParkingSpace = async (req, res = response) => {
                 apartmentWithParking,
                 apartmentInfo,
             };
-            parking.dataValues.vehicleAssigned = vehiclesInParking;
 
-            return parking 
+            parking.dataValues.vehicleAssigned = guestIncomeInfo;
+
+            return parking;
         }));
 
         res.json({
@@ -65,6 +77,7 @@ const getAllParkingSpace = async (req, res = response) => {
         });
     }
 }
+
 
 
 
