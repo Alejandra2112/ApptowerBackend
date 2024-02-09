@@ -157,6 +157,7 @@ const postFines = async (req, res) => {
 const putFines = async (req, res = response) => {
     try {
         const { idfines, state} = req.body;
+        console.log("Esto es lo que se envia body"+req.body)
 
         const fine = await Fines.findOne({ where: { idfines: idfines } });
 
@@ -166,7 +167,7 @@ const putFines = async (req, res = response) => {
 
         let results;
 
-        if (req.files.paymentproof) {
+        if (req.files && req.files.paymentproof) {
             const newImg = fine.paymentproof == "" || fine.paymentproof == null ?
                 await upload(req.files.paymentproof, ['png', 'jpg', 'jpeg', 'pdf'], 'Images') :
                 await updateFile(req.files, fine.paymentproof, ['png', 'jpg', 'jpeg', 'pdf'], 'Images');
