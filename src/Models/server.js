@@ -150,26 +150,40 @@ class Servers {
     }
   }
 
+  // Socket
+
   socketConfig() {
-    this.io.on('connection', (socket) => {
-      console.log('Nuevo cliente conectado', socket);
-      socket.on('message_new', async (msg) => {
-        try {
-          const message = await Notification.create({
-            content: msg
-          })
-          this.io.emit('message', { id: message.id, content: message.content })
-        } catch (error) {
-          console.log(error);
-        }
-      });
+    this.io.on('connection', socket => {
+
+      console.log('Cliente conectado', socket)
 
       socket.on('disconnect', () => {
-        console.log('Cliente desconectado');
-      });
-    });
+        console.log('Cliente desconectado')
 
+      })
+    })
   }
+
+  // socketConfig() {
+  //   this.io.on('connection', (socket) => {  
+  //     console.log('Nuevo cliente conectado', socket);
+  //     socket.on('message_new', async (msg) => {
+  //       try {
+  //         const message = await Notification.create({
+  //           content: msg
+  //         })
+  //         this.io.emit('message', { id: message.id, content: message.content })
+  //       } catch (error) {
+  //         console.log(error);
+  //       }
+  //     });
+
+  //     socket.on('disconnect', () => {
+  //       console.log('Cliente desconectado');
+  //     });
+  //   });
+
+  // }
 
   listen() {
 
