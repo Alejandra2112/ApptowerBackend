@@ -11,7 +11,10 @@ const getOneApartment = async (req, res = response) => {
     try {
         const { idApartment } = req.params;
 
-        const spartment = await ApartmentModel.findOne({ where: { idApartment: idApartment } });
+        const spartment = await ApartmentModel.findOne({
+            where: { idApartment: idApartment },
+            include: TowerModel
+        });
 
         if (!spartment) {
             return res.status(404).json({ error: 'Id apartment not found.' });
@@ -73,7 +76,7 @@ const getAllApartment = async (req, res = response) => {
             apartment.dataValues.vehicles = vehicles.length;
 
             apartment.dataValues.fines = fines.length;
-            
+
 
             list.push(apartment);
 

@@ -2,6 +2,7 @@ const { response } = require('express');
 const ApartmentOwnerModel = require('../Models/apartment.owners.model');
 const OwnersModel = require('../Models/owners.model');
 const ApartmentModel = require('../Models/apartment.model');
+const UserModel = require('../Models/users.model');
 
 const getOneApartmentOwners = async (req, res = response) => {
     try {
@@ -12,25 +13,28 @@ const getOneApartmentOwners = async (req, res = response) => {
         });
 
         
-        const apartments = await ApartmentModel.findAll({
-            attributes: ['idApartment', 'apartmentName', 'area', 'status']
+        const apartments = await ApartmentModel.findAll();
 
-        });
+        const owners = await OwnersModel.findAll();
 
-        const owners = await OwnersModel.findAll({
-            attributes: ['idOwner', 'docType', 'docNumber', 'name', 'lastName', 'email', 'phoneNumber', "status"],
+        const users = await UserModel.findAll();
 
-        });
 
         const data = apartmentOwners.map(ao => {
 
             const apartment = apartments.find(apartment => apartment.idApartment === ao.idApartment);
             const owner = owners.find(ow => ow.idOwner === ao.idOwner);
+            const user = users.find(user => user.iduser === owner.iduser);
+
 
             return {
                 ...ao.dataValues,
                 apartment,
-                owner
+                owner: {
+
+                    ...owner.dataValues,
+                    user
+                }
             }
         })
 
@@ -56,19 +60,13 @@ const getAllApartmentOwners = async (req, res) => {
 
         const apartmentOwners = await ApartmentOwnerModel.findAll();
 
-        const apartments = await ApartmentModel.findAll({
-            attributes: ['idApartment', 'apartmentName', 'area', 'status']
+        const apartments = await ApartmentModel.findAll();
 
-        });
-
-        const owners = await OwnersModel.findAll({
-            attributes: ['idOwner', 'docType', 'docNumber', 'name', 'lastName', 'email', 'phoneNumber', 'status'],
-
-        });
+        const owners = await OwnersModel.findAll();
 
         const data = apartmentOwners.map(ao => {
 
-            const apartment = apartments.find(apartment => apartment.idSpace === ao.idApartment);
+            const apartment = apartments.find(apartment => apartment.idApartment === ao.idApartment);
             const owner = owners.find(ow => ow.idOwner === ao.idOwner);
             
             return {

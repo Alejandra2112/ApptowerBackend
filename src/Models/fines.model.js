@@ -38,7 +38,7 @@ const Fines = sequelize.define('fines', {
         field: 'state',
     },
     evidenceFiles: {
-        type: DataTypes.TEXT,
+        type: DataTypes.ARRAY(DataTypes.TEXT),
         field: 'evidence_files',
     },
     paymentproof: {
