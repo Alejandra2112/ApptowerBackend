@@ -2,7 +2,7 @@ const { v4: uuidv4 } = require('uuid');
 const cloudinary = require("cloudinary").v2;
 cloudinary.config(process.env.CLOUDINARY_URL);
 
-const upload = async (file, allowedFileExtensions = ['png', 'jpg', 'jpeg'], folder = '') => {
+const upload = async (file, allowedFileExtensions = ['png', 'jpg', 'jpeg', 'pdf'], folder = '') => {
     if (!file) {
         return null;
     }
@@ -30,7 +30,7 @@ const upload = async (file, allowedFileExtensions = ['png', 'jpg', 'jpeg'], fold
     }
 };
 
-const updateFile = async (newFile, oldFile, allowedFileExtensions = ['png', 'jpg', 'jpeg'], folder = '', atribute = "image") => {
+const updateFile = async (newFile, oldFile, allowedFileExtensions = ['png', 'jpg', 'jpeg', 'pdf'], folder = '', atribute = "image") => {
 
     if (!newFile || !newFile.pdf) {
         return null;
