@@ -1,9 +1,10 @@
 const { response } = require('express');
 const Watchman = require('../Models/watchmans.model');
-const User = require('../Models/users.model');
 const UserModel = require('../Models/users.model');
 const Rols = require('../Models/rols.model');
 const bcryptjs = require('bcryptjs')
+const { hotmailTransporter } = require('../Helpers/emailConfig');
+const Mails = require('../Helpers/Mails');
 
 
 const getWatchman = async (req, res = response) => {
@@ -92,20 +93,27 @@ const postWatchman = async (req, res) => {
     const pdfUrl = req.files !== null ? await upload(req.files.pdf, ['pdf'], 'Documents') : null
     const imgUrl = req.files !== null ? await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images') : null
 
-    const { pdf, userImg, password, idEnterpriseSecurity, ...userData } = req.body;
+    const { pdf, userImg, password, name, lastName, email, idEnterpriseSecurity, ...userData } = req.body;
 
+    if (!password) {
+      return res.status(400).json({ error: 'La contraseña es requerida' });
+    }
     const salt = bcryptjs.genSaltSync();
-    userData.password = bcryptjs.hashSync(userData.password, salt);
+    userData.password = bcryptjs.hashSync(password, salt);
 
     const user = await UserModel.create({
       pdf: pdfUrl,
+      name: name,
+      lastName: lastName,
+      email: email,
       userImg: imgUrl,
-      password: password,
+      password: userData.password,
       status: "Activo",
       ...userData
 
     })
 
+    console.log('usuario creado correctamente:', user);
     const role = await Rols.findOne({ where: { idrole: userData.idrole } });
     const roleName = role ? role.namerole.toLowerCase() : null;
 
@@ -120,6 +128,22 @@ const postWatchman = async (req, res) => {
     }
 
     const roleData = await Rols.findByPk(userData.idrole);
+
+    // if (user && watchman) {
+
+    //   const mailOptions = Mails.changedStatusEmail(name, lastName, email);
+
+    //   hotmailTransporter.sendMail(mailOptions, (error, info) => {
+    //     if (error) {
+    //       console.error('Error al enviar el correo:', error);
+    //       res.status(500).json({ message: 'Error al enviar el correo' });
+    //     } else {
+    //       console.log('Correo enviado:', info.response);
+    //       res.json({ message: 'Correo con código de recuperación enviado' });
+    //     }
+    //   });
+    // }
+
 
     res.json({
       msgUser: "Usuario creado",
@@ -142,7 +166,7 @@ const postWatchman = async (req, res) => {
 
 
 const putWatchman = async (req, res) => {
-  const { user: userUpdate, ...watchmanUpdate } = req.body;
+  const { user: userUpdate, state, ...watchmanUpdate } = req.body;
 
   try {
     const user = await UserModel.findOne({ where: { iduser: userUpdate.iduser } });
@@ -152,7 +176,8 @@ const putWatchman = async (req, res) => {
     }
 
     await user.update({
-      ...userUpdate
+      ...userUpdate,
+      status: state
     });
 
     const updatedRole = await Rols.findByPk(user.idrole);
@@ -162,7 +187,11 @@ const putWatchman = async (req, res) => {
     if (nameRole === 'Vigilante' || nameRole === 'Seguridad' || nameRole === 'Vigilantes') {
       const watchman = await Watchman.findOne({ where: { idwatchman: watchmanUpdate.idwatchman } });
       if (watchman) {
-        await watchman.update(watchmanUpdate);
+        await watchman.update({
+          ...watchmanUpdate,
+          state: state
+        });
+
       }
     }
 

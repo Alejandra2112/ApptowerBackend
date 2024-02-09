@@ -55,6 +55,7 @@ const UserModel = sequelize.define('users', {
 
     type: DataTypes.DATE,
     field: 'birthday',
+    allowNull: true
   },
 
   sex: {
@@ -79,6 +80,7 @@ const UserModel = sequelize.define('users', {
       msg: 'El correo ya se encuentra asignado a un usuario'
     },
     field: 'email',
+    allowNull: false,
   },
 
   phone: {

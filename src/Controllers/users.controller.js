@@ -5,6 +5,9 @@ const Rols = require('../Models/rols.model');
 const ResidentModel = require('../Models/resident.model');
 const Watchman = require('../Models/watchmans.model');
 const { upload, updateFile } = require('../Helpers/uploads.helpers');
+const ApartmentResidentModel = require('../Models/apartment.residents.model');
+const { hotmailTransporter } = require('../Helpers/emailConfig');
+const Mails = require('../Helpers/Mails');
 
 
 const getUser = async (req, res = response) => {
@@ -173,54 +176,13 @@ const resetPassword = async (req, res = response) => {
 
 
 
-const postUsersforLogin = async (req, res) => {
-  try {
-    const { idrole, state, password, ...userData } = req.body;
-
-    if (userData.idrole === undefined || userData.idrole === null) {
-      userData.idrole = 2;
-      userData.state = 'Inactivo';
-    }
-
-    if (userData.password) {
-      const salt = bcryptjs.genSaltSync();
-      userData.password = bcryptjs.hashSync(userData.password, salt);
-    }
-
-    const user = await UserModel.create({
-      ...userData,
-      idrole: userData.idrole,
-      state: userData.state,
-      password: userData.password,
-    });
-
-    if (user) {
-      res.status(201).json({
-        message: 'Usuario creado exitosamente',
-        user,
-      });
-    } else {
-      res.status(400).json({
-        message: 'Error al crear el usuario',
-      });
-    }
-  } catch (error) {
-    console.error('Error al crear el usuario:', error);
-    res.status(500).json({
-      message: `Error al crear el usuario: ${error.message}`,
-    });
-  }
-};
-
-
-
 const postUser = async (req, res) => {
   try {
 
     const pdfUrl = req.files !== null ? await upload(req.files.pdf, ['pdf'], 'Documents') : null
     const imgUrl = req.files !== null ? await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images') : null
 
-    const { pdf, userImg, idEnterpriseSecurity, ...userData } = req.body;
+    const { pdf, userImg, idEnterpriseSecurity, residentType, idApartment, ...userData } = req.body;
 
     const salt = bcryptjs.genSaltSync();
     userData.password = bcryptjs.hashSync(userData.password, salt);
@@ -232,6 +194,20 @@ const postUser = async (req, res) => {
       ...userData
 
     })
+
+    // if (user) {
+    //   const mailOptions = Mails.changedStatusEmail(user.name, user.lastName, user.email);
+
+    //   hotmailTransporter.sendMail(mailOptions, (error, info) => {
+    //     if (error) {
+    //       console.error('Error al enviar el correo:', error);
+    //       res.status(500).json({ message: 'Error al enviar el correo' });
+    //     } else {
+    //       console.log('Correo enviado:', info.response);
+    //       res.json({ message: 'Correo con código de recuperación enviado' });
+    //     }
+    //   });
+    // }
 
     const role = await Rols.findOne({ where: { idrole: userData.idrole } });
     const roleName = role ? role.namerole.toLowerCase() : null;
@@ -246,13 +222,19 @@ const postUser = async (req, res) => {
     }
 
     let resident;
+    let apartment;
 
     if (roleName && roleName.includes('residente')) {
       resident = await ResidentModel.create({
         iduser: user.iduser,
-        residentType: "tenant",
-        status: "Inactive"
+        residentType: residentType,
+        status: "Active"
       })
+
+      await ApartmentResidentModel.create({
+        idApartment: idApartment,
+        idResident: resident.idResident
+      });
     }
 
     const roleData = await Rols.findByPk(userData.idrole);
@@ -284,10 +266,14 @@ const postUser = async (req, res) => {
 };
 
 
+
+
+
+
 const putUser = async (req, res) => {
   try {
     const { iduser } = req.params;
-    const { idrole, status, pdf, idEnterpriseSecurity, ...update } = req.body;
+    const { idrole, status, pdf, idEnterpriseSecurity, residentType, idApartment, ...update } = req.body;
 
     const user = await UserModel.findOne({ where: { iduser: iduser } });
 
@@ -295,15 +281,40 @@ const putUser = async (req, res) => {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
 
+    const oldStatus = user.status;
+
+
     const newPdf = req.files !== null ? await updateFile(req.files, user.pdf, ['pdf'], 'Documents') : null
     const newImageUser = req.files !== null ? await updateFile(req.files, user.userImg, ['png', 'jpg', 'jpeg'], 'Images', 'userImg') : null
 
 
     await user.update({
       pdf: newPdf,
+      idrole: idrole,
       userImg: newImageUser,
+      status: status,
       ...update
     });
+
+
+    if (oldStatus === 'Inactivo' && user.status === 'Activo') {
+      if (!user.email) {
+        console.error('Error: No se ha definido el correo electrónico del usuario.');
+        return res.status(500).json({ error: 'No se ha definido el correo electrónico del usuario.' });
+      }
+      const mailOptions = Mails.changedStatusEmail(user.name, user.lastName, user.email);
+
+      hotmailTransporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error('Error al enviar el correo:', error);
+          res.status(500).json({ message: 'Error al enviar el correo' });
+        } else {
+          console.log('Correo enviado:', info.response);
+          res.json({ message: 'Correo con código de recuperación enviado' });
+        }
+      });
+    }
+
 
 
     const role = await Rols.findOne({ where: { idrole: idrole } });
@@ -311,12 +322,47 @@ const putUser = async (req, res) => {
 
     let watchman;
     if (roleName && (roleName.includes('vigilante') || roleName.includes('seguridad') || roleName.includes('vigilancia'))) {
-      watchman = await Watchman.update({
-        state: status,
-        idEnterpriseSecurity: idEnterpriseSecurity,
-      }, {
-        where: { iduser: iduser }
-      });
+      watchman = await Watchman.findOne({ where: { iduser: iduser } });
+      if (watchman) {
+        await watchman.update({
+          state: status,
+          idEnterpriseSecurity: idEnterpriseSecurity,
+        });
+      } else {
+        watchman = await Watchman.create({
+          iduser: user.iduser,
+          state: status,
+          idEnterpriseSecurity: idEnterpriseSecurity,
+        });
+      }
+    } else {
+      watchman = await Watchman.destroy({ where: { iduser: user.iduser } });
+    }
+
+
+
+
+    let resident;
+    if (roleName && roleName.includes('residente')) {
+      resident = await ResidentModel.findOne({ where: { iduser: user.iduser } });
+      if (resident) {
+        await resident.update({ residentType: residentType });
+      } else {
+        resident = await ResidentModel.create({
+          iduser: user.iduser,
+          residentType: residentType,
+        });
+      }
+
+      const apartmentResident = await ApartmentResidentModel.findOne({ where: { idResident: resident.idResident } });
+
+      if (apartmentResident) {
+        await apartmentResident.update({ idApartment: idApartment });
+      } else {
+        await ApartmentResidentModel.create({ idApartment: idApartment, idResident: resident.idResident });
+      }
+    } else {
+      resident = await ResidentModel.destroy({ where: { iduser: user.iduser } });
     }
 
 
@@ -330,8 +376,12 @@ const putUser = async (req, res) => {
       response.watchman = watchman;
     }
 
-    res.json(response);
+    if (resident) {
+      response.msgResident = "Residente Modificado";
+      response.resident = resident;
+    }
 
+    res.json(response);
 
 
   } catch (error) {
@@ -469,7 +519,6 @@ module.exports = {
   putUser,
   getUserOne,
   postUserEmail,
-  postUsersforLogin,
   resetPassword,
   getEmailUser,
 
