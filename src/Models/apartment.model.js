@@ -56,13 +56,13 @@ const ApartmentModel = sequelize.define('Apartments', {
 );
 
 ApartmentModel.belongsTo(TowerModel, {
-    foreignKey: 'idTower', 
-    targetKey: 'idTower', 
+    foreignKey: 'idTower',
+    targetKey: 'idTower',
 });
 
 TowerModel.hasMany(ApartmentModel, {
-    foreignKey: 'idTower', 
-    sourceKey: 'idTower',  
+    foreignKey: 'idTower',
+    sourceKey: 'idTower',
 });
 
 
@@ -80,12 +80,12 @@ ApartmentModel.belongsToMany(
     otherKey: 'idOwner'
 });
 
-ApartmentModel.belongsToMany(
-    ResidentModel, {
-    through: ApartmentResidentModel,
-    foreignKey: 'idApartment',
-    otherKey: 'idResident'
-});
+// ApartmentModel.belongsToMany(
+//     ResidentModel, {
+//     through: ApartmentResidentModel,
+//     foreignKey: 'idApartment',
+//     otherKey: 'idResident'
+// });
 
 
 

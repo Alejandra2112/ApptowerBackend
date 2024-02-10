@@ -14,8 +14,8 @@ route.get('/:idwatchman', getWatchmanOne)
 route.get('/document/:document', getWatchmanDocument)
 
 
-route.post('/', validateWatchman, postWatchman)
-route.put('/', validateWatchman, putWatchman)
+route.post('/', postWatchman)
+route.put('/', putWatchman)
 // route.delete('/', checkPermissions(privilegesMap.delete_watchman, permissionMap), deleteWatchman)
 
 module.exports = route

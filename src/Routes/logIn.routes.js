@@ -1,11 +1,13 @@
 const { Router } = require('express');
 const route = Router();
-const { logIn } = require('../Controllers/logIn.controller');
+const { logIn, postUsersforLogin } = require('../Controllers/logIn.controller');
 const verifityToken = require('../Middlewares/verifityToken');
 const User = require('../Models/users.model');
 const Rols = require('../Models/rols.model');
 
 route.post('/', logIn);
+
+route.post('/users', postUsersforLogin);
 
 route.get('/access', verifityToken, async (req, res) => {
   try {

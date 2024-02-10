@@ -2,7 +2,6 @@ const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
 const Rols = require('./rols.model');
 const Watchmans = require('./watchmans.model');
-const usersforWatchmans = require('./user.watchman.model');
 
 const UserModel = sequelize.define('users', {
 
@@ -56,6 +55,7 @@ const UserModel = sequelize.define('users', {
 
     type: DataTypes.DATE,
     field: 'birthday',
+    allowNull: true
   },
 
   sex: {
@@ -80,6 +80,7 @@ const UserModel = sequelize.define('users', {
       msg: 'El correo ya se encuentra asignado a un usuario'
     },
     field: 'email',
+    allowNull: false,
   },
 
   phone: {

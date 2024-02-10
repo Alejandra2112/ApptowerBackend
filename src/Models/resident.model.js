@@ -57,6 +57,8 @@ ResidentModel.belongsTo(UserModel, {
 
 
 
+
+
 // Hooks for create and update owners
 
 // ResidentModel.afterCreate(async (resident) => {
