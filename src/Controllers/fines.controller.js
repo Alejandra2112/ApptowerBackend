@@ -1,5 +1,6 @@
 const Fines = require('../Models/fines.model');
 const ApartmentModel = require('../Models/apartment.model');
+const UsersModel = require('../Models/users.model');
 const { response } = require('express');
 const { upload, updateFile } = require('../Helpers/uploads.helpers');
 
@@ -33,7 +34,15 @@ const getFinesOne = async (req, res = response) => {
     try {
         const { idfines } = req.params;
 
-        const fines = await Fines.findOne({ where: { idfines: idfines }, include: [{ model: ApartmentModel, as: 'apartment' }] });
+        const fines = await Fines.findOne(
+            { where:
+                { idfines: idfines }, 
+                include: [
+                    { model: ApartmentModel, as: 'apartment' },
+                    { model: UsersModel, as: 'user' },
+                
+                ] 
+            });
 
         if (!fines) {
             return res.status(404).json({ error: 'No se encontró una multa con ese ID' });
@@ -157,6 +166,7 @@ const postFines = async (req, res) => {
 const putFines = async (req, res = response) => {
     try {
         const { idfines, state} = req.body;
+        console.log("Esto es lo que se envia body"+req.body)
 
         const fine = await Fines.findOne({ where: { idfines: idfines } });
 
@@ -166,7 +176,7 @@ const putFines = async (req, res = response) => {
 
         let results;
 
-        if (req.files.paymentproof) {
+        if (req.files && req.files.paymentproof) {
             const newImg = fine.paymentproof == "" || fine.paymentproof == null ?
                 await upload(req.files.paymentproof, ['png', 'jpg', 'jpeg', 'pdf'], 'Images') :
                 await updateFile(req.files, fine.paymentproof, ['png', 'jpg', 'jpeg', 'pdf'], 'Images');
