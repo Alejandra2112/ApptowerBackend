@@ -12,6 +12,8 @@ const getFinesAll = async (req, res = response) => {
                     model: ApartmentModel,
                     as: 'apartment',
                 },
+                ,
+                    { model: UsersModel, as: 'user' },
             ],
         });
 
@@ -40,7 +42,6 @@ const getFinesOne = async (req, res = response) => {
                 include: [
                     { model: ApartmentModel, as: 'apartment' },
                     { model: UsersModel, as: 'user' },
-                
                 ] 
             });
 
@@ -63,7 +64,8 @@ const getFinesByApartment = async (req, res = response) => {
     try {
         const { idApartment } = req.params;
 
-        const fines = await Fines.findAll({ where: { idApartment: idApartment }, include: [{ model: ApartmentModel, as: 'apartment' }] });
+        const fines = await Fines.findAll({ where: { idApartment: idApartment }, include: [{ model: ApartmentModel, as: 'apartment' },
+        { model: UsersModel, as: 'user' },] });
 
         if (!fines) {
             return res.status(404).json({ error: 'No se encontró una multa con ese ID' });

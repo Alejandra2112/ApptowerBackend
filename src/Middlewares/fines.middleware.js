@@ -8,7 +8,7 @@ const validateResult = (req, res, next) => {
 };
 
 const postFinesValidation = [
-    check('iduser', 'User is required or its value is invalid').not().isEmpty().isInt(),
+    check('idUser', 'User is required or its value is invalid').not().isEmpty().isInt(),
     check('fineType', 'Fine type is required or its value is invalid').not().isEmpty().isString().isLength({min: 3, max: 50}),
     check('incidentDate', 'Incident date is required or its value is invalid').not().isEmpty().isISO8601(),
     check('paymentDate', 'Payment date is required or its value is invalid').not().isEmpty().isISO8601(),

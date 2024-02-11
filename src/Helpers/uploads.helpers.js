@@ -33,8 +33,12 @@ const upload = async (file, allowedFileExtensions = ['png', 'jpg', 'jpeg', 'pdf'
 const updateFile = async (newFile, oldFile, allowedFileExtensions = ['png', 'jpg', 'jpeg', 'pdf'], folder = '', atribute = "image") => {
 
     // if (!newFile || !newFile.pdf) {
+        
     //     return null;
     // }
+    
+    console.log(newFile[atribute], 'new file')
+
 
     if (oldFile) {
         let publicId;
@@ -42,7 +46,7 @@ const updateFile = async (newFile, oldFile, allowedFileExtensions = ['png', 'jpg
         if (oldFile.endsWith('.png') || oldFile.endsWith('.jpg') || oldFile.endsWith('.jpeg')) {
             const urlArr = oldFile.split('/');
             const arr = urlArr[urlArr.length - 1];
-            const { public_id } = arr.split('.');
+            const [public_id]  = arr.split('.');
             publicId = public_id;
         } else {
             const urlArr = oldFile.split('/');
@@ -50,6 +54,7 @@ const updateFile = async (newFile, oldFile, allowedFileExtensions = ['png', 'jpg
             publicId = arr;
         }
 
+        console.log(publicId , 'id to delete')
         await cloudinary.uploader.destroy(publicId);
         return await upload(newFile[atribute], allowedFileExtensions, folder);
     }
