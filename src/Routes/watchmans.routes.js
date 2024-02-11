@@ -10,7 +10,7 @@ const checkPermissions = require('../Middlewares/checkPermission');
 // route.use(verifityToken);
 
 route.get('/', getWatchman) // posicion one: privilege, posicion two: permission
-route.get('/:idwatchman', getWatchmanOne)
+route.get('/:iduser', getWatchmanOne)
 route.get('/document/:document', getWatchmanDocument)
 
 

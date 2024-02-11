@@ -183,7 +183,6 @@ const postUser = async (req, res) => {
     const imgUrl = req.files !== null ? await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images') : null
 
     const { pdf, userImg, idEnterpriseSecurity, residentType, idApartment, ...userData } = req.body;
-
     const salt = bcryptjs.genSaltSync();
     userData.password = bcryptjs.hashSync(userData.password, salt);
 
@@ -274,7 +273,7 @@ const putUser = async (req, res) => {
   try {
     const { iduser } = req.params;
     const { idrole, status, pdf, idEnterpriseSecurity, residentType, idApartment, ...update } = req.body;
-
+    console.log(pdf, 'pdf en back')
     const user = await UserModel.findOne({ where: { iduser: iduser } });
 
     if (!user) {

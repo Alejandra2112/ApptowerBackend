@@ -63,7 +63,7 @@ const UserModel = sequelize.define('users', {
     type: DataTypes.STRING,
     field: 'sex',
     validate: {
-      isIn: [['M', 'F']],
+      isIn: [['M', 'F', 'No proporcionado']],
     },
     allowNull: true
   },

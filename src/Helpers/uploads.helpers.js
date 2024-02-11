@@ -32,9 +32,9 @@ const upload = async (file, allowedFileExtensions = ['png', 'jpg', 'jpeg', 'pdf'
 
 const updateFile = async (newFile, oldFile, allowedFileExtensions = ['png', 'jpg', 'jpeg', 'pdf'], folder = '', atribute = "image") => {
 
-    if (!newFile || !newFile.pdf) {
-        return null;
-    }
+    // if (!newFile || !newFile.pdf) {
+    //     return null;
+    // }
 
     if (oldFile) {
         let publicId;

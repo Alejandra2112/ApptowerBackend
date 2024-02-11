@@ -57,7 +57,7 @@ Fines.belongsTo(ApartmentModel, {
     as: 'apartment'
 });
 Fines.belongsTo(UsersModel, {
-    foreignKey: 'idUser',
+    foreignKey: 'iduser',
     as: 'user'
 });
 
