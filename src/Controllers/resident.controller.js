@@ -9,16 +9,20 @@ const Rols = require('../Models/rols.model');
 const ApartmentModel = require('../Models/apartment.model');
 const OwnersModel = require('../Models/owners.model');
 const ApartmentOwnerModel = require('../Models/apartment.owners.model');
+const Booking = require('../Models/booking.model');
+
 const { hotmailTransporter } = require('../Helpers/emailConfig');
 const Mails = require('../Helpers/Mails');
 
 const getOneResidents = async (req, res = response) => {
     try {
-        const { idResident } = req.params;
+        const { iduser } = req.params;
+
+        console.log(iduser, 'idparam')
 
         const resident = await ResidentModel.findOne(
             {
-                where: { idResident: idResident },
+                where: { iduser: iduser },
 
                 include: [{
 
@@ -29,11 +33,20 @@ const getOneResidents = async (req, res = response) => {
 
         );
 
+        console.log(resident)
+
+        const bookings = await Booking.findAll({
+
+            where: { iduser: iduser }
+        })
+
         const apartmentResidents = await ApartmentResidentModel.findAll({
 
-            where: { idResident: idResident },
+            where: { idResident: resident.idResident },
 
         })
+
+
 
         const apartments = await ApartmentModel.findAll();
 
@@ -55,8 +68,10 @@ const getOneResidents = async (req, res = response) => {
 
 
         res.json({
+
             resident,
-            apartments: data
+            apartments: data,
+            bookings
 
         });
 
@@ -126,7 +141,7 @@ const postResident = async (req, res) => {
         const pdfUrl = req.files !== null ? await upload(req.files.pdf, ['pdf'], 'Documents') : null
         const imgUrl = req.files !== null ? await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images') : null
 
-        const { pdf, password, idApartment, ...userData } = req.body;
+        const { pdf, idApartment, ...userData } = req.body;
         console.log(userData, 'userData en back')
         const idApartmentNumber = Number(idApartment);
 
@@ -134,9 +149,11 @@ const postResident = async (req, res) => {
         userData.password = bcryptjs.hashSync(userData.password, salt);
 
         const user = await UserModel.create({
+
             pdf: pdfUrl,
             userImg: imgUrl,
-            password: password,
+            password: userData.password,
+            idrole: userData.idrole,
             status: "Activo",
             ...userData
 

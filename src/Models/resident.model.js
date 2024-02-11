@@ -2,6 +2,7 @@ const { DataTypes, INTEGER } = require('sequelize');
 const sequelize = require('../Database/config');
 const UserModel = require('./users.model');
 
+
 const ResidentModel = sequelize.define('Residents', {
 
     idResident: {
@@ -43,7 +44,7 @@ const ResidentModel = sequelize.define('Residents', {
     timestamps: true
 
 });
-
+  
 
 UserModel.hasMany(ResidentModel, {
     foreignKey: 'iduser',

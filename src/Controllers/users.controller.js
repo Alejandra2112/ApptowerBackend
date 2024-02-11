@@ -5,9 +5,6 @@ const Rols = require('../Models/rols.model');
 const ResidentModel = require('../Models/resident.model');
 const Watchman = require('../Models/watchmans.model');
 const { upload, updateFile } = require('../Helpers/uploads.helpers');
-const ApartmentResidentModel = require('../Models/apartment.residents.model');
-const { hotmailTransporter } = require('../Helpers/emailConfig');
-const Mails = require('../Helpers/Mails');
 
 
 const getUser = async (req, res = response) => {
@@ -144,46 +141,56 @@ const resetPassword = async (req, res = response) => {
 };
 
 
-// const putModifyProfile = async (req, res = response) => {
-//   try {
-//     const { iduser } = req.params;
-//     const { idrole, state, password, pdf, ...update } = req.body;
 
-//     const user = await User.findOne({ where: { iduser: iduser } });
+const postUsersforLogin = async (req, res) => {
+  try {
+    const { idrole, state, password, ...userData } = req.body;
 
-//     if (!user) {
-//       return res.status(404).json({ error: 'Usuario no encontrado' });
-//     }
+    if (userData.idrole === undefined || userData.idrole === null) {
+      userData.idrole = 2;
+      userData.state = 'Inactivo';
+    }
 
-//     const newPdf = await updateFile(req.files, user.pdf, ['pdf'], 'Documents');
+    if (userData.password) {
+      const salt = bcryptjs.genSaltSync();
+      userData.password = bcryptjs.hashSync(userData.password, salt);
+    }
 
-//     if (password) {
-//       const salt = bcryptjs.genSaltSync(10);
-//       const hashedPassword = bcryptjs.hashSync(password, salt);
-//       update.password = hashedPassword;
-//     }
+    const user = await UserModel.create({
+      ...userData,
+      idrole: userData.idrole,
+      state: userData.state,
+      password: userData.password,
+    });
 
-//     await user.update({ idrole, state, pdf: newPdf, ...update }, { force: true });
+    if (user) {
+      res.status(201).json({
+        message: 'Usuario creado exitosamente',
+        user,
+      });
+    } else {
+      res.status(400).json({
+        message: 'Error al crear el usuario',
+      });
+    }
+  } catch (error) {
+    console.error('Error al crear el usuario:', error);
+    res.status(500).json({
+      message: `Error al crear el usuario: ${error.message}`,
+    });
+  }
+};
 
-//     res.json({
-//       user: 'Usuario modificado exitosamente.',
-//     });
-//   } catch (error) {
-//     console.error('Error al modificar usuario:', error);
-//     res.status(500).json({ error: 'Error al modificar usuario' });
-//   }
-// }
 
 
 
 const postUser = async (req, res) => {
   try {
 
-    const pdfUrl = req.files !== null ? await upload(req.files.pdf, ['pdf'], 'Documents') : null
+    const pdfUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
     const imgUrl = req.files !== null ? await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images') : null
 
     const { pdf, userImg, idEnterpriseSecurity, residentType, idApartment, ...userData } = req.body;
-
     const salt = bcryptjs.genSaltSync();
     userData.password = bcryptjs.hashSync(userData.password, salt);
 
@@ -270,11 +277,89 @@ const postUser = async (req, res) => {
 
 
 
+const putPersonalInformation = async (req, res = response) => {
+  try {
+    const { iduser, pdf, ...newData } = req.body;
+
+    const user = await UserModel.findOne({ where: { iduser: iduser } });
+
+    // Llamar a la función updateFile y esperar su resultado
+    const newPdf = await updateFile(req.files, pdf, ['pdf'], 'Documents', 'newFile');
+
+    if (!user) {
+      return res.status(404).json({ msg: 'Usuario no encontrado.' });
+    }
+
+    console.log(newPdf)
+
+    const updatedUser = await user.update({
+      pdf: newPdf,
+      docType: newData.docType,
+      document: newData.document,
+      name: newData.name,
+      lastName: newData.lastName,
+      birthday: newData.birthday,
+      sex: newData.sex,
+      email: newData.email,
+      phone: newData.phone,
+    });
+
+    res.json({
+      msg: "Actualizaste información personal",
+      user: updatedUser
+    });
+
+  } catch (error) {
+    console.error('Error al editar usuario:', error);
+    return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
+  }
+};
+
+
+const putChangeImg = async (req, res = response) => {
+  try {
+    const { iduser, ...newData } = req.body;
+
+    console.log(req.files, "file")
+
+    const user = await UserModel.findOne({ where: { iduser: iduser } });
+
+    if (!user) {
+      return res.status(404).json({ msg: 'usuario no encontrada.' });
+    }
+
+    const newImg = user.userImg == "" && req.files ?
+      await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images') :
+      req.files ? await updateFile(req.files, user.userImg, ['png', 'jpg', 'jpeg'], 'Images', "userImg") : ""
+
+
+    console.log(user.userImg, "Old img")
+    console.log(newImg, "newImg")
+
+
+    const updatedUser = await user.update({
+
+      userImg: newImg == "" ? newData.userImg : newImg,
+    });
+
+    res.json({
+      msg: "Imgen actualizada",
+      user: updatedUser
+    });
+
+  } catch (error) {
+    console.error('Error al editar usuario:', error);
+    return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
+  }
+};
+
+
+
 const putUser = async (req, res) => {
   try {
     const { iduser } = req.params;
     const { idrole, status, pdf, idEnterpriseSecurity, residentType, idApartment, ...update } = req.body;
-
+    console.log(pdf, 'pdf en back')
     const user = await UserModel.findOne({ where: { iduser: iduser } });
 
     if (!user) {
@@ -394,104 +479,6 @@ const putUser = async (req, res) => {
 
 
 
-
-// const putUser = async (req, res) => {
-//   let message = '';
-
-//   try {
-//     const { iduser } = req.params;
-//     const { idrole, state, password, pdf, ...update } = req.body;
-
-//     const user = await UserModel.findOne({ where: { iduser: iduser } });
-
-//     if (!user) {
-//       return res.status(404).json({ error: 'Usuario no encontrado' });
-//     }
-
-//     const oldRole = await Rols.findByPk(user.idrole);
-//     const newRole = await Rols.findByPk(idrole);
-
-//     // Actualizar usuario con el nuevo rol
-//     const newPdf = await updateFile(req.files, user.pdf, ['png', 'jpg', 'jpeg', 'pdf'], 'Documents');
-//     if (password) {
-//       const salt = bcryptjs.genSaltSync(10);
-//       const hashedPassword = bcryptjs.hashSync(password, salt);
-//       update.password = hashedPassword;
-//     }
-//     await user.update({ idrole, state, pdf: newPdf, ...update }, { force: true });
-
-//     if (oldRole.id !== newRole.id) {
-//       // Eliminar residente si cambia a vigilante
-//       if (oldRole.namerole === 'Residente' && newRole.namerole !== 'Residente') {
-//         const residente = await ResidentModel.findOne({ where: { docNumber: user.document } });
-//         if (residente) {
-//           await residente.destroy();
-//         }
-//       }
-
-//       // Eliminar vigilante si cambia a residente
-//       if (oldRole.namerole !== 'Residente' && newRole.namerole === 'Residente') {
-//         const vigilante = await Watchman.findOne({ where: { document: user.document } });
-//         if (vigilante) {
-//           await vigilante.destroy();
-//         }
-//       }
-
-//       // Crear nuevo residente si cambia a residente
-//       if (newRole.namerole === 'Residente') {
-//         await ResidentModel.create({
-//           docType: user.documentType,
-//           docNumber: user.document,
-//           phoneNumber: user.phone,
-//           email: user.email,
-//           name: user.name,
-//           lastName: user.lastname,
-//           pdf: req.body.pdf,
-//           birthday: req.body.birthday,
-//           sex: req.body.sex,
-//           residentType: req.body.residentType,
-//           status: 'Active',
-//         });
-//       }
-
-//       // Crear nuevo vigilante si cambia a vigilante
-//       if (newRole.namerole !== 'Residente') {
-//         await Watchman.create({
-//           documentType: user.documentType,
-//           document: user.document,
-//           namewatchman: user.name,
-//           lastnamewatchman: user.lastname,
-//           phone: user.phone,
-//           email: user.email,
-//           dateOfbirth: req.body.dateOfbirth,
-//           state: 'Activo',
-//         });
-//       }
-//     }
-
-//     // Actualizar datos según el nuevo rol
-//     if (newRole.namerole === 'Residente') {
-//       const resident = await ResidentModel.findOne({ where: { docNumber: user.document } });
-//       if (resident) {
-//         await resident.update({ name: user.name, lastName: user.lastname, phoneNumber: user.phone, email: user.email });
-//       }
-//     } else {
-//       const watchman = await Watchman.findOne({ where: { document: user.document } });
-//       if (watchman) {
-//         await watchman.update({ namewatchman: user.name, lastnamewatchman: user.lastname, phone: user.phone, email: user.email });
-//       }
-//     }
-
-//     message = 'Usuario modificado exitosamente.';
-//   } catch (error) {
-//     message = 'Error al modificar usuario: ' + error.message;
-//   }
-
-//   res.json({
-//     user: message,
-//   });
-// };
-
 // const deleteUser = async (req, res) => {
 //   const { iduser } = req.body;
 //   let message = '';
@@ -519,7 +506,12 @@ module.exports = {
   putUser,
   getUserOne,
   postUserEmail,
+  postUsersforLogin,
   resetPassword,
   getEmailUser,
+
+
+  putChangeImg,
+  putPersonalInformation
 
 };

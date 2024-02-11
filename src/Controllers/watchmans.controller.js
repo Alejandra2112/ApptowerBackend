@@ -37,10 +37,10 @@ const getWatchman = async (req, res = response) => {
 
 const getWatchmanOne = async (req, res = response) => {
   try {
-    const { idwatchman } = req.params;
+    const { iduser } = req.params;
 
     const watchman = await Watchman.findOne({
-      where: { idwatchman: idwatchman },
+      where: { iduser: iduser },
       include: [{
         model: UserModel,
         as: "user"
@@ -65,9 +65,14 @@ const getWatchmanOne = async (req, res = response) => {
 
 const getWatchmanDocument = async (req, res = response) => {
   try {
-    const document = req.params.document;
+    const { document } = req.params;
 
-    const watchman = await Watchman.findOne({ where: { document: document } });
+    const watchman = await Watchman.findOne({
+      include: [{
+        model: UserModel,
+        where: { document: document }
+      }]
+    });
     console.log('Vigilante obtenido correctamente:', watchman);
 
     if (!watchman) {

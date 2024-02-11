@@ -4,7 +4,7 @@ const moment = require('moment-timezone');
 
 
 const getShifts = async (req, res = response) => {
-  const idwatchman = req.params.idwatchman;
+  const { idwatchman } = req.params;
 
   try {
     const shifts = await Shifts.findAll({

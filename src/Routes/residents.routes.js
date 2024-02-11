@@ -3,7 +3,7 @@ const route = Router()
 const validation = require('../Middlewares/validation.middleware')
 const { getOneResidents, getAllResidents, postResident, putResident } = require('../Controllers/resident.controller')
 
-route.get('/:idResident', getOneResidents)
+route.get('/:iduser', getOneResidents)
 route.get('/', getAllResidents)
 route.post('/', postResident)
 route.put('/', putResident)
