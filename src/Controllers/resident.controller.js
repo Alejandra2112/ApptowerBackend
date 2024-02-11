@@ -141,7 +141,7 @@ const postResident = async (req, res) => {
         const pdfUrl = req.files !== null ? await upload(req.files.pdf, ['pdf'], 'Documents') : null
         const imgUrl = req.files !== null ? await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images') : null
 
-        const { pdf, password, idApartment, ...userData } = req.body;
+        const { pdf, idApartment, ...userData } = req.body;
         console.log(userData, 'userData en back')
         const idApartmentNumber = Number(idApartment);
 
@@ -149,9 +149,11 @@ const postResident = async (req, res) => {
         userData.password = bcryptjs.hashSync(userData.password, salt);
 
         const user = await UserModel.create({
+
             pdf: pdfUrl,
             userImg: imgUrl,
-            password: password,
+            password: userData.password,
+            idrole: userData.idrole,
             status: "Activo",
             ...userData
 
