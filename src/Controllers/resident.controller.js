@@ -3,7 +3,7 @@ const ResidentModel = require('../Models/resident.model');
 const { upload, updateFile } = require('../Helpers/uploads.helpers');
 const ApartmentResidentModel = require('../Models/apartment.residents.model');
 const { body } = require('express-validator');
-const bcryptjs = require('bcryptjs');
+const bcryptjs = require('bcryptjs')
 const UserModel = require('../Models/users.model');
 const Rols = require('../Models/rols.model');
 const ApartmentModel = require('../Models/apartment.model');
@@ -11,6 +11,8 @@ const OwnersModel = require('../Models/owners.model');
 const ApartmentOwnerModel = require('../Models/apartment.owners.model');
 const Booking = require('../Models/booking.model');
 
+const { hotmailTransporter } = require('../Helpers/emailConfig');
+const Mails = require('../Helpers/Mails');
 
 const getOneResidents = async (req, res = response) => {
     try {
@@ -136,10 +138,12 @@ const postResident = async (req, res) => {
 
     try {
 
-        const pdfUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
-        const imgUrl = await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images')
+        const pdfUrl = req.files !== null ? await upload(req.files.pdf, ['pdf'], 'Documents') : null
+        const imgUrl = req.files !== null ? await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images') : null
 
-        const { pdf, ...userData } = req.body;
+        const { pdf, password, idApartment, ...userData } = req.body;
+        console.log(userData, 'userData en back')
+        const idApartmentNumber = Number(idApartment);
 
         const salt = bcryptjs.genSaltSync();
         userData.password = bcryptjs.hashSync(userData.password, salt);
@@ -147,8 +151,7 @@ const postResident = async (req, res) => {
         const user = await UserModel.create({
             pdf: pdfUrl,
             userImg: imgUrl,
-            idrole: 1, // resident rol 
-            password: userData.password,
+            password: password,
             status: "Activo",
             ...userData
 
@@ -157,14 +160,14 @@ const postResident = async (req, res) => {
         const resident = await ResidentModel.create({
 
             iduser: user.iduser,
-            residentType: "tenant",
+            residentType: userData.residentType,
             status: "Inactive"
         })
 
 
         const apartmentResident = userData.idApartment ? await ApartmentResidentModel.create({
 
-            idApartment: userData.idApartment,
+            idApartment: idApartmentNumber,
             idResident: resident.idResident,
             residentStartDate: userData.residentStartDate
 
@@ -187,6 +190,7 @@ const postResident = async (req, res) => {
 
     } catch (error) {
         console.error('Error al crear usuario:', error);
+        console.error(error.stack); // This will print the stack trace
         return res.status(500).json({ message: 'Error interno del servidor hola', error: error.message });
     }
 

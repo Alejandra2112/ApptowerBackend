@@ -1,14 +1,17 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const User = require('../Models/users.model');
+const UserModel = require('../Models/users.model');
 const Rols = require('../Models/rols.model');
 const { Op } = require('sequelize');
+const { hotmailTransporter } = require('../Helpers/emailConfig');
+const successRegistrationEmail = require('../Helpers/Mails');
+const Mails = require('../Helpers/Mails');
 
 const logIn = async (req, res) => {
   const { usuario, password } = req.body;
 
   try {
-    const user = await User.findOne({
+    const user = await UserModel.findOne({
       where: {
         [Op.or]: [
           { document: usuario },
@@ -28,9 +31,10 @@ const logIn = async (req, res) => {
       return res.status(401).json({ message: 'Ha ocurrido un problema, comunícate con el Administrador' });
     }
 
-    const userWithRole = await User.findByPk(user.iduser, {
+    const userWithRole = await UserModel.findByPk(user.iduser, {
       include: Rols,
     });
+
 
     if (!userWithRole) {
       return res.status(500).json({ message: 'Ocurrió un error' });
@@ -60,6 +64,68 @@ const logIn = async (req, res) => {
   }
 };
 
+
+
+
+const postUsersforLogin = async (req, res) => {
+  try {
+    const { idrole, state, password, name, email, lastName, ...userData } = req.body;
+
+    let newIdRole = idrole;
+    if (newIdRole === undefined || newIdRole === null) {
+      newIdRole = 2;
+      userData.status = 'Inactivo';
+    }
+
+    let hashedPassword;
+    if (password) {
+      const salt = bcrypt.genSaltSync();
+      hashedPassword = bcrypt.hashSync(password, salt);
+    }
+
+    const user = await UserModel.create({
+      ...userData,
+      idrole: newIdRole,
+      state: userData.state,
+      password: hashedPassword,
+      name: name,
+      lastName: lastName,
+      email: email,
+    });
+
+    if (user) {
+      res.status(201).json({
+        message: 'Usuario creado exitosamente',
+        user,
+      });
+
+      const mailOptions = Mails.registerSuccessEmail(name, lastName, email);
+
+      hotmailTransporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error('Error al enviar el correo:', error);
+          res.status(500).json({ message: 'Error al enviar el correo' });
+        } else {
+          console.log('Correo enviado:', info.response);
+          res.json({ message: 'Correo con código de recuperación enviado' });
+        }
+      });
+
+    } else {
+      res.status(400).json({
+        message: 'Error al crear el usuario',
+      });
+    }
+  } catch (error) {
+    console.error('Error al crear el usuario:', error);
+    res.status(500).json({
+      message: `Error al crear el usuario: ${error.message}`,
+    });
+  }
+};
+
+
 module.exports = {
   logIn,
+  postUsersforLogin
 };

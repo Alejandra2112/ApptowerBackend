@@ -85,9 +85,8 @@ const putSpace = async (req, res = response) => {
 
         const newImg = space.image == "" && req.files ?
             await upload(req.files.image, ['png', 'jpg', 'jpeg'], 'Images') :   
-            req.files ? await updateFile(req.files, space.image, ['png', 'jpg', 'jpeg'], 'Images', "image") : ""
-
-
+            req.files ? await updateFile(req.files, space.image, ['png', 'jpg', 'jpeg', 'pdf'], 'Images', "image") : ""
+            
         if (!space) {
             return res.status(404).json({ msg: 'Zona comun no encontrada.' });
         }
