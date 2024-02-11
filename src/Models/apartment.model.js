@@ -80,12 +80,12 @@ ApartmentModel.belongsToMany(
     otherKey: 'idOwner'
 });
 
-// ApartmentModel.belongsToMany(
-//     ResidentModel, {
-//     through: ApartmentResidentModel,
-//     foreignKey: 'idApartment',
-//     otherKey: 'idResident'
-// });
+ApartmentModel.belongsToMany(
+    ResidentModel, {
+    through: ApartmentResidentModel,
+    foreignKey: 'idApartment',
+    otherKey: 'idResident'
+});
 
 
 
