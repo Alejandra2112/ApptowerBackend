@@ -9,15 +9,18 @@ const Rols = require('../Models/rols.model');
 const ApartmentModel = require('../Models/apartment.model');
 const OwnersModel = require('../Models/owners.model');
 const ApartmentOwnerModel = require('../Models/apartment.owners.model');
+const Booking = require('../Models/booking.model');
 
 
 const getOneResidents = async (req, res = response) => {
     try {
-        const { idResident } = req.params;
+        const { iduser } = req.params;
+
+        console.log(iduser, 'idparam')
 
         const resident = await ResidentModel.findOne(
             {
-                where: { idResident: idResident },
+                where: { iduser: iduser },
 
                 include: [{
 
@@ -28,11 +31,20 @@ const getOneResidents = async (req, res = response) => {
 
         );
 
+        console.log(resident)
+
+        const bookings = await Booking.findAll({
+
+            where: { iduser: iduser}
+        })
+
         const apartmentResidents = await ApartmentResidentModel.findAll({
 
-            where: { idResident: idResident },
+            where: { idResident: resident.idResident },
 
         })
+
+
 
         const apartments = await ApartmentModel.findAll();
 
@@ -54,8 +66,10 @@ const getOneResidents = async (req, res = response) => {
 
 
         res.json({
+
             resident,
-            apartments: data
+            apartments: data,
+            bookings
 
         });
 
