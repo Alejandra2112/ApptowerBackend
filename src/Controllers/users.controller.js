@@ -199,7 +199,7 @@ const postUser = async (req, res) => {
     const user = await UserModel.create({
       pdf: pdfUrl,
       userImg: imgUrl,
-      idrole: 2, // resident rol 
+      idrole: userData.idrole, // resident rol 
       password: userData.password,
       ...userData
 

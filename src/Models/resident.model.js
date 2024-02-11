@@ -1,6 +1,9 @@
 const { DataTypes, INTEGER } = require('sequelize');
 const sequelize = require('../Database/config');
 const UserModel = require('./users.model');
+const ApartmentOwnerModel = require('./apartment.owners.model');
+const ApartmentModel = require('./apartment.model');
+const ApartmentResidentModel = require('./apartment.residents.model');
 
 const ResidentModel = sequelize.define('Residents', {
 
@@ -43,6 +46,19 @@ const ResidentModel = sequelize.define('Residents', {
     timestamps: true
 
 });
+
+// Configuración de la asociación con Apartments
+ApartmentResidentModel.belongsTo(ApartmentModel, {
+    foreignKey: 'idApartment',
+    targetKey: 'idApartment',
+  });
+  
+  ApartmentModel.hasMany(ApartmentResidentModel, {
+    foreignKey: 'idApartment',
+    sourceKey: 'idApartment',
+  });
+  
+  
 
 
 UserModel.hasMany(ResidentModel, {

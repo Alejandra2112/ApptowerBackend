@@ -56,16 +56,5 @@ const ApartmentResidentModel = sequelize.define('ApartmentResidents', {
 
 });
 
-// Configuración de la asociación con Apartments
-ApartmentResidentModel.belongsTo(ApartmentModel, {
-  foreignKey: 'idApartment',
-  targetKey: 'idApartment',
-});
-
-ApartmentModel.hasMany(ApartmentResidentModel, {
-  foreignKey: 'idApartment',
-  sourceKey: 'idApartment',
-});
-
 
 module.exports = ApartmentResidentModel;
