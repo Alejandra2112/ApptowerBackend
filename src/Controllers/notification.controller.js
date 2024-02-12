@@ -1,6 +1,34 @@
 const { response } = require('express');
-
 const Notification = require('../Models/notification.model');
+const { DateSchema } = require('yup');
+
+// Sockets
+
+const notifications = (socket) => {
+
+    console.log('Cliente conectado', socket.id)
+
+    socket.on('disconnect', () => {
+
+        // console.log('Cliente desconectado')
+
+    })
+
+    socket.on('dashboard-info', (data) => {
+
+        console.log('dashboard info', data)
+    })
+
+    socket.on('enviar-mensaje', (payload) => {
+
+        console.log(payload)
+        socket.broadcast.emit('enviar-mensaje', 'Desde el server' + payload)
+    }
+
+    )
+}
+
+// HTTP
 
 const getNotification = async (req, res = response) => {
     try {
@@ -21,7 +49,7 @@ const postNotification = async (req, res) => {
     const body = req.body;
     try {
         await Notification.create(body);
-        message = 'Notificación Registrada Exitosamente';        
+        message = 'Notificación Registrada Exitosamente';
     } catch (error) {
         message = error.message;
     }
@@ -58,4 +86,5 @@ module.exports = {
     getNotification,
     postNotification,
     deleteNotification,
+    notifications
 }

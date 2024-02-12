@@ -4,8 +4,10 @@ const fileUpload = require('express-fileupload')
 const http = require('http');
 const cookieParser = require('cookie-parser');
 
+const { Server } = require('socket.io');
+const { notifications } = require('../Controllers/notification.controller');
 
-const { Server } = require('socket.io')
+
 class Servers {
   constructor() {
     this.app = express();
@@ -69,6 +71,7 @@ class Servers {
     this.routes();
     this.db_connect();
     this.socketConfig();
+
   }
 
   middlewares() {
@@ -160,15 +163,9 @@ class Servers {
   // Socket
 
   socketConfig() {
-    this.io.on('connection', socket => {
 
-      console.log('Cliente conectado', socket)
-
-      socket.on('disconnect', () => {
-        console.log('Cliente desconectado')
-
-      })
-    })
+    this.io.on('connection', notifications)
+    
   }
 
   // socketConfig() {
@@ -181,6 +178,7 @@ class Servers {
   //         })
   //         this.io.emit('message', { id: message.id, content: message.content })
   //       } catch (error) {
+
   //         console.log(error);
   //       }
   //     });
