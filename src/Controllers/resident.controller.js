@@ -143,7 +143,6 @@ const postResident = async (req, res) => {
 
         const { pdf, idApartment, ...userData } = req.body;
         console.log(userData, 'userData en back')
-        const idApartmentNumber = Number(idApartment);
 
         const salt = bcryptjs.genSaltSync();
         userData.password = bcryptjs.hashSync(userData.password, salt);
@@ -154,7 +153,7 @@ const postResident = async (req, res) => {
             userImg: imgUrl,
             password: userData.password,
             idrole: userData.idrole,
-            status: "Activo",
+            status: "Inactivo", // Creste user for wait admin permission
             ...userData
 
         })
@@ -163,17 +162,17 @@ const postResident = async (req, res) => {
 
             iduser: user.iduser,
             residentType: userData.residentType,
-            status: "Inactive"
+            status: "Active" // Active becase live in the tower
         })
 
 
-        const apartmentResident = userData.idApartment ? await ApartmentResidentModel.create({
+        const apartmentResident = idApartment ? await ApartmentResidentModel.create({
 
-            idApartment: idApartmentNumber,
+            idApartment: idApartment,
             idResident: resident.idResident,
             residentStartDate: userData.residentStartDate
 
-        }) : ""
+        }) : null
 
         const roleData = await Rols.findByPk(userData.idrole);
 
