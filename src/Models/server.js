@@ -78,9 +78,15 @@ class Servers {
     this.app.use(cookieParser());
 
     this.app.use((req, res, next) => {
-      const origin = req.headers.origin || 'https://apptowerbackend.onrender.com' || '*' ;
+      const origin = req.headers.origin;
+      const allowedOrigin = 'https://apptowerbackend.onrender.com';
 
-      res.setHeader('Access-Control-Allow-Origin', origin);
+      if (origin === allowedOrigin) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+      } else {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+      }
+
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
       res.setHeader('Access-Control-Allow-Credentials', 'true');
