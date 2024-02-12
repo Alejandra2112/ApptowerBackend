@@ -13,7 +13,7 @@ route.get('/access', verifityToken, async (req, res) => {
   try {
     const user = req.user;
     const rol = user.idrole;
-    console.log('Rolñllllllllllllllllllllllllllllllllllll:', rol);
+    const iduser = user.iduser;
     let roleName = '';
 
     const roleData = await Rols.findByPk(rol);
@@ -26,6 +26,8 @@ route.get('/access', verifityToken, async (req, res) => {
     res.json({
       role: roleName,
       message: `Es ${roleName}`,
+      user: iduser,
+
     });
 
     console.log('Rol:', roleName);

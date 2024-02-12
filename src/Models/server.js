@@ -72,23 +72,28 @@ class Servers {
   }
 
   middlewares() {
-    this.app.use(cookieParser()); 
+    this.app.use(cookieParser());
+
     this.app.use((req, res, next) => {
-      res.setHeader('Access-Control-Allow-Origin', '*');
+      const origin = req.headers.origin || '*';
+
+      res.setHeader('Access-Control-Allow-Origin', origin);
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-      res.setHeader(
-        'Access-Control-Allow-Headers',
-        'Content-Type, Authorization'
-      );
-      return next();
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+      next();
     });
+
     this.app.use(express.json());
+
     this.app.use(fileUpload({
       useTempFiles: true,
       tempFileDir: '/tmp/',
       createParentPath: true
     }));
   }
+
   routes() {
     this.app.use(this.LoginPath, require('../Routes/logIn.routes'))
     this.app.use(this.UserPath, require('../Routes/users.routes'));
