@@ -165,7 +165,7 @@ class Servers {
   socketConfig() {
 
     this.io.on('connection', notifications)
-    
+
   }
 
   // socketConfig() {
