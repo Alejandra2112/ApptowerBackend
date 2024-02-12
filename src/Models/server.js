@@ -2,6 +2,7 @@ const express = require('express');
 const sequelize = require('../Database/config');
 const fileUpload = require('express-fileupload')
 const http = require('http');
+const cookieParser = require('cookie-parser');
 
 const { Server } = require('socket.io');
 const { notifications } = require('../Controllers/notification.controller');
@@ -74,6 +75,7 @@ class Servers {
   }
 
   middlewares() {
+    this.app.use(cookieParser()); 
     this.app.use((req, res, next) => {
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');

@@ -12,7 +12,6 @@ const getFinesAll = async (req, res = response) => {
                     model: ApartmentModel,
                     as: 'apartment',
                 },
-                ,
                     { model: UsersModel, as: 'user' },
             ],
         });

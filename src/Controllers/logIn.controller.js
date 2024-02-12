@@ -20,6 +20,7 @@ const logIn = async (req, res) => {
       }
     });
 
+
     if (!user) {
       return res.status(401).json({ message: 'Usuario no encontrado' });
     }
@@ -31,14 +32,6 @@ const logIn = async (req, res) => {
       return res.status(401).json({ message: 'Ha ocurrido un problema, comunícate con el Administrador' });
     }
 
-    const userWithRole = await UserModel.findByPk(user.iduser, {
-      include: Rols,
-    });
-
-
-    if (!userWithRole) {
-      return res.status(500).json({ message: 'Ocurrió un error' });
-    }
     const userRoleId = user.idrole;
     console.log("idrole", userRoleId);
 
@@ -51,19 +44,17 @@ const logIn = async (req, res) => {
       expiresIn: '365d',
     });
 
-
     res.cookie('token', token);
 
     res.json({
       message: 'Inicio de sesión exitoso',
-      token,
+      token
     });
   } catch (error) {
     console.error('Error al iniciar sesión:', error);
     res.status(500).json({ message: 'Error' });
   }
 };
-
 
 
 
