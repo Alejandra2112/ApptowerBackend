@@ -3,6 +3,7 @@ const sequelize = require('../Database/config');
 const fileUpload = require('express-fileupload')
 const http = require('http');
 const cookieParser = require('cookie-parser');
+const session = require('express-session');
 
 const { Server } = require('socket.io');
 const { notifications } = require('../Controllers/notification.controller');
@@ -78,21 +79,24 @@ class Servers {
     this.app.use(cookieParser());
 
     this.app.use((req, res, next) => {
-      const origin = req.headers.origin;
-      const allowedOrigin = 'https://apptowerbackend.onrender.com';
+      const origin = req.headers.origin || '*';
 
-      if (origin === allowedOrigin) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-      } else {
-        res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
-      }
-
+      res.setHeader('Access-Control-Allow-Origin', origin);
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
       res.setHeader('Access-Control-Allow-Credentials', 'true');
 
       next();
     });
+
+    this.app.set('trust proxy', 1); // trust first proxy
+    this.app.use(cookieParser());
+    this.app.use(session({
+      secret: 'somesecret',
+      resave: false,
+      saveUninitialized: true,
+      cookie: { secure: true, sameSite: 'none' }
+    }));
 
     this.app.use(express.json());
 
