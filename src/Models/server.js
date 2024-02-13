@@ -99,7 +99,10 @@ class Servers {
       secret: 'somesecret',
       resave: false,
       saveUninitialized: true,
-      cookie: { secure: true, sameSite: 'none' }
+      cookie: {
+        secure: false,
+        sameSite: 'none'
+      }
     }));
 
     this.app.use(express.json());
