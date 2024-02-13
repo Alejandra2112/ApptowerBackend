@@ -4,7 +4,6 @@ const fileUpload = require('express-fileupload')
 const http = require('http');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const cors = require('cors');
 
 const { Server } = require('socket.io');
 const { notifications } = require('../Controllers/notification.controller');
@@ -76,55 +75,19 @@ class Servers {
 
   }
 
-  // middlewares() {
-  //   this.app.use(cookieParser());
-
-  //   this.app.use((req, res, next) => {
-  //     const origin = req.headers.origin;
-
-  //     const allowedOrigins = ['https://apptowerbackend.onrender.com', 'http://localhost:3000', 'http://localhost:5173'];
-
-  //     if (allowedOrigins.includes(origin)) {
-  //       res.setHeader('Access-Control-Allow-Origin', origin);
-  //     }
-
-  //     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  //     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  //     res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-  //     next();
-  //   });
-
-  //   this.app.set('trust proxy', 1);
-  //   this.app.use(cookieParser());
-  //   this.app.use(session({
-  //     secret: 'somesecret',
-  //     resave: false,
-  //     saveUninitialized: true,
-  //     cookie: { secure: true, sameSite: 'none' }
-  //   }));
-
-  //   this.app.use(express.json());
-
-  //   this.app.use(fileUpload({
-  //     useTempFiles: true,
-  //     tempFileDir: '/tmp/',
-  //     createParentPath: true
-  //   }));
-  // }
-
-
-
-
   middlewares() {
     this.app.use(cookieParser());
 
-    this.app.use(cors({
-      origin: ['https://apptowerbackend.onrender.com', 'http://localhost:3000', 'http://localhost:5173'],
-      methods: ['GET', 'POST', 'PUT', 'DELETE'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
-      credentials: true
-    }));
+    this.app.use((req, res, next) => {
+      const origin = req.headers.origin || '*';
+
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+      next();
+    });
 
     this.app.set('trust proxy', 1);
     this.app.use(cookieParser());
@@ -143,7 +106,6 @@ class Servers {
       createParentPath: true
     }));
   }
-
 
   routes() {
     this.app.use(this.LoginPath, require('../Routes/logIn.routes'))
