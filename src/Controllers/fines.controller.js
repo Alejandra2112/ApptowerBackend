@@ -107,62 +107,6 @@ const postFines = async (req, res) => {
     });
 };
 
-// const putFines = async (req, res = response) => {
-//     const body = req.body;
-//     let message = '';
-
-//     try {
-//         const { idfines, state } = body;
-//         const existingFines = await Fines.findOne({
-//             where: { idfines: idfines },
-//         });
-
-//         if (existingFines) {
-//             // Verificar si la multa actual tiene el campo paymentproof
-//             if (existingFines.paymentproof == null) {
-//                 // Procesar y almacenar paymentproof si existe
-//                 console.log("Esto es lo que se envia"+req.files.paymentproof)
-//                 const imageUrl = await upload(req.files.paymentproof, ['pdf', 'jpg', 'jpeg', 'png'], 'File');
-//                 console.log("Esto se imprime nuevo"+imageUrl);
-
-//                 // Actualizar la multa con el nuevo estado y paymentproof
-//                 await Fines.update({
-//                     state: state,
-//                     paymentproof: imageUrl,
-//                 }, {
-//                     where: { idfines: idfines },
-//                 });
-
-//                 message = 'Multa modificada exitosamente con nuevo paymentproof.';
-//             } else {
-                
-//                 console.log("Esto es lo que se envia reemplazo "+req.files.paymentproof)
-//                 const newfile = await updateFile(req.files.paymentproof, existingFines.paymentproof, ['pdf', 'jpg', 'jpeg', 'png'], 'File');
-//                 console.log( "Esto es lo que se actualizo reemplazo "+newfile);
-//                 const results = await Fines.update({
-//                     state: state,
-//                     paymentproof: newfile,
-//                 }, {
-//                     where: { idfines: idfines },
-//                 });
-
-//                 if (newfile != null || newfile != '') {
-//                     message = 'Multa modificada exitosamente.',results;
-//                 } else {
-//                     message = 'No se encontró una multa con ese ID', results;
-//                 }
-//             }
-//         } else {
-//             message = 'No se encontró una multa con ese ID';
-//         }
-//     } catch (error) {
-//         message = 'Error al modificar multa: ' + error.message;
-//     }
-
-//     res.json({
-//         fines: message,
-//     });
-// };
 
 const putFines = async (req, res = response) => {
     try {
