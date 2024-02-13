@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const verificarToken = (req, res, next) => {
   const token = req.cookies.token;
 
+
   if (!token) {
     return res.status(401).json({ mensaje: 'Acceso denegado' });
   }
