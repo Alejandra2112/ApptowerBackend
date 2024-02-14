@@ -5,6 +5,8 @@ const Rols = require('../Models/rols.model');
 const ResidentModel = require('../Models/resident.model');
 const Watchman = require('../Models/watchmans.model');
 const { upload, updateFile } = require('../Helpers/uploads.helpers');
+const ApartmentResidentModel = require('../Models/apartment.residents.model');
+const Mails = require('../Helpers/Mails');
 
 
 const getUser = async (req, res = response) => {
@@ -387,17 +389,17 @@ const putUser = async (req, res) => {
         console.error('Error: No se ha definido el correo electrónico del usuario.');
         return res.status(500).json({ error: 'No se ha definido el correo electrónico del usuario.' });
       }
-      const mailOptions = Mails.changedStatusEmail(user.name, user.lastName, user.email);
+      // const mailOptions = Mails.changedStatusEmail(user.name, user.lastName, user.email);
 
-      hotmailTransporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          console.error('Error al enviar el correo:', error);
-          res.status(500).json({ message: 'Error al enviar el correo' });
-        } else {
-          console.log('Correo enviado:', info.response);
-          res.json({ message: 'Correo con código de recuperación enviado' });
-        }
-      });
+      // hotmailTransporter.sendMail(mailOptions, (error, info) => {
+      //   if (error) {
+      //     console.error('Error al enviar el correo:', error);
+      //     res.status(500).json({ message: 'Error al enviar el correo' });
+      //   } else {
+      //     console.log('Correo enviado:', info.response);
+      //     res.json({ message: 'Correo con código de recuperación enviado' });
+      //   }
+      // });
     }
 
 
