@@ -79,16 +79,17 @@ class Servers {
     this.app.use(cookieParser());
 
     this.app.use((req, res, next) => {
-      const allowedOrigins = ['http://localhost:3000', 'http://localhost:5173', 'https://apptowerbackend.onrender.com'];
+
       const origin = req.headers.origin;
-
-      if (allowedOrigins.includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-      }
-
+      res.setHeader('Access-Control-Allow-Origin', origin || '*');
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
       res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+
+      if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+      }
 
       next();
     });
@@ -99,7 +100,10 @@ class Servers {
       secret: 'somesecret',
       resave: false,
       saveUninitialized: true,
-      cookie: { secure: true, sameSite: 'none' }
+      cookie: {
+        secure: false,
+        sameSite: 'none'
+      }
     }));
 
     this.app.use(express.json());
