@@ -6,6 +6,6 @@ route.get('/', getEnterpriseSecurity)
 route.get('/email/:email', getEnterpriceEmail)
 route.get('/NIT/:NIT', getEnterpriceNIT)
 route.post('/', postEnterpriseSecurity)
-route.put('/:idEnterpriseSecurity', putEnterpriseSecurity)
+route.put('/', putEnterpriseSecurity)
 
 module.exports = route  

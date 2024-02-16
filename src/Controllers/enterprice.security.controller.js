@@ -82,8 +82,7 @@ const postEnterpriseSecurity = async (req, res) => {
 
 
 const putEnterpriseSecurity = async (req, res) => {
-    const { idEnterpriseSecurity } = req.params;
-    const body = req.body;
+    const { idEnterpriseSecurity } = req.body;
 
     try {
         const enterpriseSecurity = await EnterpriseSecurity.findByPk(idEnterpriseSecurity);
@@ -94,7 +93,7 @@ const putEnterpriseSecurity = async (req, res) => {
             });
         }
 
-        await enterpriseSecurity.update(body);
+        await enterpriseSecurity.update(req.body);
 
         res.json({
             enterpriseSecurity,
@@ -105,7 +104,6 @@ const putEnterpriseSecurity = async (req, res) => {
         });
     }
 }
-
 module.exports = {
     getEnterpriseSecurity,
     postEnterpriseSecurity,
