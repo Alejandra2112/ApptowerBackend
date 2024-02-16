@@ -182,7 +182,7 @@ class Servers {
 
   socketConfig() {
 
-    this.io.on('connection', notifications)
+    this.io.on('connection', (socket) => notifications(socket, this.io))
 
   }
 

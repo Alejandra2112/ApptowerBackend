@@ -1,31 +1,33 @@
 const { response } = require('express');
 const Notification = require('../Models/notification.model');
 const { DateSchema } = require('yup');
+const { ISO_8601 } = require('moment-timezone');
+const UserModel = require('../Models/users.model');
 
 // Sockets
 
-const notifications = (socket) => {
+const notifications = async (socket, io) => {
+
 
     console.log('Cliente conectado', socket.id)
 
-    socket.on('disconnect', () => {
+    socket.on('response-connection', (mensaje) => {
 
-        // console.log('Cliente desconectado')
+        
+        console.log('Mensaje recibido desde el cliente:', mensaje);
 
-    })
+        socket.emit('response-servidor', `Mensaje recibido por el servidor ${mensaje}`);
 
-    socket.on('dashboard-info', (data) => {
+    });
 
-        console.log('dashboard info', data)
-    })
-
-    socket.on('enviar-mensaje', (payload) => {
-
-        console.log(payload)
-        socket.broadcast.emit('enviar-mensaje', 'Desde el server' + payload)
-    }
-
+    const users = await UserModel.findAll(
+        {
+            where: { status: 'Activo' }
+        }
     )
+
+    io.emit('active-users', { users })
+
 }
 
 // HTTP
