@@ -1,8 +1,8 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
 
-const User = require('./users.model');
-const Space = require('./spaces.model');
+const UserModel = require('./users.model');
+const SpacesModel = require('./spaces.model');
 
 const Booking = sequelize.define('booking', {
   idbooking: {
@@ -63,11 +63,11 @@ const Booking = sequelize.define('booking', {
   {
     timestamps: true,
   });
-Booking.belongsTo(Space, {
+Booking.belongsTo(SpacesModel, {
   foreignKey: 'idSpace',
   targetKey: 'idSpace',
 });
-Booking.belongsTo(User, {
+Booking.belongsTo(UserModel, {
   foreignKey: 'iduser',
   targetKey: 'iduser',
 });

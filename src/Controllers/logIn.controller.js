@@ -44,11 +44,12 @@ const logIn = async (req, res) => {
       expiresIn: '365d',
     });
 
-    res.cookie('token', token, { httpOnly: true });
+    res.cookie('token', token);
 
     res.json({
       message: 'Inicio de sesión exitoso',
-      token
+      token,
+      user
     });
   } catch (error) {
     console.error('Error al iniciar sesión:', error);
