@@ -2,11 +2,11 @@ const { Router } = require("express");
 const route = Router();
 const {
   getVisitorsAll,
-    getVisitorsOne,
+  getVisitorsOne,
   postVisitors,
   putVisitors,
 } = require("../Controllers/visitors.controller");
-const validations = require("../Middlewares/visitors.middleware");
+const { visitorsValidations } = require("../Middlewares/visitors.middleware");
 
 // const checkPermissions = require("../Middlewares/checkPermission");
 // const verifityToken = require("../Middlewares/verifityToken");
@@ -17,24 +17,26 @@ const validations = require("../Middlewares/visitors.middleware");
 
 route.get(
   "/",
-//   checkPermissions(privilegesMap.get_visitors, permissionMap.visitantes),
+  //   checkPermissions(privilegesMap.get_visitors, permissionMap.visitantes),
   getVisitorsAll
 ),
-route.get(
+  route.get(
     "/:idVisitor",
     // checkPermissions(privilegesMap.get_visitors, permissionMap.visitantes),
     getVisitorsOne
-    ),
+  ),
   route.post(
     "/",
-    validations.postValidationVisitor,
+    visitorsValidations,
     // checkPermissions(privilegesMap.post_visitors, permissionMap.visitantes),
     postVisitors
   );
+
 route.put(
   "/",
-  validations.putValidationVisitor,
-//   checkPermissions(privilegesMap.put_visitors, permissionMap.visitantes),
+  visitorsValidations,
+  // validations.putValidationVisitor,
+  //   checkPermissions(privilegesMap.put_visitors, permissionMap.visitantes),
   putVisitors
 );
 

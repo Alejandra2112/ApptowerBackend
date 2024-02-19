@@ -7,7 +7,7 @@ const {
   postFines,
   putFines,
 } = require("../Controllers/fines.controller");
-const validations = require("../Middlewares/fines.middleware");
+const {finesValidations} = require("../Middlewares/fines.middleware");
 // const checkPermissions = require("../Middlewares/checkPermission");
 // const verifityToken = require("../Middlewares/verifityToken");
 // const privilegesMap = require("../Helpers/Privileges.js");
@@ -32,13 +32,15 @@ route.get(
 );
 route.post(
   "/",
-  validations.postFinesValidation,
+  // validations.postFinesValidation,
+  finesValidations,
   // checkPermissions(privilegesMap.post_fines, permissionMap.multas),
   postFines
 );
 route.put(
   "/",
-  validations.putFinesValidation,
+  // validations.putFinesValidation,
+  finesValidations,
   // checkPermissions(privilegesMap.put_fines, permissionMap.multas),
   putFines
 );
