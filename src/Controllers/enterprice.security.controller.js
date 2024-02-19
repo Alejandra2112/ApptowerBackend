@@ -1,6 +1,8 @@
 const { response } = require('express');
 
 const EnterpriseSecurity = require('../Models/enterprice.security.model');
+const Watchman = require('../Models/watchmans.model');
+const UserModel = require('../Models/users.model');
 
 const getEnterpriseSecurity = async (req, res = response) => {
     try {
@@ -94,6 +96,19 @@ const putEnterpriseSecurity = async (req, res) => {
         }
 
         await enterpriseSecurity.update(req.body);
+
+        const watchmen = await Watchman.findAll({ where: { idEnterpriseSecurity } });
+
+
+        for (const watchman of watchmen) {
+            await watchman.update({ state: req.body.state });
+
+            const user = await UserModel.findByPk(watchman.iduser);
+            if (user) {
+                await user.update({ status: req.body.state });
+            }
+        }
+
 
         res.json({
             enterpriseSecurity,

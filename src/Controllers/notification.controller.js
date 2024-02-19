@@ -9,12 +9,10 @@ const UserModel = require('../Models/users.model');
 const notifications = async (socket, io) => {
 
 
-    console.log('Cliente conectado', socket.id)
 
     socket.on('response-connection', (mensaje) => {
 
-        
-        console.log('Mensaje recibido desde el cliente:', mensaje);
+
 
         socket.emit('response-servidor', `Mensaje recibido por el servidor ${mensaje}`);
 
