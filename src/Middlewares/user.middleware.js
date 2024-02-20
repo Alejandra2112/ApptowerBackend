@@ -70,7 +70,7 @@ const UserValidationes = (req, res, next) => {
 
 
 module.exports = {
-  validateUser,
+  UserValidationes,
 }
 
 
