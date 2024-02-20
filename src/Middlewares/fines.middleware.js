@@ -3,16 +3,16 @@ const yup = require('yup');
 const postFinesSchema = yup.object().shape({
     idUser: yup.number().required('el id del usuario es requerido'),
     fineType: yup.string().required('Tipo de multa es requerido'),
-    incidentDate: yup.date().required('Fec'),
-    paymentDate: yup.date().required('Payment date is required'),
-    amount: yup.number().required('Amount is required'),
-    idApartment: yup.number().required('Apartment is required'),
-    state: yup.string().required('State is required'),
+    incidentDate: yup.date().required('Se requiere la fecha del incidente'),
+    paymentDate: yup.date().required('Se requiere la fecha de pago'),
+    amount: yup.number().required('Se requiere el monto de la multa'),
+    idApartment: yup.number().required('Se requiere el id del apartamento'),
+    state: yup.string().required('Se requiere el estado de la multa'),
 });
 
 const putFinesSchema = yup.object().shape({
-    idfines: yup.number().required('Fines is required'),
-    state: yup.string().required('State is required'),
+    idfines: yup.number().required('Se requiere el id de la multa'),
+    state: yup.string().required('Se requiere el estado de la multa'),
 });
 
 
