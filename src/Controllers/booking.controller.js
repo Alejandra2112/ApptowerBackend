@@ -8,7 +8,7 @@ const getBooking = async (req, res = response) => {
     try {
         const booking = await Booking.findAll({
             include: [
-                { model: UserModel, attributes: ['name', 'lastname', 'email'] },
+                { model: UserModel, attributes: ['name', 'lastName', 'email'] },
                 { model: SpacesModel, attributes: ['spaceName', 'spaceType', 'capacity'] }
             ]
         });
