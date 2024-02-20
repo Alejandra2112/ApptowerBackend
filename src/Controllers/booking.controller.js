@@ -1,14 +1,14 @@
 const { response } = require('express');
 
 const Booking = require('../Models/booking.model');
-const User = require('../Models/users.model');
+const UserModel = require('../Models/users.model');
 const SpacesModel = require('../Models/spaces.model');
 
 const getBooking = async (req, res = response) => {
     try {
         const booking = await Booking.findAll({
             include: [
-                { model: User, attributes: ['name', 'lastname', 'email'] },
+                { model: UserModel, attributes: ['name', 'lastname', 'email'] },
                 { model: SpacesModel, attributes: ['spaceName', 'spaceType', 'capacity'] }
             ]
         });
@@ -30,7 +30,7 @@ const getOneBookingbySpaces = async (req, res = response) => {
         const booking = await Booking.findAll({
             where: { idSpace: idSpace },
             include: [
-                { model: User, attributes: ['name', 'lastname', 'email'] },
+                { model: UserModel, attributes: ['name', 'lastname', 'email'] },
                 { model: SpacesModel, attributes: ['spaceName', 'spaceType','capacity'] }
             ]
         });
