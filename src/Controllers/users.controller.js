@@ -276,6 +276,33 @@ const postUser = async (req, res) => {
 
 
 
+const putPasswordUser = async (req, res) => {
+  try {
+    const { iduser, password } = req.body;
+
+    const user
+      = await UserModel.findOne({ where: { iduser: iduser } });
+
+    if (!user) {
+      return res.status(404).json({ msg: 'Usuario no encontrado.' });
+    }
+
+    const salt = bcryptjs.genSaltSync();
+    user.password = bcryptjs.hashSync(password, salt);
+
+    await user.save();
+
+    res.json({
+      msg: "Contraseña actualizada",
+      user
+    });
+
+  } catch (error) {
+    console.error('Error al editar usuario:', error);
+    return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
+  }
+};
+
 
 
 
@@ -511,7 +538,7 @@ module.exports = {
   postUsersforLogin,
   resetPassword,
   getEmailUser,
-
+  putPasswordUser,
 
   putChangeImg,
   putPersonalInformation
