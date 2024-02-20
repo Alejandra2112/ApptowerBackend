@@ -4,6 +4,7 @@ const RecoveryCode = require('../Models/RecoveryCode.model');
 const { Op } = require('sequelize');
 const successRegistrationEmail = require('../Helpers/Mails');
 const Mails = require('../Helpers/Mails');
+const UserModel = require('../Models/users.model');
 
 
 setInterval(async () => {
@@ -20,6 +21,13 @@ setInterval(async () => {
 
 const postEmailUser = async (req, res = response) => {
     const { email } = req.body;
+
+    const user = await UserModel.findOne({ where: { email: email } });
+
+
+    if (!user) {
+        return res.status(400).json({ message: 'El correo electrónico no está registrado' });
+    }
 
     function generateSixDigitCode() {
         return Math.floor(Math.random() * 900000) + 100000;
@@ -57,6 +65,8 @@ const postEmailUser = async (req, res = response) => {
         res.status(500).json({ message: 'Error al guardar el código en la base de datos' });
     }
 };
+
+
 
 const verifyCode = async (req, res = response) => {
     const { recoveryCode } = req.body;

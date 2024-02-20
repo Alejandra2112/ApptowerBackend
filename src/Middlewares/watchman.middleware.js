@@ -6,8 +6,6 @@ const postWatchmanSchema = yup.object().shape({
 
   iduser: yup.number().required("El usuario es requerido"),
 
-  state: yup.string().required("El estado es requerido")
-    .matches(/^(Activo|Inactivo)$/, 'Estado invalido'),
 
 });
 
