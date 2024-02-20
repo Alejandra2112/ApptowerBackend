@@ -1,32 +1,54 @@
 const { response } = require('express');
 const Notification = require('../Models/notification.model');
-const { DateSchema } = require('yup');
-const { ISO_8601 } = require('moment-timezone');
 const UserModel = require('../Models/users.model');
+const Guest_income = require('../Models/guest.income.model');
+const Fines = require('../Models/fines.model');
+const Booking = require('../Models/booking.model');
+const ApartmentModel = require('../Models/apartment.model');
 
 // Sockets
-
 const notifications = async (socket, io) => {
-
-
-
-    socket.on('response-connection', (mensaje) => {
-
-
-
-        socket.emit('response-servidor', `Mensaje recibido por el servidor ${mensaje}`);
-
+    
+    socket.on('user-logied', async (data) => {
+        if (data?.user?.iduser) {
+            const user = await UserModel.findOne({ where: { iduser: data.user.iduser } });
+            io.emit('user', user);
+        } else {
+            console.error('El ID de usuario es indefinido.');
+        }
     });
 
-    const users = await UserModel.findAll(
-        {
-            where: { status: 'Activo' }
-        }
-    )
+    
+};
 
-    io.emit('active-users', { users })
 
-}
+const dashboardInformation = async (socket, io) => {
+    
+
+    const guestIncome = await Guest_income.findAll();
+    const fines = await Fines.findAll();
+    const bookings = await Booking.findAll();
+    const apartments = await ApartmentModel.findAll();
+    const users = await UserModel.findAll()
+
+    const data = {
+        guestIncomes: guestIncome,
+        fines: fines,
+        bookings: bookings,
+        apartments: apartments,
+        users: users
+    };
+
+    socket.emit('dashboard-information', data);
+    socket.on('dashboard-information', data => {
+
+        console.log('data from dashboard', data)
+    });
+
+
+};
+
+
 
 // HTTP
 
@@ -86,5 +108,6 @@ module.exports = {
     getNotification,
     postNotification,
     deleteNotification,
-    notifications
+    notifications,
+    dashboardInformation
 }

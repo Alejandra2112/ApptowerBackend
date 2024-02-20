@@ -6,7 +6,8 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 
 const { Server } = require('socket.io');
-const { notifications } = require('../Controllers/notification.controller');
+const { notifications, dashboardInformation } = require('../Controllers/notification.controller');
+const { putPersonalInformation } = require('../Controllers/users.controller');
 
 
 class Servers {
@@ -72,6 +73,10 @@ class Servers {
     this.routes();
     this.db_connect();
     this.socketConfig();
+
+    // Test
+
+    // this.socketPutUser()
 
   }
 
@@ -182,9 +187,15 @@ class Servers {
 
   socketConfig() {
 
-    this.io.on('connection', (socket) => notifications(socket, this.io))
+    this.io.on('connection', (socket) => {
+
+      notifications(socket, this.io)
+      dashboardInformation(socket, this.io)
+
+    })
 
   }
+
 
   // socketConfig() {
   //   this.io.on('connection', (socket) => {  
