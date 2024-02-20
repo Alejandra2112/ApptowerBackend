@@ -169,7 +169,7 @@ class Servers {
 
     try {
 
-      await sequelize.sync({ force: false }).then(() => {
+      await sequelize.sync({ force: true }).then(() => {
         console.log('Models synchronized with the database');
 
       });

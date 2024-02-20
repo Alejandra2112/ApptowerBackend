@@ -4,6 +4,7 @@ const Permission = require('../Models/permissions.model');
 const rolsPermissions = require('../Models/rolsPermissions.model');
 const Privileges = require('../Models/privileges.model');
 const { Sequelize } = require('sequelize');
+const UserModel = require('../Models/users.model');
 
 const getRols = async (req, res = response) => {
   try {
@@ -58,16 +59,17 @@ const getRolsOne = async (req, res = response) => {
   }
 };
 
-
 const getRolsNameRole = async (req, res = response) => {
   try {
     const { namerole } = req.params;
 
     const rols = await Rols.findOne({
-      where: Sequelize.where(
-        Sequelize.fn('lower', Sequelize.col('namerole')),
-        Sequelize.fn('lower', namerole)
-      )
+      where: {
+        namerole: Sequelize.where(
+          Sequelize.fn('lower', Sequelize.col('namerole')),
+          Sequelize.fn('lower', namerole)
+        )
+      }
     });
 
     if (rols) {
@@ -86,11 +88,12 @@ const getRolsNameRole = async (req, res = response) => {
   }
 }
 
+
 const postRols = async (req, res) => {
   let message = '';
   const { namerole, description, detailsRols } = req.body;
   console.log(detailsRols, 'detailsRols')
-  
+
 
   try {
     if (!detailsRols || !Array.isArray(detailsRols)) {
@@ -168,6 +171,12 @@ const putRols = async (req, res) => {
       }
 
       await rolsPermissions.bulkCreate(resolvedInstances);
+    }
+
+    const updatedStateUser = await UserModel.findAll({ where: { idrole } });
+
+    if (updatedStateUser) {
+      await UserModel.update({ status: others.state }, { where: { idrole } });
     }
 
     return res.json({ message: 'Rol actualizado exitosamente' });

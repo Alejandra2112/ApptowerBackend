@@ -8,7 +8,7 @@ const {
   putGuestIncome,
 
 } = require("../Controllers/guest.income.controller");
-const validations = require("../Middlewares/guestIncome.middleware");
+const {guestIncomeValidations} = require("../Middlewares/guestIncome.middleware");
 
 // const checkPermissions = require("../Middlewares/checkPermission");
 // const verifityToken = require("../Middlewares/verifityToken");
@@ -35,13 +35,15 @@ route.get(
 
 route.post(
   "/",
-  validations.postValidationGuestIncome,
+  // validations.postValidationGuestIncome,
+  guestIncomeValidations,
 //   checkPermissions(privilegesMap.get_guest_income, permissionMap.ingresos),
   postGuestIncome
 ),
   route.put(
     "/",
-    validations.putValidationGuestIncome,
+    // validations.putValidationGuestIncome,
+    guestIncomeValidations,
     // checkPermissions(privilegesMap.put_guest_income, permissionMap.ingresos),
     putGuestIncome
   );

@@ -23,11 +23,11 @@ const Fines = sequelize.define('fines', {
         field: 'payment_date',
     },
     amount: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.DECIMAL(10, 2),
         field: 'amount',
     },
     details: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(500),
         field: 'details',
     },
     idApartment: {
