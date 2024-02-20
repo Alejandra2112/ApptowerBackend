@@ -78,8 +78,6 @@ const getWatchmanDocument = async (req, res = response) => {
     if (!watchman) {
       return res.status(404).json({ error: 'No se encontró un vigilante con ese documento' });
     }
-
-
     res.json({
       watchman,
     });

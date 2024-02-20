@@ -12,6 +12,7 @@ route.get('/email/:email', getEmailUser);
 route.get('/', getUser)
 route.post('/', UserValidationes, postUser)
 route.put('/img', putChangeImg)
+route.put('/password', putPasswordUser)
 route.put('/personalInfo', putPersonalInformation)
 
 route.post('/reset', resetPassword) //cambiar contraseña desde el restablecer contraseña
