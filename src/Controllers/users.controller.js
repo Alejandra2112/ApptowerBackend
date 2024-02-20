@@ -7,6 +7,7 @@ const Watchman = require('../Models/watchmans.model');
 const { upload, updateFile } = require('../Helpers/uploads.helpers');
 const ApartmentResidentModel = require('../Models/apartment.residents.model');
 const Mails = require('../Helpers/Mails');
+const Notification = require('../Models/notification.model');
 
 
 const getUser = async (req, res = response) => {
@@ -262,6 +263,22 @@ const postUser = async (req, res) => {
     if (resident) {
       response.msgResident = "Residente creado";
       response.resident = resident;
+    }
+
+    const notification = await Notification.create({
+
+      iduser: 1,
+      content: `Create el usuario ${user.name} ${user.lastName} con el rol de ${roleData.namerole}`,
+      datetime: new Date(),
+
+    })
+
+    console.log(notification, "notification")
+
+    if (notification) { 
+
+      response.notification = notification;
+
     }
 
     res.json(response);

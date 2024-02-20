@@ -8,22 +8,37 @@ const ApartmentModel = require('../Models/apartment.model');
 
 // Sockets
 const notifications = async (socket, io) => {
-    
-    socket.on('user-logied', async (data) => {
-        if (data?.user?.iduser) {
-            const user = await UserModel.findOne({ where: { iduser: data.user.iduser } });
-            io.emit('user', user);
-        } else {
-            console.error('El ID de usuario es indefinido.');
-        }
-    });
 
-    
+
+    socket.on('user-id', async (id) => {
+
+        console.log('id desde e, front ', id)
+
+        const notificacionesByUser = await Notification.findAll({ where: { iduser: id } });
+
+        console.log(notificacionesByUser, 'Notificaciones de juario')
+
+        
+        io.emit('notifications-user', notificacionesByUser);
+
+
+
+    })
+    // socket.on('user-logied', async (data) => {
+    //     if (data?.user?.iduser) {
+    //         const user = await UserModel.findOne({ where: { iduser: data.user.iduser } });
+    //         io.emit('user', user);
+    //     } else {
+    //         console.error('El ID de usuario es indefinido.');
+    //     }
+    // });
+
+
 };
 
 
 const dashboardInformation = async (socket, io) => {
-    
+
 
     const guestIncome = await Guest_income.findAll();
     const fines = await Fines.findAll();
