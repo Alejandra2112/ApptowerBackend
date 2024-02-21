@@ -193,7 +193,7 @@ const postUser = async (req, res) => {
     const pdfUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
     const imgUrl = req.files !== null ? await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images') : null
 
-    const { pdf, userImg, idEnterpriseSecurity, residentType, idApartment, ...userData } = req.body;
+    const { idUserLogged, pdf, userImg, idEnterpriseSecurity, residentType, idApartment, ...userData } = req.body;
     const salt = bcryptjs.genSaltSync();
     userData.password = bcryptjs.hashSync(userData.password, salt);
 
@@ -267,8 +267,8 @@ const postUser = async (req, res) => {
 
     const notification = await Notification.create({
 
-      iduser: 1,
-      content: `Create el usuario ${user.name} ${user.lastName} con el rol de ${roleData.namerole}`,
+      iduser: idUserLogged,
+      content: `Se creo el usuario ${user.name} ${user.lastName} con el rol de ${roleData.namerole}`,
       datetime: new Date(),
 
     })
