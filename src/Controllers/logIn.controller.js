@@ -6,6 +6,9 @@ const { Op } = require('sequelize');
 const { hotmailTransporter } = require('../Helpers/emailConfig');
 const successRegistrationEmail = require('../Helpers/Mails');
 const Mails = require('../Helpers/Mails');
+const rolsPermissions = require('../Models/rolsPermissions.model');
+const Permissions = require('../Models/permissions.model');
+const Privileges = require('../Models/privileges.model');
 
 const logIn = async (req, res) => {
   const { usuario, password } = req.body;
@@ -35,21 +38,51 @@ const logIn = async (req, res) => {
     const userRoleId = user.idrole;
     console.log("idrole", userRoleId);
 
+
+    /// Obtener permisos y privilegios del rol
+    const roles = await rolsPermissions.findAll({
+      where: { idrole: userRoleId },
+      include: [
+        { model: Permissions },
+        { model: Privileges }
+      ]
+    });
+
+    const PermissionsAndPrivileges = roles.map((role) => ({
+      idpermission: role.idpermission,
+      idprivilege: role.idprivilege,
+    }));
+
+
     const tokenPayload = {
       iduser: user.iduser,
       idrole: userRoleId,
     };
 
+    const userPayload = {
+      iduser: user.iduser,
+      name: user.name,
+      lastName: user.lastName,
+      idrole: userRoleId,
+    };
+
+    const RolePrivilegesPayload = {
+      PermissionsAndPrivileges
+    }
+
+
     const token = jwt.sign(tokenPayload, process.env.MISECRETKEY, {
       expiresIn: '365d',
     });
 
-    res.cookie('token', token);
+    res.cookie('token', token, { httpOnly: false, secure: false });
+    res.cookie('user', JSON.stringify(userPayload), { httpOnly: false, secure: false });
+    res.cookie('permisosAndPrivileges', JSON.stringify(RolePrivilegesPayload), { httpOnly: false, secure: false });
+
 
     res.json({
       message: 'Inicio de sesión exitoso',
-      token,
-      user
+      token
     });
   } catch (error) {
     console.error('Error al iniciar sesión:', error);
