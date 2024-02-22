@@ -190,8 +190,18 @@ const postUsersforLogin = async (req, res) => {
 const postUser = async (req, res) => {
   try {
 
-    const pdfUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
-    const imgUrl = req.files !== null ? await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images') : null
+    let pdfUrl = null;
+    let imgUrl = null;
+
+    if (req.files) {
+      if (req.files.pdf) {
+        pdfUrl = await upload(req.files.pdf, ['pdf'], 'Documents');
+      }
+      if (req.files.userImg) {
+        imgUrl = await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images');
+      }
+    }
+
 
     const { idUserLogged, pdf, userImg, idEnterpriseSecurity, residentType, idApartment, ...userData } = req.body;
     const salt = bcryptjs.genSaltSync();
@@ -266,16 +276,14 @@ const postUser = async (req, res) => {
     }
 
     const notification = await Notification.create({
-
       iduser: idUserLogged,
-      content: `Se creo el usuario ${user.name} ${user.lastName} con el rol de ${roleData.namerole}`,
+      content: JSON.stringify({ mensaje: `Se creo el usuario ${user.name} ${user.lastName} con el rol de ${roleData.namerole}` }),
       datetime: new Date(),
-
     })
 
     console.log(notification, "notification")
 
-    if (notification) { 
+    if (notification) {
 
       response.notification = notification;
 

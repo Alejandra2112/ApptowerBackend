@@ -93,9 +93,17 @@ const getWatchmanDocument = async (req, res = response) => {
 const postWatchman = async (req, res) => {
 
   try {
-    const pdfUrl = req.files !== null ? await upload(req.files.pdf, ['pdf'], 'Documents') : null
-    const imgUrl = req.files !== null ? await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images') : null
+    let pdfUrl = null;
+    let imgUrl = null;
 
+    if (req.files) {
+      if (req.files.pdf) {
+        pdfUrl = await upload(req.files.pdf, ['pdf'], 'Documents');
+      }
+      if (req.files.userImg) {
+        imgUrl = await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images');
+      }
+    }
     const { pdf, userImg, password, name, lastName, email, idEnterpriseSecurity, ...userData } = req.body;
 
     if (!password) {

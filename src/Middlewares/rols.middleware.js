@@ -19,6 +19,8 @@ const putRolSchema = yup.object().shape({
 
   description: yup.string().min(3, 'Debe tener minimo 3 caracteres')
     .max(30, 'Solo puede tener maximo 50 caracteres'),
+
+  state: yup.string().matches(/^(Activo|Inactivo)$/, 'Estado invalido'),
 });
 
 const rolValidations = (req, res, next) => {
