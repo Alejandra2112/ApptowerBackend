@@ -14,7 +14,10 @@ const notifications = async (socket, io) => {
 
         console.log('id desde e, front ', id)
 
-        const notificacionesByUser = await Notification.findAll({ where: { iduser: id } });
+        const notificacionesByUser = await Notification.findAll({ 
+            where: { iduser: id },
+            order: [['createdAt', 'DESC']]
+        });
 
         console.log(notificacionesByUser, 'Notificaciones de juario')
 

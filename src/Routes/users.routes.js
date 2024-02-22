@@ -16,7 +16,7 @@ route.put('/password', putPasswordUser)
 route.put('/personalInfo', putPersonalInformation)
 
 route.post('/reset', resetPassword) //cambiar contraseña desde el restablecer contraseña
-route.put('/:iduser', UserValidationes, putUser)
+route.put('/:iduser', putUser)
 // route.put('/edited', putUser)
 route.post('/email', postUserEmail)
 

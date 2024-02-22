@@ -265,21 +265,31 @@ const postUser = async (req, res) => {
       response.resident = resident;
     }
 
-    const notification = await Notification.create({
+    // Add notifications
 
-      iduser: idUserLogged,
-      content: `Se creo el usuario ${user.name} ${user.lastName} con el rol de ${roleData.namerole}`,
-      datetime: new Date(),
+    if (idUserLogged && user) {
 
-    })
+      const notification = await Notification.create({
 
-    console.log(notification, "notification")
+        iduser: idUserLogged,
+        type: 'success',
+        content: {
+          message: `Se creo el usuario ${user.name} ${user.lastName} con el rol de ${roleData.namerole}`,
+          information: user
+        },
+        datetime: new Date(),
 
-    if (notification) { 
+      })
 
-      response.notification = notification;
+      console.log(notification, "notification")
 
+      if (notification) {
+
+        response.notification = notification;
+
+      }
     }
+
 
     res.json(response);
 
@@ -325,7 +335,7 @@ const putPasswordUser = async (req, res) => {
 
 const putPersonalInformation = async (req, res = response) => {
   try {
-    const { iduser, pdf, ...newData } = req.body;
+    const { idUserLogged, iduser, pdf, ...newData } = req.body;
 
     const user = await UserModel.findOne({ where: { iduser: iduser } });
 
@@ -335,8 +345,6 @@ const putPersonalInformation = async (req, res = response) => {
     if (!user) {
       return res.status(404).json({ msg: 'Usuario no encontrado.' });
     }
-
-    console.log(newPdf)
 
     const updatedUser = await user.update({
       pdf: newPdf,
@@ -350,8 +358,40 @@ const putPersonalInformation = async (req, res = response) => {
       phone: newData.phone,
     });
 
+    // Message confirmation and notification
+
+    let message = `La información personal de ${user.name} ${user.lastName} ha sido actualizada.`
+
+    // Add notification 
+
+    console.log(idUserLogged, 'usuario logueado', updatedUser, 'usuario actualizado')
+
+    if (idUserLogged && updatedUser) {
+
+      const notification = await Notification.create({
+
+        iduser: idUserLogged,
+        type: 'warning',
+        content: {
+          message: message,
+          information: user
+        },
+        datetime: new Date(),
+
+      })
+
+      if (notification) {
+
+        response.notification = notification;
+
+      }
+
+    }
+
+
+
     res.json({
-      msg: "Actualizaste información personal",
+      message: message,
       user: updatedUser
     });
 
@@ -379,17 +419,13 @@ const putChangeImg = async (req, res = response) => {
       req.files ? await updateFile(req.files, user.userImg, ['png', 'jpg', 'jpeg'], 'Images', "userImg") : ""
 
 
-    console.log(user.userImg, "Old img")
-    console.log(newImg, "newImg")
-
-
     const updatedUser = await user.update({
 
       userImg: newImg == "" ? newData.userImg : newImg,
     });
 
     res.json({
-      msg: "Imgen actualizada",
+      message: `Se cambio la imagen de perfil de ${user.name} ${user.lastName}`,
       user: updatedUser
     });
 
@@ -404,7 +440,7 @@ const putChangeImg = async (req, res = response) => {
 const putUser = async (req, res) => {
   try {
     const { iduser } = req.params;
-    const { idrole, status, pdf, idEnterpriseSecurity, residentType, idApartment, ...update } = req.body;
+    const { idUserLogged, idrole, status, pdf, idEnterpriseSecurity, residentType, idApartment, ...update } = req.body;
     console.log(pdf, 'pdf en back')
     const user = await UserModel.findOne({ where: { iduser: iduser } });
 
@@ -494,6 +530,26 @@ const putUser = async (req, res) => {
       }
     } else {
       resident = await ResidentModel.destroy({ where: { iduser: user.iduser } });
+    }
+
+    // Add notifications
+
+    if (idUserLogged && user) {
+
+      const notification = await Notification.create({
+
+        iduser: idUserLogged,
+        type: 'warning',
+        content: {
+          message: `Se modifico usuario ${user.name} ${user.lastName} `,
+          information: user
+        },
+        datetime: new Date(),
+
+      })
+
+      console.log(notification, "notification")
+
     }
 
 
