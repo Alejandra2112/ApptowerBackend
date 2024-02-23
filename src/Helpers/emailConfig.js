@@ -1,13 +1,16 @@
 const nodemailer = require('nodemailer');
 
-const hotmailTransporter = nodemailer.createTransport({
-    service: 'hotmail',
+const GmailTransporter = nodemailer.createTransport({
+    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
     auth: {
-        user: 'apptower@outlook.com',
-        pass: process.env.passwordEmail
+        user: 'domuscomplex.solutions@gmail.com',
+        pass: 'luyk rjbw llro nhxj' || process.env.passwordEmail
     }
 });
 
 module.exports = {
-    hotmailTransporter,
+    GmailTransporter,
 };

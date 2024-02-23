@@ -190,8 +190,18 @@ const postUsersforLogin = async (req, res) => {
 const postUser = async (req, res) => {
   try {
 
-    const pdfUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
-    const imgUrl = req.files !== null ? await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images') : null
+    let pdfUrl = null;
+    let imgUrl = null;
+
+    if (req.files) {
+      if (req.files.pdf) {
+        pdfUrl = await upload(req.files.pdf, ['pdf'], 'Documents');
+      }
+      if (req.files.userImg) {
+        imgUrl = await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images');
+      }
+    }
+
 
     const { idUserLogged, pdf, userImg, idEnterpriseSecurity, residentType, idApartment, ...userData } = req.body;
     const salt = bcryptjs.genSaltSync();
@@ -208,7 +218,7 @@ const postUser = async (req, res) => {
     // if (user) {
     //   const mailOptions = Mails.changedStatusEmail(user.name, user.lastName, user.email);
 
-    //   hotmailTransporter.sendMail(mailOptions, (error, info) => {
+    //   GmailTransporter.sendMail(mailOptions, (error, info) => {
     //     if (error) {
     //       console.error('Error al enviar el correo:', error);
     //       res.status(500).json({ message: 'Error al enviar el correo' });
@@ -471,7 +481,7 @@ const putUser = async (req, res) => {
       }
       // const mailOptions = Mails.changedStatusEmail(user.name, user.lastName, user.email);
 
-      // hotmailTransporter.sendMail(mailOptions, (error, info) => {
+      // GmailTransporter.sendMail(mailOptions, (error, info) => {
       //   if (error) {
       //     console.error('Error al enviar el correo:', error);
       //     res.status(500).json({ message: 'Error al enviar el correo' });

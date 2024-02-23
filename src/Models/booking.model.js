@@ -1,8 +1,7 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
-
-const UserModel = require('./users.model');
 const SpacesModel = require('./spaces.model');
+const ResidentModel = require('./resident.model');
 
 const Booking = sequelize.define('booking', {
   idbooking: {
@@ -17,59 +16,66 @@ const Booking = sequelize.define('booking', {
     required: true,
 
   },
-  iduser: {
+  idResident: {
     type: DataTypes.INTEGER,
-    field: 'iduser',
+    field: 'idResident',
     required: true,
 
   },
-  bookingdate: {
+  StartDateBooking: {
     type: DataTypes.DATE,
-    field: 'bookingdate',
+    field: 'StartDateBooking',
     required: true,
 
   },
-  amount: {
+
+  StartTimeBooking: {
+    type: DataTypes.TIME,
+    field: 'StartTimeBooking',
+    required: true,
+
+  },
+
+  EndDateBooking: {
+    type: DataTypes.DATE,
+    field: 'EndDateBooking',
+    required: true,
+
+  },
+
+  EndTimeBooking: {
+    type: DataTypes.TIME,
+    field: 'EndTimeBooking',
+    required: true,
+
+  },
+
+  amountPeople: {
     type: DataTypes.INTEGER,
-    field: 'amount',
+    field: 'amountPeople',
     required: true,
 
   },
   status: {
-    type: DataTypes.ENUM, values: ['pendiente', 'cancelado', 'activo', 'finalizado', 'por pagar', 'pagado'],
-    required: true,
+    type: DataTypes.STRING,
+    field: 'status',
+    validate: {
+      isIn: [['Por revisar', 'Cancelado', 'Aprobado']],
+    },
+    defaultValue: 'Por revisar',
   },
-  finalDate: {
-    type: DataTypes.DATE,
-    field: 'finalDate',
-    required: true,
 
-  },
 },
-  //AGREGAR CANTIDAD
-  //FECHA FINAL
-  //ESTATUS
-  /* 
-    pendiente
-    cancelado
-    activo
-    finalizado
-
-
-
-    por pagar
-    pagado
-  */
   {
-    timestamps: true,
+    timestamps: false,
   });
 Booking.belongsTo(SpacesModel, {
   foreignKey: 'idSpace',
   targetKey: 'idSpace',
 });
-Booking.belongsTo(UserModel, {
-  foreignKey: 'iduser',
-  targetKey: 'iduser',
+Booking.belongsTo(ResidentModel, {
+  foreignKey: 'idResident',
+  targetKey: 'idResident',
 });
 
 module.exports = Booking;

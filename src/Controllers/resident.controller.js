@@ -11,7 +11,7 @@ const OwnersModel = require('../Models/owners.model');
 const ApartmentOwnerModel = require('../Models/apartment.owners.model');
 const Booking = require('../Models/booking.model');
 
-const { hotmailTransporter } = require('../Helpers/emailConfig');
+const { GmailTransporter } = require('../Helpers/emailConfig');
 const Mails = require('../Helpers/Mails');
 
 const getOneResidents = async (req, res = response) => {

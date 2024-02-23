@@ -1,5 +1,5 @@
 const { response } = require('express');
-const { hotmailTransporter } = require('../Helpers/emailConfig');
+const { GmailTransporter } = require('../Helpers/emailConfig');
 const RecoveryCode = require('../Models/RecoveryCode.model');
 const { Op } = require('sequelize');
 const successRegistrationEmail = require('../Helpers/Mails');
@@ -50,7 +50,7 @@ const postEmailUser = async (req, res = response) => {
 
         const mailOptions = Mails.recorvedPasswordEmail(recoveryCode, email);
 
-        hotmailTransporter.sendMail(mailOptions, (error, info) => {
+        GmailTransporter.sendMail(mailOptions, (error, info) => {
             if (error) {
                 console.error('Error al enviar el correo:', error);
                 res.status(500).json({ message: 'Error al enviar el correo' });

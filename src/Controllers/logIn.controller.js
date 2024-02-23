@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const UserModel = require('../Models/users.model');
 const Rols = require('../Models/rols.model');
 const { Op } = require('sequelize');
-const { hotmailTransporter } = require('../Helpers/emailConfig');
+const { GmailTransporter } = require('../Helpers/emailConfig');
 const successRegistrationEmail = require('../Helpers/Mails');
 const Mails = require('../Helpers/Mails');
 const rolsPermissions = require('../Models/rolsPermissions.model');
@@ -126,7 +126,7 @@ const postUsersforLogin = async (req, res) => {
 
       const mailOptions = Mails.registerSuccessEmail(name, lastName, email);
 
-      hotmailTransporter.sendMail(mailOptions, (error, info) => {
+      GmailTransporter.sendMail(mailOptions, (error, info) => {
         if (error) {
           console.error('Error al enviar el correo:', error);
           res.status(500).json({ message: 'Error al enviar el correo' });
