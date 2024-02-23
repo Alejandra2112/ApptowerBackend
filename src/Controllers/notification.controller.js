@@ -14,15 +14,14 @@ const notifications = async (socket, io) => {
 
         console.log('id desde e, front ', id)
 
-        const notificacionesByUser = await Notification.findAll({ 
-            where: { iduser: id },
+        const allNotifications = await Notification.findAll({ 
             order: [['createdAt', 'DESC']]
         });
 
-        console.log(notificacionesByUser, 'Notificaciones de juario')
+        console.log(allNotifications, 'Notificaciones de juario')
 
         
-        io.emit('notifications-user', notificacionesByUser);
+        io.emit('notifications-user', allNotifications);
 
 
 
@@ -34,7 +33,7 @@ const notifications = async (socket, io) => {
     //     } else {
     //         console.error('El ID de usuario es indefinido.');
     //     }
-    // });
+    // });  
 
 
 };
