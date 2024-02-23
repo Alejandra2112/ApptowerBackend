@@ -218,7 +218,7 @@ const postUser = async (req, res) => {
     // if (user) {
     //   const mailOptions = Mails.changedStatusEmail(user.name, user.lastName, user.email);
 
-    //   hotmailTransporter.sendMail(mailOptions, (error, info) => {
+    //   GmailTransporter.sendMail(mailOptions, (error, info) => {
     //     if (error) {
     //       console.error('Error al enviar el correo:', error);
     //       res.status(500).json({ message: 'Error al enviar el correo' });
@@ -481,7 +481,7 @@ const putUser = async (req, res) => {
       }
       // const mailOptions = Mails.changedStatusEmail(user.name, user.lastName, user.email);
 
-      // hotmailTransporter.sendMail(mailOptions, (error, info) => {
+      // GmailTransporter.sendMail(mailOptions, (error, info) => {
       //   if (error) {
       //     console.error('Error al enviar el correo:', error);
       //     res.status(500).json({ message: 'Error al enviar el correo' });

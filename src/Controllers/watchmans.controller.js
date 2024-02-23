@@ -3,7 +3,7 @@ const Watchman = require('../Models/watchmans.model');
 const UserModel = require('../Models/users.model');
 const Rols = require('../Models/rols.model');
 const bcryptjs = require('bcryptjs')
-const { hotmailTransporter } = require('../Helpers/emailConfig');
+const { GmailTransporter } = require('../Helpers/emailConfig');
 const Mails = require('../Helpers/Mails');
 
 
@@ -144,7 +144,7 @@ const postWatchman = async (req, res) => {
 
     //   const mailOptions = Mails.changedStatusEmail(name, lastName, email);
 
-    //   hotmailTransporter.sendMail(mailOptions, (error, info) => {
+    //   GmailTransporter.sendMail(mailOptions, (error, info) => {
     //     if (error) {
     //       console.error('Error al enviar el correo:', error);
     //       res.status(500).json({ message: 'Error al enviar el correo' });

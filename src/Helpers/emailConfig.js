@@ -7,7 +7,7 @@ const GmailTransporter = nodemailer.createTransport({
     secure: true,
     auth: {
         user: 'domuscomplex.solutions@gmail.com',
-        pass: process.env.passwordEmail || 'luyk rjbw llro nhxj'
+        pass: 'luyk rjbw llro nhxj' || process.env.passwordEmail
     }
 });
 

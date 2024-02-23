@@ -1,7 +1,7 @@
 module.exports = {
     registerSuccessEmail: (name, lastName, email) => {
         return {
-            from: 'apptower@outlook.com',
+            from: 'domuscomplex.solutions@gmail.com',
             to: email,
             subject: 'Confirmación de registro exitoso',
             html: ` <html>
@@ -77,7 +77,7 @@ module.exports = {
 
     changedStatusEmail: (name, lastName, email) => {
         return {
-            from: 'apptower@outlook.com',
+            from: 'domuscomplex.solutions@gmail.com',
             to: email,
             subject: 'Cuenta activada exitosamente',
             html: ` <html>
@@ -148,7 +148,7 @@ module.exports = {
             </div>
         </body>
         </html>`,
-            from: 'apptower@outlook.com',
+            from: 'domuscomplex.solutions@gmail.com',
             to: email,
             subject: 'Cuenta activada exitosamente',
             html: ` <html>
