@@ -10,12 +10,10 @@ const ApartmentModel = require('../Models/apartment.model');
 const notifications = async (socket, io) => {
 
 
-    socket.on('user-id', async (id) => {
 
-        console.log('id desde e, front ', id)
 
         const notificacionesByUser = await Notification.findAll({ 
-            where: { iduser: id },
+            // where: { iduser: id },
             order: [['createdAt', 'DESC']]
         });
 
@@ -26,7 +24,7 @@ const notifications = async (socket, io) => {
 
 
 
-    })
+    
     // socket.on('user-logied', async (data) => {
     //     if (data?.user?.iduser) {
     //         const user = await UserModel.findOne({ where: { iduser: data.user.iduser } });
