@@ -21,6 +21,16 @@ const notifications = async (socket, io) => {
         
         io.emit('notifications-user', allNotifications);
 
+        socket.on('seen-notification', (notification) => {
+
+            console.log('data from seen-notification', notification)
+
+            notification = Notification.update({ seen: true })
+
+            console.log()
+        })        
+
+
 
 
     
