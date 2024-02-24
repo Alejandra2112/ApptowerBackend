@@ -9,37 +9,52 @@ const ApartmentModel = require('../Models/apartment.model');
 // Sockets
 const notifications = async (socket, io) => {
 
+    
+
+
+    const allNotifications = await Notification.findAll({
+        order: [['createdAt', 'DESC']]
+    });
+
+    io.emit('notifications-user', allNotifications);
 
 
 
-        const allNotifications = await Notification.findAll({ 
+    socket.on('seen-notification', async (id) => {
+
+        console.log('data from seen-notification', id)
+
+        const notification = await Notification.findByPk(id);
+
+        console.log(notification, 'Notificacion buscada')
+
+        const notificationUpdated = await notification.update({
+            ...notification,
+            seen: true
+        })
+
+        console.log(notificationUpdated, 'notification updated')
+
+        const allNotifications = await Notification.findAll({
             order: [['createdAt', 'DESC']]
         });
-
-        console.log(allNotifications, 'Notificaciones de juario')
-
-        
+    
+    
         io.emit('notifications-user', allNotifications);
 
-        socket.on('seen-notification', (notification) => {
 
-            console.log('data from seen-notification', notification)
-
-            notification = Notification.update({ seen: true })
-
-            console.log()
-        })        
+    })
 
 
 
 
-    
+
     // socket.on('user-logied', async (data) => {
-    //     if (data?.user?.iduser) {
-    //         const user = await UserModel.findOne({ where: { iduser: data.user.iduser } });
+    //     if (data?.user?.data.idnotificationuser) {
+    //         const user = await UserModel.findOne({ where: { data.idnotificationuser: data.user.data.idnotificationuser } });
     //         io.emit('user', user);
     //     } else {
-    //         console.error('El ID de usuario es indefinido.');
+    //         console.error('El data.idnotification de usuario es indefindata.idnotificationo.');
     //     }
     // });  
 
@@ -105,34 +120,34 @@ const postNotification = async (req, res) => {
     });
 }
 
-const deleteNotification = async (req, res = response) => {
-    const body = req.body;
-    let message = '';
+// const deleteNotification = async (req, res = response) => {
+//     const body = req.body;
+//     let message = '';
 
-    try {
-        const { idnotification } = body;
+//     try {
+//         const { data.idnotificationnotification } = body;
 
-        const deletedRows = await Notification.destroy({
-            where: { idnotification: idnotification },
-        });
+//         const deletedRows = await Notification.destroy({
+//             where: { data.idnotificationnotification: data.idnotificationnotification },
+//         });
 
-        if (deletedRows > 0) {
-            message = 'Notificación eliminada exitosamente.';
-        } else {
-            message = 'No se encontró una notificación con ese ID';
-        }
-    } catch (error) {
-        message = 'Error al eliminar notificación: ' + error.message;
-    }
-    res.json({
-        notification: message,
-    });
-}
+//         if (deletedRows > 0) {
+//             message = 'Notificación eliminada exitosamente.';
+//         } else {
+//             message = 'No se encontró una notificación con ese data.idnotification';
+//         }
+//     } catch (error) {
+//         message = 'Error al eliminar notificación: ' + error.message;
+//     }
+//     res.json({
+//         notification: message,
+//     });
+// }
 
 module.exports = {
     getNotification,
     postNotification,
-    deleteNotification,
+    // deleteNotification,
     notifications,
     dashboardInformation
 }

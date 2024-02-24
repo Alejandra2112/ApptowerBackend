@@ -33,11 +33,11 @@ const getOneResidents = async (req, res = response) => {
 
         );
 
-        console.log(resident)
+        console.log(resident, 'resident')
 
         const bookings = await Booking.findAll({
 
-            where: { iduser: iduser }
+            where: { idResident: resident.idResident }
         })
 
         const apartmentResidents = await ApartmentResidentModel.findAll({
@@ -64,8 +64,6 @@ const getOneResidents = async (req, res = response) => {
         if (!resident) {
             return res.status(404).json({ error: 'Id residente no esta encontrado' });
         }
-
-
 
         res.json({
 

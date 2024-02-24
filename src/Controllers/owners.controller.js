@@ -9,6 +9,7 @@ const bcryptjs = require('bcryptjs');
 const UserModel = require('../Models/users.model');
 const ApartmentModel = require('../Models/apartment.model');
 const Rols = require('../Models/rols.model');
+const Notification = require('../Models/notification.model');
 
 
 
@@ -27,7 +28,7 @@ const getOneOwner = async (req, res = response) => {
         const apartmentOwners = await ApartmentOwnerModel.findAll({
 
             where: { idOwner: idOwner },
-            
+
         })
 
         const apartments = await ApartmentModel.findAll();
@@ -52,7 +53,7 @@ const getOneOwner = async (req, res = response) => {
             owner,
             apartments: data
         });
-        
+
     } catch (error) {
         console.error('Error to get owner.', error);
         res.status(500).json({
@@ -110,7 +111,7 @@ const postOwner = async (req, res) => {
         const pdfUrl = await upload(req.files.pdf, ['pdf'], 'Documents')
         const imgUrl = await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images')
 
-        const { pdf, isResident, ...userData } = req.body;
+        const { idUserLogged, pdf, isResident, ...userData } = req.body;
 
         const salt = bcryptjs.genSaltSync();
         userData.password = bcryptjs.hashSync(userData.password, salt);
@@ -141,6 +142,7 @@ const postOwner = async (req, res) => {
         }) : ""
 
         let resident = null;
+        let apartment;
 
         if (isResident === true || isResident === "true") {
 
@@ -159,13 +161,45 @@ const postOwner = async (req, res) => {
                 residentStartDate: new Date()
             })
 
+            apartment = await ApartmentModel.findByPk(userData.idApartment)
+
         }
+
 
         const roleData = await Rols.findByPk(userData.idrole);
 
+        const userLogged = await UserModel.findByPk(idUserLogged)
+
+        let notification;
+
+        if (idUserLogged && user) {
+
+            notification = await Notification.create({
+
+                iduser: idUserLogged,
+                type: 'success',
+                content: {
+                    message: `Se agrego un nuevo propietario ${user.name} ${user.lastName}
+                     ${apartment ? `al apartamento ${apartment.apartmentName}` : ''}
+                    `,
+                    information: { user, userLogged }
+                },
+                datetime: new Date(),
+
+            })
+
+            console.log(notification, "notification")
+
+            if (notification) {
+
+                response.notification = notification;
+
+            }
+        }
+
         res.json({
 
-            msgUser: "Usuario creado",
+            message: notification.content.message,
             user,
             role: roleData,
             msgResident: "Residente creado",
