@@ -94,15 +94,19 @@ const postVehicle = async (req, res) => {
 const putVehicle = async (req, res = response) => {
 
     try {
-        console.log('aqui ediamos vehiculo')
-
         const body = req.body;
 
         const { idvehicle, Updating } = body;
 
-        const vehicle = await Vehicle.update(Updating, {
-            where: { idvehicle: idvehicle },
+        const vehicle = await Vehicle.findOne({
+            where: { idvehicle: idvehicle }
         });
+
+        if (!vehicle) {
+            return res.status(404).json({ error: 'El vehículo no fue encontrado.' });
+        }
+
+        await vehicle.update(Updating);
 
         // Notification
 
@@ -130,6 +134,12 @@ const putVehicle = async (req, res = response) => {
             })
 
         }
+
+        res.json({
+
+            message: notification.content.message,
+
+        });
 
 
     } catch (error) {
