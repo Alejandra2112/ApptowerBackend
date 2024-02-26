@@ -3,6 +3,7 @@ const ApartmentOwnerModel = require('../Models/apartment.owners.model');
 const OwnersModel = require('../Models/owners.model');
 const ApartmentModel = require('../Models/apartment.model');
 const UserModel = require('../Models/users.model');
+const Notification = require('../Models/notification.model');
 
 const getOneApartmentOwners = async (req, res = response) => {
     try {
@@ -12,7 +13,7 @@ const getOneApartmentOwners = async (req, res = response) => {
             where: { idApartment: idApartment },
         });
 
-        
+
         const apartments = await ApartmentModel.findAll();
 
         const owners = await OwnersModel.findAll();
@@ -68,7 +69,7 @@ const getAllApartmentOwners = async (req, res) => {
 
             const apartment = apartments.find(apartment => apartment.idApartment === ao.idApartment);
             const owner = owners.find(ow => ow.idOwner === ao.idOwner);
-            
+
             return {
                 ...ao.dataValues,
                 apartment,
@@ -98,32 +99,69 @@ const postApartmentOwner = async (req, res) => {
     let message = '';
     const body = req.body;
 
-    console.log(body)
+    console.log(body, 'body')
 
     try {
 
         await ApartmentOwnerModel.create(body);
-        message = 'Apartment owner create';
 
-    } catch (e) {
+        const owner = await OwnersModel.findOne({
 
-        message = e.message;
+            where: { idOwner: body.idOwner },
+            include: [{
+                model: UserModel,
+                as: 'user'
+            }]
 
+        })
+
+        const userLogged = await UserModel.findByPk(body.idUserLogged)
+
+        let notification;
+        let apartment = await ApartmentModel.findByPk(body.idApartment)
+
+
+        if (body.idUserLogged && userLogged) {
+
+            notification = await Notification.create({
+
+                iduser: body.idUserLogged,
+                type: 'success',
+                content: {
+                    message: `Se asigno a ${owner.user.name} ${owner.user.lastName}
+                     ${apartment ? `como propietario del apartamento ${apartment.apartmentName}` : ''}
+                    `,
+                    information: { user: owner.user, userLogged, apartment }
+                },
+                datetime: new Date(),
+
+            })
+
+            console.log(notification, "notification")
+
+        }
+
+        res.json({
+
+            message: notification.content.message,
+            apartmentOwners: message,
+
+        });
+
+    } catch (error) {
+        console.error('Error al asignar apartamento al propretario:', error);
+        return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
     }
-    res.json({
 
-        apartmentOwners: message,
-
-    });
 };
 
 
 const putApartmentOwner = async (req, res = response) => {
 
-    const body = req.body;
-    let message = '';
 
     try {
+
+        const body = req.body;
 
         const { idApartmentOwner, ...update } = body;
 
@@ -133,26 +171,57 @@ const putApartmentOwner = async (req, res = response) => {
 
         });
 
-        if (updatedRows > 0) {
+        // Notification
 
-            message = 'Apartment owner assigned to space ok.';
+        const userLogged = await UserModel.findByPk(body.idUserLogged)
 
-        } else {
+        let notification;
 
-            message = 'Id apartment owner not found';
+        const owner = await OwnersModel.findOne({
+
+            where: { idOwner: body.idOwner },
+            include: [{
+                model: UserModel,
+                as: 'user'
+            }]
+
+        })
+
+        let apartment = await ApartmentModel.findByPk(body.idApartment)
+
+
+        if (body.idUserLogged && userLogged) {
+
+            notification = await Notification.create({
+
+                iduser: body.idUserLogged,
+                type: 'warning',
+                content: {
+                    message: `Se modifico la propiedad de ${owner.user.name} ${owner.user.lastName}
+                     ${apartment ? `como propietario del apartamento ${apartment.apartmentName}` : ''}
+                    `,
+                    information: { userLogged, apartment }
+                },
+                datetime: new Date(),
+
+            })
+
+            console.log(notification, "notification")
 
         }
 
+        res.json({
+
+            message: notification.content.message,
+
+        });
+
+
     } catch (error) {
-
-        message = 'Error update space owner' + error.message;
-
+        console.error('Error al modificar apartamento al propretario:', error);
+        return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
     }
-    res.json({
 
-        apartmentOwners: message,
-
-    });
 };
 
 
