@@ -3,6 +3,8 @@ const AssignedParkingModel = require('../Models/assigned.parking.model');
 const ParkingSpaceModel = require('../Models/parking.spaces.model');
 const SpaceModel = require('../Models/spaces.model');
 const ApartmentModel = require('../Models/apartment.model');
+const Notification = require('../Models/notification.model');
+const UserModel = require('../Models/users.model');
 
 const getApartmentWithAssignedParking = async (req, res = response) => {
     try {
@@ -30,7 +32,7 @@ const getApartmentWithAssignedParking = async (req, res = response) => {
 
         res.json({
             assignedParking: data,
-        }); 
+        });
     } catch (error) {
         console.error('Error to get apartment.', error);
         res.status(500).json({
@@ -84,36 +86,68 @@ const getAllAssignedParking = async (req, res) => {
 
 const postAssignedParking = async (req, res) => {
 
-
-    let message = '';
-    const body = req.body;
-
-    console.log(body)
-
     try {
 
-        await AssignedParkingModel.create(body);
-        message = 'Parking space create';
+        const body = req.body;
 
-    } catch (e) {
+        const parkingAssigned = await AssignedParkingModel.create(body);
 
-        message = e.message;
 
+        // Notification
+
+        const userLogged = await UserModel.findByPk(body.idUserLogged)
+
+        let notification;
+
+        const parking = await ParkingSpaceModel.findOne({
+
+            where: { idParkingSpace: body.idParkingSpace },
+
+        })
+
+        let apartment = await ApartmentModel.findByPk(body.idApartment)
+
+
+        if (body.idUserLogged && userLogged) {
+
+            notification = await Notification.create({
+
+                iduser: body.idUserLogged,
+                type: 'success',
+                content: {
+                    message: `Se asigno el parqueadero ${parking.parkingName}
+                      ${apartment ? `al apartamento ${apartment.apartmentName}` : ''}
+                     `,
+                    information: { userLogged, apartment }
+                },
+                datetime: new Date(),
+
+            })
+
+            console.log(notification, "notification")
+
+        }
+
+        res.json({
+
+            message: notification.content.message,
+
+        });
+
+    } catch (error) {
+        console.error('Error al asignar parqueadero al apartamento:', error);
+        return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
     }
-    res.json({
 
-        assignedParkings: message,
-
-    });
 };
 
 
 const putAssignedParking = async (req, res = response) => {
 
-    const body = req.body;
-    let message = '';
 
     try {
+
+        const body = req.body;
 
         const { idAssignedParking, ...update } = body;
 
@@ -123,27 +157,55 @@ const putAssignedParking = async (req, res = response) => {
 
         });
 
-        if (updatedRows > 0) {
+        // Notification
 
-            message = 'Parking spaces assigned to space ok.';
+        const userLogged = await UserModel.findByPk(body.idUserLogged)
 
-        } else {
+        let notification;
 
-            message = 'Id Assigned parking not found';
+        const parking = await ParkingSpaceModel.findOne({
+
+            where: { idParkingSpace: body.idParkingSpace },
+
+        })
+
+        let apartment = await ApartmentModel.findByPk(body.idApartment)
+
+
+        if (body.idUserLogged && userLogged) {
+
+            notification = await Notification.create({
+
+                iduser: body.idUserLogged,
+                type: 'warning',
+                content: {
+                    message: `Se re asigno el parqueadero ${parking.parkingName}
+                     ${apartment ? `al apartamento ${apartment.apartmentName}` : ''}
+                    `,
+                    information: { userLogged, apartment }
+                },
+                datetime: new Date(),
+
+            })
+
+            console.log(notification, "notification")
 
         }
 
+        res.json({
+
+            message: notification.content.message,
+
+        });
+
+
+
     } catch (error) {
-
-        message = 'Error update assigned parking' + error.message;
-
+        console.error('Error al modificar asignacion de parqueadero al apartamento:', error);
+        return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
     }
-    res.json({
 
-        assignedParkings: message,
-
-    });
-};
+}
 
 
 const deleteAssignedParking = async (req, res) => {

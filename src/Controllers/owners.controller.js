@@ -182,7 +182,7 @@ const postOwner = async (req, res) => {
                     message: `Se agrego un nuevo propietario ${user.name} ${user.lastName}
                      ${apartment ? `al apartamento ${apartment.apartmentName}` : ''}
                     `,
-                    information: { user, userLogged }
+                    information: { user, userLogged, owner }
                 },
                 datetime: new Date(),
 

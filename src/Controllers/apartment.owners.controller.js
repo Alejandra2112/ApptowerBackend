@@ -107,7 +107,7 @@ const postApartmentOwner = async (req, res) => {
 
         const owner = await OwnersModel.findOne({
 
-            where: {idOwner: body.idOwner},
+            where: { idOwner: body.idOwner },
             include: [{
                 model: UserModel,
                 as: 'user'
@@ -131,7 +131,7 @@ const postApartmentOwner = async (req, res) => {
                     message: `Se asigno a ${owner.user.name} ${owner.user.lastName}
                      ${apartment ? `como propietario del apartamento ${apartment.apartmentName}` : ''}
                     `,
-                    information: { user: owner.user, userLogged }
+                    information: { user: owner.user, userLogged, apartment }
                 },
                 datetime: new Date(),
 
@@ -145,23 +145,23 @@ const postApartmentOwner = async (req, res) => {
 
             message: notification.content.message,
             apartmentOwners: message,
-    
+
         });
 
     } catch (error) {
         console.error('Error al asignar apartamento al propretario:', error);
         return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
-      }
-    
+    }
+
 };
 
 
 const putApartmentOwner = async (req, res = response) => {
 
-    const body = req.body;
-    let message = '';
 
     try {
+
+        const body = req.body;
 
         const { idApartmentOwner, ...update } = body;
 
@@ -171,26 +171,57 @@ const putApartmentOwner = async (req, res = response) => {
 
         });
 
-        if (updatedRows > 0) {
+        // Notification
 
-            message = 'Apartment owner assigned to space ok.';
+        const userLogged = await UserModel.findByPk(body.idUserLogged)
 
-        } else {
+        let notification;
 
-            message = 'Id apartment owner not found';
+        const owner = await OwnersModel.findOne({
+
+            where: { idOwner: body.idOwner },
+            include: [{
+                model: UserModel,
+                as: 'user'
+            }]
+
+        })
+
+        let apartment = await ApartmentModel.findByPk(body.idApartment)
+
+
+        if (body.idUserLogged && userLogged) {
+
+            notification = await Notification.create({
+
+                iduser: body.idUserLogged,
+                type: 'warning',
+                content: {
+                    message: `Se modifico la propiedad de ${owner.user.name} ${owner.user.lastName}
+                     ${apartment ? `como propietario del apartamento ${apartment.apartmentName}` : ''}
+                    `,
+                    information: { userLogged, apartment }
+                },
+                datetime: new Date(),
+
+            })
+
+            console.log(notification, "notification")
 
         }
 
+        res.json({
+
+            message: notification.content.message,
+
+        });
+
+
     } catch (error) {
-
-        message = 'Error update space owner' + error.message;
-
+        console.error('Error al modificar apartamento al propretario:', error);
+        return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
     }
-    res.json({
 
-        apartmentOwners: message,
-
-    });
 };
 
 

@@ -10,15 +10,13 @@ const ApartmentModel = require('../Models/apartment.model');
 const notifications = async (socket, io) => {
 
     
-
-
     const allNotifications = await Notification.findAll({
         order: [['createdAt', 'DESC']]
     });
 
     io.emit('notifications-user', allNotifications);
 
-
+    
 
     socket.on('seen-notification', async (id) => {
 
