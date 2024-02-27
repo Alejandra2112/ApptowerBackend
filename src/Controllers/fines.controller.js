@@ -3,6 +3,8 @@ const ApartmentModel = require('../Models/apartment.model');
 const UsersModel = require('../Models/users.model');
 const { response } = require('express');
 const { upload, updateFile } = require('../Helpers/uploads.helpers');
+const UserModel = require('../Models/users.model');
+const Notification = require('../Models/notification.model');
 
 const getFinesAll = async (req, res = response) => {
     try {
@@ -12,7 +14,7 @@ const getFinesAll = async (req, res = response) => {
                     model: ApartmentModel,
                     as: 'apartment',
                 },
-                    { model: UsersModel, as: 'user' },
+                { model: UsersModel, as: 'user' },
             ],
         });
 
@@ -36,12 +38,13 @@ const getFinesOne = async (req, res = response) => {
         const { idfines } = req.params;
 
         const fines = await Fines.findOne(
-            { where:
-                { idfines: idfines }, 
+            {
+                where:
+                    { idfines: idfines },
                 include: [
                     { model: ApartmentModel, as: 'apartment' },
                     { model: UsersModel, as: 'user' },
-                ] 
+                ]
             });
 
         if (!fines) {
@@ -63,8 +66,10 @@ const getFinesByApartment = async (req, res = response) => {
     try {
         const { idApartment } = req.params;
 
-        const fines = await Fines.findAll({ where: { idApartment: idApartment }, include: [{ model: ApartmentModel, as: 'apartment' },
-        { model: UsersModel, as: 'user' },] });
+        const fines = await Fines.findAll({
+            where: { idApartment: idApartment }, include: [{ model: ApartmentModel, as: 'apartment' },
+            { model: UsersModel, as: 'user' },]
+        });
 
         if (!fines) {
             return res.status(404).json({ error: 'No se encontró una multa con ese ID' });
@@ -85,33 +90,68 @@ const getFinesByApartment = async (req, res = response) => {
 
 const postFines = async (req, res) => {
     let message = '';
-    
+
 
     try {
         const images = req.files.evidenceFiles;
         console.log("Tamaño", images ? images.length : 0); // Maneja el caso de un solo archivo
         const imagesArray = Array.isArray(images) ? images : [images];
-        const imagesUrl = await Promise.all(imagesArray.map(async(file)  => await upload(file, ['pdf','jpg','jpeg','png'], 'Evidences')))
+        const imagesUrl = await Promise.all(imagesArray.map(async (file) => await upload(file, ['pdf', 'jpg', 'jpeg', 'png'], 'Evidences')))
         console.log(imagesUrl);
-        const {evidenceFiles, ...finesAtributes } = req.body;
-        await Fines.create({
+
+
+        const { idUserLogged, idApartment, videnceFiles, ...finesAtributes } = req.body;
+        const fine = await Fines.create({
             evidenceFiles: imagesUrl,
+            idApartment: idApartment,
             ...finesAtributes,
         });
-        message = 'Multa Registrada Exitosamente';
-    } catch (e) {
-        message = e.message;
+
+        // Notification
+
+        const userLogged = await UserModel.findByPk(idUserLogged)
+
+        let notification;
+
+        let apartment = await ApartmentModel.findByPk(idApartment)
+
+
+        if (idUserLogged && userLogged) {
+
+            notification = await Notification.create({
+
+                iduser: idUserLogged,
+                type: 'success',
+                content: {
+                    message: `Se multo al apartamento ${apartment.apartmentName}
+                    por motivo de ${fine.fineType}`,
+                    information: { userLogged, fine }
+                },
+                datetime: new Date(),
+
+            })
+
+        }
+
+        res.json({
+
+            message: notification.content.message,
+
+        });
+
+
+    } catch (error) {
+        console.error('Error al crear multa:', error);
+        return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
     }
-    res.json({
-        fines: message,
-    });
+
 };
 
 
 const putFines = async (req, res = response) => {
     try {
-        const { idfines, state} = req.body;
-        console.log("Esto es lo que se envia body"+req.body)
+        const { idfines, state } = req.body;
+        console.log("Esto es lo que se envia body" + req.body)
 
         const fine = await Fines.findOne({ where: { idfines: idfines } });
 

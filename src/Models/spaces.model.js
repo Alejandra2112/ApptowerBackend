@@ -39,6 +39,12 @@ const SpacesModel = sequelize.define('Spaces', {
 
     },
 
+    schedule: {
+        type: DataTypes.JSON,
+        field: 'schedule',
+        allowNull: true,
+    },
+
     capacity: {
         type: DataTypes.INTEGER,
         field: 'capacity',

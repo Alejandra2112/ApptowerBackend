@@ -4,6 +4,7 @@ const ApartmentResidentModel = require('../Models/apartment.residents.model');
 const ApartmentModel = require('../Models/apartment.model');
 const UserModel = require('../Models/users.model');
 const TowerModel = require('../Models/tower.model');
+const Notification = require('../Models/notification.model');
 
 const getOneApartmentResidents = async (req, res = response) => {
     try {
@@ -139,28 +140,62 @@ const getApartmentsResidents = async (req, res = response) => {
 
 const postApartmentResident = async (req, res) => {
 
-    
-
-    let message = '';
-    const body = req.body;
-
-    console.log(body)
 
     try {
 
+
+        const body = req.body;
+
+        console.log(body)
+
         await ApartmentResidentModel.create(body);
-        message = 'Add resident to apartment.';
 
-    } catch (e) {
+        const resident = await ResidentsModel.findOne({
 
-        message = e.message;
+            where: { idResident: body.idResident },
+            include: [{
+                model: UserModel,
+                as: 'user'
+            }]
 
+        })
+
+        // Notification
+
+        const userLogged = await UserModel.findByPk(body.idUserLogged)
+
+        let notification;
+        let apartment = await ApartmentModel.findByPk(body.idApartment)
+
+
+        if (body.idUserLogged && userLogged) {
+
+            notification = await Notification.create({
+
+                iduser: body.idUserLogged,
+                type: 'success',
+                content: {
+                    message: `Se agrego a ${resident.user.name} ${resident.user.lastName}
+                     ${apartment ? `como residente del apartamento ${apartment.apartmentName}` : ''}
+                    `,
+                    information: { user: resident.user, userLogged, apartment }
+                },
+                datetime: new Date(),
+
+            })
+        }
+
+        res.json({
+
+            message: notification.content.message,
+
+        });
+
+    } catch (error) {
+        console.error('Error al asignar residente al apartamento:', error);
+        return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
     }
-    res.json({
 
-        apartmentResidents: message,
-
-    });
 };
 
 
@@ -176,27 +211,60 @@ const putApartmentResident = async (req, res = response) => {
             where: { idApartmentResident: idApartmentResident },
         });
 
-        if (updatedRows > 0) {
+        // Notification
 
-            message = 'Aparment resident update ok';
+        const userLogged = await UserModel.findByPk(body.idUserLogged)
 
-        } else {
+        let notification;
 
-            message = 'Id apartment resident is not found';
+        const resident = await ResidentsModel.findOne({
+
+            where: { idResident: body.idResident },
+            include: [{
+                model: UserModel,
+                as: 'user'
+            }]
+
+        })
+
+        let apartment = await ApartmentModel.findByPk(body.idApartment)
+
+
+        if (body.idUserLogged && userLogged) {
+
+            notification = await Notification.create({
+
+                iduser: body.idUserLogged,
+                type: 'warning',
+                content: {
+                    message: `Se modifico residencia de ${resident.user.name} ${resident.user.lastName}
+                     ${apartment ? `como residente del apartamento ${apartment.apartmentName}` : ''}
+                    `,
+                    information: { userLogged, apartment }
+                },
+                datetime: new Date(),
+
+            })
+
+            console.log(notification, "notification")
 
         }
 
+        res.json({
+
+            message: notification.content.message,
+
+        });
+
+
+
     } catch (error) {
-
-        message = 'Error update apartment: ' + error.message;
-
+        console.error('Error al modificar residente del apartamento:', error);
+        return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
     }
-    res.json({
 
-        apartmentResidents: message,
+}
 
-    });
-};
 
 
 const deleteApartmentResident = async (req, res) => {

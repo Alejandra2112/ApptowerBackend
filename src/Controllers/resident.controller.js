@@ -13,6 +13,7 @@ const Booking = require('../Models/booking.model');
 
 const { GmailTransporter } = require('../Helpers/emailConfig');
 const Mails = require('../Helpers/Mails');
+const Notification = require('../Models/notification.model');
 
 const getOneResidents = async (req, res = response) => {
     try {
@@ -33,11 +34,11 @@ const getOneResidents = async (req, res = response) => {
 
         );
 
-        console.log(resident)
+        console.log(resident, 'resident')
 
         const bookings = await Booking.findAll({
 
-            where: { iduser: iduser }
+            where: { idResident: resident.idResident }
         })
 
         const apartmentResidents = await ApartmentResidentModel.findAll({
@@ -64,8 +65,6 @@ const getOneResidents = async (req, res = response) => {
         if (!resident) {
             return res.status(404).json({ error: 'Id residente no esta encontrado' });
         }
-
-
 
         res.json({
 
@@ -141,7 +140,7 @@ const postResident = async (req, res) => {
         const pdfUrl = req.files !== null ? await upload(req.files.pdf, ['pdf'], 'Documents') : null
         const imgUrl = req.files !== null ? await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images') : null
 
-        const { pdf, idApartment, ...userData } = req.body;
+        const { idUserLogged, pdf, idApartment, ...userData } = req.body;
         console.log(userData, 'userData en back')
 
         const salt = bcryptjs.genSaltSync();
@@ -176,21 +175,40 @@ const postResident = async (req, res) => {
 
         const roleData = await Rols.findByPk(userData.idrole);
 
+        
+        const userLogged = await UserModel.findByPk(idUserLogged)
+
+        let notification;
+        let apartment = await ApartmentModel.findByPk(idApartment)
+
+
+        if (idUserLogged && userLogged) {
+
+            notification = await Notification.create({
+
+                iduser: idUserLogged,
+                type: 'success',
+                content: {
+                    message: `Se agrego un nuevo residencia  ${user.name} ${user.lastName}
+                     ${apartment ? ` al apartamento ${apartment.apartmentName}` : ''}
+                    `,
+                    information: { userLogged, resident }
+                },
+                datetime: new Date(),
+
+            })
+        }
+
         res.json({
 
-            msgUser: "Usuario creado",
-            user,
-            role: roleData,
-            msgResident: "Residente creado",
-            resident,
-            apartmentResident
-        })
+            message: notification.content.message,
 
+        });
 
 
 
     } catch (error) {
-        console.error('Error al crear usuario:', error);
+        console.error('Error al crear residente:', error);
         console.error(error.stack); // This will print the stack trace
         return res.status(500).json({ message: 'Error interno del servidor hola', error: error.message });
     }
@@ -204,18 +222,17 @@ const putResident = async (req, res = response) => {
 
     try {
 
-        const { idResident, idApartment, ...residentAtributes } = req.body
+        const { idUserLogged, idResident, idApartment, ...residentAtributes } = req.body
 
 
         const resident = await ResidentModel.findOne(
             {
                 where: { idResident: idResident },
 
-                // include: [{
-
-                //     model: UserModel,
-                //     as: "user"
-                // }]
+                include: [{
+                    model: UserModel,
+                    as: 'user'
+                }]
             }
 
         );
@@ -261,12 +278,36 @@ const putResident = async (req, res = response) => {
 
         });
 
+        // Notifications
+
+        const userLogged = await UserModel.findByPk(idUserLogged)
+
+        let notification;
+        let apartment = await ApartmentModel.findByPk(idApartment)
+
+
+        if (idUserLogged && userLogged) {
+
+            notification = await Notification.create({
+
+                iduser: idUserLogged,
+                type: 'warning',
+                content: {
+                    message: `Se modifico la residencia de ${resident.user.name} ${resident.user.lastName}
+                     ${apartment ? `en el apartamento ${apartment.apartmentName}` : ''}
+                    `,
+                    information: { userLogged, apartment }
+                },
+                datetime: new Date(),
+
+            })
+        }
+
         res.json({
 
-            resident: updatedResident,
-            newOwner
+            message: notification.content.message,
 
-        })
+        });
 
 
     } catch (error) {

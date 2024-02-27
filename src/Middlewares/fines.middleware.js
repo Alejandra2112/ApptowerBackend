@@ -8,6 +8,8 @@ const postFinesSchema = yup.object().shape({
     amount: yup.number().required('Se requiere el monto de la multa'),
     idApartment: yup.number().required('Se requiere el id del apartamento'),
     state: yup.string().required('Se requiere el estado de la multa'),
+    details: yup.string().required('Se requiere una descripcion de incidente')
+
 });
 
 const putFinesSchema = yup.object().shape({
