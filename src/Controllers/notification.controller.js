@@ -12,28 +12,28 @@ const notifications = async (socket, io) => {
 
 
 
-        const allNotifications = await Notification.findAll({ 
-            order: [['createdAt', 'DESC']]
-        });
+    const allNotifications = await Notification.findAll({
+        order: [['createdAt', 'DESC']]
+    });
 
-        console.log(allNotifications, 'Notificaciones de juario')
-
-        
-        io.emit('notifications-user', allNotifications);
-
-        socket.on('seen-notification', (notification) => {
-
-            console.log('data from seen-notification', notification)
-
-            notification = Notification.update({ seen: true })
-
-            console.log()
-        })        
+    console.log(allNotifications, 'Notificaciones de juario')
 
 
+    io.emit('notifications-user', allNotifications);
+
+    socket.on('seen-notification', (notification) => {
+
+        console.log('data from seen-notification', notification)
+
+        notification = Notification.update({ seen: true })
+
+        console.log()
+    })
 
 
-    
+
+
+
     // socket.on('user-logied', async (data) => {
     //     if (data?.user?.iduser) {
     //         const user = await UserModel.findOne({ where: { iduser: data.user.iduser } });

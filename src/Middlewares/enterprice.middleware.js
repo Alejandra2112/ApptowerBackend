@@ -11,8 +11,8 @@ const postEnterpriceSchema = yup.object().shape({
         .max(13, 'Solo puede tener maximo 13 caracteres'),
 
     address: yup.string().required("La dirección es requerida")
-        .min(10, 'Debe tener minimo 10 caracteres')
-        .max(20, 'Solo puede tener maximo 50 caracteres'),
+        .min(5, 'Debe tener minimo 5 caracteres')
+        .max(20, 'Solo puede tener maximo 20 caracteres'),
 
     phone: yup.string().required("El telefono es requerido")
         .min(10, 'Debe tener minimo 10 caracteres')
