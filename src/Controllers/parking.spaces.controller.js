@@ -84,42 +84,7 @@ const getAllParkingSpace = async (req, res = response) => {
 const postParkingSpace = async (req, res) => {
 
 
-    // let message = '';
-    // const { floor, parkingPerFloor, status, ...parkingAtributes} = req.body;
 
-    // console.log(parkingPerFloor)   
-
-    // try {
-
-    //     let newParkingscreated = 0;
-
-    //     for (let parking = 1; parking <= parkingPerFloor; parking ++ ) {
-
-    //         await ParkingSpacesModel.create( {
-    //             parkingName: (parking < 10) ? `${floor}0${parking}` : `${floor}${parking}`,
-    //             status: "Active",
-    //             ...parkingAtributes
-
-    //         });
-    //         newParkingscreated ++
-
-    //     }
-
-    //     message = `Se crearon ${newParkingscreated} parqueaderos nuevos.`;
-
-
-
-
-    // } catch (e) {
-
-    //     message = e.message;
-
-    // }
-    // res.json({
-
-    //     parkingSpaces: message,
-
-    // });
 
     try {
 
@@ -142,7 +107,7 @@ const postParkingSpace = async (req, res) => {
 
         res.json({
 
-            parkingSpaces: message,
+            message: message,
 
         });
 
@@ -170,6 +135,7 @@ const putParkingSpace = async (req, res = response) => {
             where: { idParkingSpace: idParkingSpace },
         });
 
+
         if (updatedRows > 0) {
 
             message = 'Parking spaces update ok';
@@ -179,13 +145,15 @@ const putParkingSpace = async (req, res = response) => {
             message = 'Id parking space not found';
 
         }
+
+        
     } catch (error) {
 
         message = 'Error update parking space' + error.message;
 
     }
     res.json({
-        parkingSpaces: message,
+        message: 'Se modifico el parqueadero.',
     });
 };
 
