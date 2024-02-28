@@ -25,6 +25,8 @@ const getGuestIncomeParking = async (req, res = response) => {
 const getGuestIncomeParkingOne = async (req, res = response) => {
     try {
         const { idGuestIncomeParking } = req.params;
+        
+        console.log('idGuestIncomeParking:', idGuestIncomeParking);
 
         const guestIncomeParking = await GuestIncomeParking.findOne({
             where: { idGuestIncomeParking: idGuestIncomeParking },
@@ -43,7 +45,7 @@ const getGuestIncomeParkingOne = async (req, res = response) => {
         });
     } catch (error) {
         res.status(500).json({
-            error: 'Error al obtener el parqueadero del ingreso',
+            error: 'Error al obtener el parqueadero del ingreso', msg: error.message,
         });
     }
 
