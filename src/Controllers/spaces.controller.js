@@ -55,6 +55,8 @@ const postSpace = async (req, res) => {
 
         console.log(imgUrl)
 
+        console.log(spaceAtributes, 'data with schedule')
+
         const space = await SpacesModel.create({
             image: imgUrl,
             ...spaceAtributes
@@ -84,9 +86,9 @@ const putSpace = async (req, res = response) => {
         console.log(space.image)
 
         const newImg = space.image == "" && req.files ?
-            await upload(req.files.image, ['png', 'jpg', 'jpeg'], 'Images') :   
+            await upload(req.files.image, ['png', 'jpg', 'jpeg'], 'Images') :
             req.files ? await updateFile(req.files, space.image, ['png', 'jpg', 'jpeg', 'pdf'], 'Images', "image") : ""
-            
+
         if (!space) {
             return res.status(404).json({ msg: 'Zona comun no encontrada.' });
         }

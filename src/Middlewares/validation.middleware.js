@@ -5,9 +5,9 @@ const validator = (req, res, next) => {
 
     if (!errors.isEmpty()) {
         const formattedErrors = errors.array().map(error => ({
-            value: error.value,
+            // value: error.value,
+            message: error.msg,
             field: error.path,
-            message: error.msg
         }));
         return res.status(400).json({ errors: formattedErrors });
     }

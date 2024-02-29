@@ -7,10 +7,9 @@ const towerValidationForPost = [
 
 
     check('towerName')
-        .trim()
         .notEmpty()
         .withMessage('Nombre de torre es obligatorio')
-        .isLength({ min: 3, max: 20 })
+        .isLength({ min: 1, max: 20 })
         .withMessage('El nombre del bloque debe tener maximo 20 caracteres.')
         .matches(/^[a-zA-Z0-9\s]+$/)
         .withMessage('El nombre de la torre solo puede contener letras, números y espacios')
@@ -29,32 +28,30 @@ const towerValidationForPost = [
 const towerValidationForPut = [
 
     check('towerName')
-        .optional() // Hacer que el nombre de la torre sea opcional para las actualizaciones
-        .trim()
         .notEmpty()
-        .withMessage('Nombre de torre es obligatorio')
-        .isLength({ min: 3, max: 20 })
+        .withMessage('Nombre de torre es obligatorio')  
+        .isLength({ min: 1, max: 20 })
         .withMessage('El nombre del bloque debe tener máximo 20 caracteres.')
         .matches(/^[a-zA-Z0-9\s]+$/)
-        .withMessage('El nombre de la torre solo puede contener letras, números y espacios')
-        // .custom(async (value, { req }) => {
+        .withMessage('El nombre de la torre solo puede contener letras, números y espacios'),
+    // .custom(async (value, { req }) => {
 
-        //     console.log(req.body.towerName, 'body')
-        //     const existingTowerById = await TowerModel.findOne({ where: { idTower: req.body.idTower } });
+    //     console.log(req.body.towerName, 'body')
+    //     const existingTowerById = await TowerModel.findOne({ where: { idTower: req.body.idTower } });
 
-        //     const existingTowerByName = await TowerModel.findOne({ where: { towerName: value } });
+    //     const existingTowerByName = await TowerModel.findOne({ where: { towerName: value } });
 
-        //     if (req?.body?.towerName == existingTowerByName?.towerName) {
+    //     if (req?.body?.towerName == existingTowerByName?.towerName) {
 
-        //         return true;
+    //         return true;
 
-        //     } else if (existingTowerByName) throw new Error('Nombre del bloque ya esta en uso.');
+    //     } else if (existingTowerByName) throw new Error('Nombre del bloque ya esta en uso.');
 
-        //     return true;
+    //     return true;
 
-        // }),
+    // }),
 
-    .check('status')
+    check('status')
         .isIn(['Active', 'Inactive'])
         .withMessage('El estado no es válido.')
 ];
