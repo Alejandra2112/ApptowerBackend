@@ -54,7 +54,7 @@ const towerValidationForPut = [
 
         // }),
 
-    check('status')
+    .check('status')
         .isIn(['Active', 'Inactive'])
         .withMessage('El estado no es válido.')
 ];
