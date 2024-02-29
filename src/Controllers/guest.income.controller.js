@@ -41,6 +41,13 @@ const getGuestIncomeOne = async (req, res = response) => {
     try {
         const { idGuest_income } = req.params;
 
+        const parkingGuestIncome = await GuestIncomeParking.findOne({
+            where: { idGuest_income: idGuest_income },
+            include: [
+                { model: ParkingSpacesModel, as: 'asociatedParkingSpace' },
+            ],
+        });
+
         const guestIncome = await GuestIncome.findOne({
             where: { idGuest_income: idGuest_income },
             include: [
@@ -68,7 +75,7 @@ const getGuestIncomeOne = async (req, res = response) => {
     } catch (error) {
         console.error('Error al obtener ingreso:', error);
         res.status(500).json({
-            error: 'Error al obtener ingreso',
+            error: 'Error al obtener ingreso', msg: error.message,
         });
     }
 

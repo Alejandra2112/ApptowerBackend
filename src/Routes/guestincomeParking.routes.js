@@ -10,9 +10,9 @@ const {
 } = require('../Controllers/guestincomeParking.controller');
 
 route.get('/', getGuestIncomeParking);
-route.get('/:id', getGuestIncomeParkingOne);
+route.get('/:idGuestIncomeParking', getGuestIncomeParkingOne);
 route.get('/byApartment/:idApartment', getGuestIncomeParkingByApartment);
 route.post('/', postGuestIncomeParking);
-route.put('/:id', putGuestIncomeParking);
+route.put('/:idGuestIncomeParking', putGuestIncomeParking);
 
 module.exports = route;

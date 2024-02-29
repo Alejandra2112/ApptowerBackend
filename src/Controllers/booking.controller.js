@@ -77,11 +77,9 @@ const getOneBookingbySpaces = async (req, res = response) => {
 const postBooking = async (req, res) => {
     const body = req.body;
 
-
-
     if (body.StartDateBooking) {
         const startDate = new Date(body.StartDateBooking);
-        body.StartDateBooking = `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}`;
+        body.StartDateBooking = startDate.toISOString().split('T')[0];
     }
 
     console.log(body, 'datos de una reserva realizada');
@@ -113,7 +111,6 @@ const postBooking = async (req, res) => {
         });
     }
 };
-
 
 
 const putBooking = async (req, res) => {
