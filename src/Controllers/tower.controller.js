@@ -71,7 +71,7 @@ const postTower = async (req, res) => {
         })
 
         res.json({
-            msg: 'Torre creada ',
+            message: `Se agrego ${towerAtributes.towerName}.`,
             tower
         })
 
@@ -114,7 +114,7 @@ const putTower = async (req, res = response) => {
         });
 
         res.json({
-            msg: "Torre actualizada",
+            message: `Se modificoel el bloque ${updatedTower.towerName}.`,
             tower: updatedTower
         });
 
