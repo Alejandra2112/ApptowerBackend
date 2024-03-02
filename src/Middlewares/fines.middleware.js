@@ -1,19 +1,19 @@
-const { body } = require('express-validator');
+const { check } = require('express-validator');
 
 const postFinesValidations = [
-  body('idUser').isInt().withMessage('el id del usuario es requerido'),
-  body('fineType').isString().withMessage('Tipo de multa es requerido'),
-  body('incidentDate').isDate().withMessage('Se requiere la fecha del incidente'),
-  body('paymentDate').isDate().withMessage('Se requiere la fecha de pago'),
-  body('amount').isNumeric().withMessage('Se requiere el monto de la multa'),
-  body('idApartment').isInt().withMessage('Se requiere el id del apartamento'),
-  body('state').isString().withMessage('Se requiere el estado de la multa'),
-  body('details').isString().withMessage('Se requiere una descripcion de incidente')
+  check('idUser').isInt().withMessage('el id del usuario es requerido'),
+  check('fineType').isString().withMessage('Tipo de multa es requerido'),
+  check('incidentDate').isDate().withMessage('Se requiere la fecha del incidente'),
+  check('paymentDate').isDate().withMessage('Se requiere la fecha de pago'),
+  check('amount').isNumeric().withMessage('Se requiere el monto de la multa'),
+  check('idApartment').isInt().withMessage('Se requiere el id del apartamento'),
+  check('state').isString().withMessage('Se requiere el estado de la multa'),
+  check('details').isString().withMessage('Se requiere una descripcion de incidente')
 ];
 
 const putFinesValidations = [
-  body('idfines').isInt().withMessage('Se requiere el id de la multa'),
-  body('state').isString().withMessage('Se requiere el estado de la multa'),
+  check('idfines').isInt().withMessage('Se requiere el id de la multa'),
+  check('state').isString().withMessage('Se requiere el estado de la multa'),
 ];
 
 module.exports = {
@@ -37,7 +37,7 @@ function finesValidations (req, res, next) {
         return next();
       }
       // Realiza la validación del esquema
-      schema.validateSync(req.body, { abortEarly: false });
+      schema.validateSync(req.check, { abortEarly: false });
       next();
     } catch (error) {
       // Captura los errores de validación y envíalos en la respuesta JSON

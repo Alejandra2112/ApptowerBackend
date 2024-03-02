@@ -6,8 +6,10 @@ const {
   getFinesByApartment,
   postFines,
   putFines,
+
 } = require("../Controllers/fines.controller");
 const {postFinesValidations, putFinesValidations} = require("../Middlewares/fines.middleware");
+const validation = require("../Middlewares/validation.middleware");
 // const checkPermissions = require("../Middlewares/checkPermission");
 // const verifityToken = require("../Middlewares/verifityToken");
 // const privilegesMap = require("../Helpers/Privileges.js");
@@ -35,12 +37,14 @@ route.post(
   // validations.postFinesValidation,
   // finesValidations,
   postFinesValidations,
+  validation,
   // checkPermissions(privilegesMap.post_fines, permissionMap.multas),
   postFines
 );
 route.put(
   "/",
   putFinesValidations,
+  validation,
   // finesValidations,
   // checkPermissions(privilegesMap.put_fines, permissionMap.multas),
   putFines
