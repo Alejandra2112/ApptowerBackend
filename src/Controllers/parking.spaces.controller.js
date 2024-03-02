@@ -84,8 +84,6 @@ const getAllParkingSpace = async (req, res = response) => {
 const postParkingSpace = async (req, res) => {
 
 
-
-
     try {
 
         let newParkingscreated = 0;
@@ -146,15 +144,15 @@ const putParkingSpace = async (req, res = response) => {
 
         }
 
-        
-    } catch (error) {
-
-        message = 'Error update parking space' + error.message;
-
+        res.json({
+            message: 'Se modifico el parqueadero.',
+        });
+    } catch (e) {
+        console.error('Error al modificar la parqueadero:', e);
+        const message = e.message || 'Error al crear parqueadero.';
+        res.status(500).json({ message });
     }
-    res.json({
-        message: 'Se modifico el parqueadero.',
-    });
+    
 };
 
 

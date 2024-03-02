@@ -41,8 +41,6 @@ const getAllTower = async (req, res = response) => {
             return tower;
         }));
 
-        console.log(towersList);
-
         res.json({
             towers: towersList,
         });
@@ -99,14 +97,8 @@ const putTower = async (req, res = response) => {
         const newImg = tower.towerImg == "" && req.files ?
             await upload(req.files.towerImg, ['png', 'jpg', 'jpeg'], 'Images') :
             req.files ? await updateFile(req.files, tower.towerImg, ['png', 'jpg', 'jpeg'], 'Images', "towerImg"): ""
-            
+        
 
-        console.log(tower.towerImg, "Old img")
-        console.log(newImg, "newImg")
-
-
-
-        // Actualizar la torre con los nuevos datos
         const updatedTower = await tower.update({
             towerName: newData.towerName,
             towerImg: newImg == "" ? newData.towerImg : newImg,

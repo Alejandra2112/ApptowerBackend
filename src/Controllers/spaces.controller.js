@@ -1,6 +1,8 @@
 const { response } = require('express');
 const SpacesModel = require('../Models/spaces.model');
 const { upload, updateFile } = require('../Helpers/uploads.helpers');
+const UserModel = require('../Models/users.model');
+const Notification = require('../Models/notification.model');
 
 const getOneSpace = async (req, res = response) => {
     try {
@@ -46,28 +48,30 @@ const getAllSpaces = async (req, res = response) => {
 
 const postSpace = async (req, res) => {
     try {
+        const { ...spaceAttributes } = req.body;
 
-        const { ...spaceAtributes } = req.body;
 
-        console.log(req.files)
+        const imgUrl = req.files !== null ? await upload(req.files.image, ['png', 'jpg', 'jpeg'], 'Images') : null;
 
-        const imgUrl = req.files !== null ? await upload(req.files.image, ['png', 'jpg', 'jpeg'], 'Images') : null
+        console.log()
 
-        console.log(imgUrl)
+        spaceAttributes.schedule = JSON.parse(spaceAttributes.schedule)
 
-        console.log(spaceAtributes, 'data with schedule')
+        if (!spaceAttributes.schedule.startHour || !spaceAttributes.schedule.endHour) {
+            spaceAttributes.schedule = { startHour: '10:00', endHour: '18:00' };
+        }
 
         const space = await SpacesModel.create({
             image: imgUrl,
-            ...spaceAtributes
-        })
+            ...spaceAttributes
+        });
+
+        console.log(space, 'spaces created');
 
         res.json({
-            msg: 'Espacio creado ',
+            message: `Se agregó la zona común ${space.spaceName}`,
             space
-        })
-
-
+        });
     } catch (e) {
         console.error('Error al crear la espacio:', e);
         const message = e.message || 'Error al crear la espacio.';
@@ -75,15 +79,15 @@ const postSpace = async (req, res) => {
     }
 };
 
+
 const putSpace = async (req, res = response) => {
     try {
         const { idSpace, ...newData } = req.body;
 
-        console.log(req.files, "MOSTRA pues")
-
         const space = await SpacesModel.findOne({ where: { idSpace: idSpace } });
 
-        console.log(space.image)
+        // Parsea schedule 
+        newData.schedule = JSON.parse(newData.schedule);
 
         const newImg = space.image == "" && req.files ?
             await upload(req.files.image, ['png', 'jpg', 'jpeg'], 'Images') :
@@ -100,12 +104,42 @@ const putSpace = async (req, res = response) => {
             image: newImg == "" ? newData.image : newImg,
             area: newData.area,
             capacity: newData.capacity,
+            schedule: newData.schedule,
             status: newData.status
         });
 
+
+
+        // Notification
+
+        const userLogged = await UserModel.findByPk(newData.idUserLogged)
+
+        let notification;
+
+
+        if (newData.idUserLogged && userLogged) {
+
+            notification = await Notification.create({
+
+                iduser: newData.idUserLogged,
+                type: 'warning',
+                content: {
+                    message: `Se modifico ${updatedSpace.spaceName}
+                      ${updatedSpace.status == 'Active' ?
+                            ` ahora esta disponible en el horario de ${updatedSpace.schedule.startHour} 
+                        hasta ${updatedSpace.schedule.endHour} ` : 'ahora NO esta disponible'}`,
+                    information: { userLogged, space }
+                },
+                datetime: new Date(),
+
+            })
+
+        }
+
         res.json({
-            msg: "Zona comun actualizada",
-            tower: updatedSpace
+
+            message: notification.content.message,
+
         });
 
     } catch (error) {
