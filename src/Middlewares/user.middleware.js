@@ -5,7 +5,7 @@ const postUserSchema = yup.object().shape({
     docType: yup.string().required("El tipo de documento es requerido")
         .length(2).matches(/^(CC|CE|TI|PA)$/, 'Tipo de documento invalido'),
 
-    document: yup.string().min(7).max(13).required(),
+    document: yup.string().required("El documento es requerido").min(7).max(13),
 
     name: yup.string().required("El nombre es requerido"),
 
