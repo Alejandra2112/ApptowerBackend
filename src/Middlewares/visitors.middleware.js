@@ -1,60 +1,70 @@
-const yup = require("yup");
-    //Se crea el esquema de validación para el método PUT
-    const postVisitorSchema = yup.object().shape({
-        //se pone el campo tal cual como viene en el json, yup.tipo de dato y luego
-        //la validacion que re quiera hacer, dentro de los parentesis el mensaje que se quieraenviar en caso de error
-        // las valiaciones que yup permite son:
-        // required, string, number, boolean, date, array, object, mixed, email, url, min, max, matches, length, etc
-        name: yup.string().required("El nombre es requerido").min(3, 'Debe tener un minimo de 3 caracteres')
-        .max(50, 'Solo puede tener maximo 50 caracteres'),
+const { body, validationResult } = require('express-validator');
+const Visitors = require('../Models/visitors.model');
 
-        lastname: yup.string().required("El apellido es requerido")
-        .min(3, 'Debe tener minimo 3 caracteres')
-        .max(50,'Solo puede tener maximo 50 caracteres'),
-
-        documentType: yup.string().required("El tipo de documento es requerido")
-        .length(2).matches(/^(CC|CE|TI|PA)$/, 'Tipo de documento invalido'),
-        documentNumber: yup.string().min(7).max(10).required(),
-        
-        genre: yup.string().required().matches(/^(M|F|O)$/),
-        access: yup.bool().required(),
-    });
-    
-    const putVisitosSchema = yup.object().shape({
-        access: yup.bool().required('El acceso es requerido'),
+const postVisitorsValidations = [
+  // ...resto de las validaciones
+  body('name').isString().withMessage('El nombre es requerido')
+  .notEmpty().withMessage('El nombre es requerido')
+  .isLength({ min: 3, max: 50 }).withMessage('Debe tener un minimo de 3 caracteres y maximo 50 caracteres'),
+  body('lastname').isString().withMessage('El apellido es requerido')
+  .isLength({ min: 3, max: 50 }).withMessage('Debe tener minimo 3 caracteres y maximo 50 caracteres'),
+  body('documentType').isString().withMessage('El tipo de documento es requerido').isLength({ min: 2, max: 2 }).withMessage('Tipo de documento invalido')
+  .matches(/^(CC|CE|TI|PA)$/).withMessage('Tipo de documento invalido'),
+  body('documentNumber').isString().withMessage('El número de documento es requerido').isLength({ min: 7, max: 10 }).custom(async (value) => {
+    const visitor = await Visitors.findOne({ documentNumber: value });
+    if (visitor) {
+      throw new Error('El número de documento ya existe');
+    }
+  }),
+  body('genre').isString().withMessage('El genero es requerido')
+  .matches(/^(M|F|O)$/).withMessage('Genero invalido'),
+  body('access').isBoolean().withMessage('El acceso es requerido'),
+  // ...resto de las validaciones
+  (req, res, next) => {
+    const errors = validationResult(req).formatWith(({ msg, path }) => {
+      return { field: path, message: msg };
     });
   
-    
-    //Se crea el middleware de validación, el cual se encarga de validar el esquema de acuerdo al método de la solicitud
-    function visitorsValidations (req, res, next) {
-        try {
-          let schema;
-          // Determina el esquema a utilizar segun el mertodo de la solicitud
-          if (req.method === 'POST') {
-            schema = postVisitorSchema;
-          } else if (req.method === 'PUT') {
-            schema = putVisitosSchema;
-          } else {
-            // Si no es POST ni PUT, llama a next() sin validar
-            return next();
-          }
-          // Realiza la validación del esquema
-          schema.validateSync(req.body, { abortEarly: false });
-          next();
-        } catch (error) {
-          // Captura los errores de validación y envíalos en la respuesta JSON
-          const errors = error.inner.map(err => ({
-            field: err.path,
-            message: err.message
-          }));
-          res.status(400).json({ errors });
+    if (!errors.isEmpty()) {
+      const firstErrors = errors.array().reduce((accumulator, currentError) => {
+        if (!accumulator.find(error => error.field === currentError.field)) {
+          accumulator.push(currentError);
         }
-      }
+        return accumulator;
+      }, []);
+  
+      return res.status(400).json({ errors: firstErrors });
+    }
+    next();
+  },
+];
 
-//Se exporta el middleware de validación
+const putVisitorsValidations = [
+  body('access').isBoolean().withMessage('El acceso es requerido'),
+  (req, res, next) => {
+    const errors = validationResult(req).formatWith(({ msg, path }) => {
+      return { field: path, message: msg };
+    });
+  
+    if (!errors.isEmpty()) {
+      const firstErrors = errors.array().reduce((accumulator, currentError) => {
+        if (!accumulator.find(error => error.field === currentError.field)) {
+          accumulator.push(currentError);
+        }
+        return accumulator;
+      }, []);
+  
+      return res.status(400).json({ errors: firstErrors });
+    }
+    next();
+  },
+
+];
+
 module.exports = {
-    visitorsValidations,
-}
+  postVisitorsValidations,
+  putVisitorsValidations,
+};
 
 // const {check, validationResult} = require('express-validator');
 

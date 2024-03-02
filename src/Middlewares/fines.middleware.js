@@ -1,21 +1,25 @@
-const yup = require('yup');
+const { body } = require('express-validator');
 
-const postFinesSchema = yup.object().shape({
-    idUser: yup.number().required('el id del usuario es requerido'),
-    fineType: yup.string().required('Tipo de multa es requerido'),
-    incidentDate: yup.date().required('Se requiere la fecha del incidente'),
-    paymentDate: yup.date().required('Se requiere la fecha de pago'),
-    amount: yup.number().required('Se requiere el monto de la multa'),
-    idApartment: yup.number().required('Se requiere el id del apartamento'),
-    state: yup.string().required('Se requiere el estado de la multa'),
-    details: yup.string().required('Se requiere una descripcion de incidente')
+const postFinesValidations = [
+  body('idUser').isInt().withMessage('el id del usuario es requerido'),
+  body('fineType').isString().withMessage('Tipo de multa es requerido'),
+  body('incidentDate').isDate().withMessage('Se requiere la fecha del incidente'),
+  body('paymentDate').isDate().withMessage('Se requiere la fecha de pago'),
+  body('amount').isNumeric().withMessage('Se requiere el monto de la multa'),
+  body('idApartment').isInt().withMessage('Se requiere el id del apartamento'),
+  body('state').isString().withMessage('Se requiere el estado de la multa'),
+  body('details').isString().withMessage('Se requiere una descripcion de incidente')
+];
 
-});
+const putFinesValidations = [
+  body('idfines').isInt().withMessage('Se requiere el id de la multa'),
+  body('state').isString().withMessage('Se requiere el estado de la multa'),
+];
 
-const putFinesSchema = yup.object().shape({
-    idfines: yup.number().required('Se requiere el id de la multa'),
-    state: yup.string().required('Se requiere el estado de la multa'),
-});
+module.exports = {
+  postFinesValidations,
+  putFinesValidations
+};
 
 
 //Se crea el middleware de validación, el cual se encarga de validar el esquema de acuerdo al método de la solicitud

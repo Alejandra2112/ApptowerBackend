@@ -93,7 +93,7 @@ const postFines = async (req, res) => {
 
 
     try {
-        const images = req.files.evidenceFiles;
+        const images = req.files?.evidenceFiles;
         console.log("Tamaño", images ? images.length : 0); // Maneja el caso de un solo archivo
         const imagesArray = Array.isArray(images) ? images : [images];
         const imagesUrl = await Promise.all(imagesArray.map(async (file) => await upload(file, ['pdf', 'jpg', 'jpeg', 'png'], 'Evidences')))
