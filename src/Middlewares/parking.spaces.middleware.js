@@ -1,76 +1,82 @@
 const { check } = require('express-validator');
 const ParkingSpacesModel = require('../Models/parking.spaces.model');
 
-const createParkinValidation = [
 
-    // check('parkingName')
-    //     .isLength({ min: 3 })
-    //     .withMessage('Parking space name must be at least 3 characters.')
-    //     .trim()
-    //     .matches(/^[a-zA-Z0-9\s]+$/)
-    //     .withMessage('Parking space name must contain only letters and numbers.')
-    //     .custom(async (value) => {
-    //         const existingParking = await ParkingSpacesModel.findOne({ where: { parkingName: value } });
+const parkingValidationForPost = [
+    check('floor')
+        .notEmpty().withMessage('El nombre del piso obligatorio.')
+        .matches(/^[0-9A-Z]+$/).withMessage('El nombre del piso solo puede contener números y letras.')
+        .custom(async (value, { req }) => {
 
-    //         if (existingParking) {
-    //             throw new Error('Parking space name is already in use');
-    //         }
+            const existingParking = await ParkingSpacesModel.findAll();
+            const parkingNames = existingParking.map(parking => parking.parkingName.substring(0, parking.parkingName.length - 2));
 
-    //         return true;
-    //     }),
+            console.log(parkingNames, 'spaceNames')
+
+            if (parkingNames.includes(value)) {
+                throw new Error(`El piso ${value} ya tiene los parqueaderos registrados.`);
+            }
+
+            return true;
+        }),
+
+
+
+
+    check('parkingPerFloor')
+        .notEmpty().withMessage('Numero de parqueaderos por piso es obligatorio.')
+        .isInt({ min: 1 })
+        .withMessage('El número de plazas de aparcamiento por piso debe ser un número entero positivo.')
+        .toInt(),
+
     check('parkingType')
+        .notEmpty().withMessage('El tipo de parqueadero es obligatorio.')
         .isIn(['Private', 'Public'])
-        .withMessage('Parking space type is not valid.'),
-    // check('status')
-    //     .isIn(['Active', 'Inactive'])
-    //     .withMessage('Status parking spaces is not valid.')
+        .withMessage('El tipo de espacio de estacionamiento no es válido.'),
+]
 
 
-];
+const parkingValidationForPut = [
 
-const updateParkinValidation = [
 
     check('parkingName')
         .optional()
-        .isLength({ min: 3 })
-        .withMessage('Parking space name must be at least 3 characters.')
-        .trim()
+        .isLength({ min: 4 })
+        .withMessage('El nombre del espacio de estacionamiento debe tener al menos 3 caracteres.')
         .matches(/^[a-zA-Z0-9\s]+$/)
-        .withMessage('Parking space name must contain only letters and numbers.')
+        .withMessage('El nombre del espacio de estacionamiento solo debe contener letras y números.')
         .custom(async (value, { req }) => {
-            const body = req.body;
-            const { parkingName } = body;
 
-            const existingParking = await ParkingSpacesModel.findOne({ where: { parkingName: value } });
+            const body = req.body
 
+            const existingParkingById = await ParkingSpacesModel.findOne({ where: { idParkingSpace: body.idParkingSpace } });
+            const existingParkingByName = await ParkingSpacesModel.findOne({ where: { parkingName: value } });
 
-            if (value === parkingName) {
-                return true;
+            if (!existingParkingById || !existingParkingByName) {
+                return true; // Permitir el registro
+            } else if (existingParkingById.parkingName !== existingParkingByName.parkingName) {
+                throw new Error(`Nombre del parqueadero "${value}" ya está en uso.`);
             } else {
-
-                if (existingParking) {
-                    throw new Error('Parking space name is already in use');
-                }
                 return true;
-
             }
 
+
+
         }),
+
     check('parkingType')
-        .optional()
         .isIn(['Private', 'Public'])
-        .withMessage('Parking space type is not valid.'),
+        .withMessage('El tipo de espacio de estacionamiento no es válido.'),
+
     check('status')
-        .optional()
         .isIn(['Active', 'Inactive'])
-        .withMessage('Status parking spaces is not valid.')
-
-
+        .withMessage('El estado del espacio de estacionamiento no es válido.'),
 ];
+
 
 module.exports = {
 
-    createParkinValidation,
-    updateParkinValidation
+    parkingValidationForPost,
+    parkingValidationForPut
 
 }

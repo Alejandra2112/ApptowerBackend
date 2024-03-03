@@ -1,25 +1,38 @@
-const { body, validationResult } = require('express-validator');
+const { check, validationResult } = require('express-validator');
 const Visitors = require('../Models/visitors.model');
 
 const postVisitorsValidations = [
   // ...resto de las validaciones
-  body('name').isString().withMessage('El nombre es requerido')
+  check('name').isString().withMessage('El nombre es requerido')
   .notEmpty().withMessage('El nombre es requerido')
   .isLength({ min: 3, max: 50 }).withMessage('Debe tener un minimo de 3 caracteres y maximo 50 caracteres'),
-  body('lastname').isString().withMessage('El apellido es requerido')
+  
+  check('lastname').isString().withMessage('El apellido es requerido')
+  .notEmpty().withMessage('El apellido es requerido')
   .isLength({ min: 3, max: 50 }).withMessage('Debe tener minimo 3 caracteres y maximo 50 caracteres'),
-  body('documentType').isString().withMessage('El tipo de documento es requerido').isLength({ min: 2, max: 2 }).withMessage('Tipo de documento invalido')
+
+  check('documentType').isString().withMessage('El tipo de documento es requerido')
+  .notEmpty().withMessage('El tipo de documento es requerido')
+  .isLength({ min: 2, max: 2 }).withMessage('Tipo de documento invalido')
   .matches(/^(CC|CE|TI|PA)$/).withMessage('Tipo de documento invalido'),
-  body('documentNumber').isString().withMessage('El número de documento es requerido').isLength({ min: 7, max: 10 }).custom(async (value) => {
-    const visitor = await Visitors.findOne({ documentNumber: value });
+
+  check('documentNumber').isString().withMessage('El número de documento es requerido')
+  .notEmpty().withMessage('El número de documento es requerido')
+  .isLength({ min: 7, max: 10 })
+  .custom(async (value) => {
+
+    const visitor = await Visitors.findOne({where: { documentNumber: value }});
     if (visitor) {
       throw new Error('El número de documento ya existe');
     }
+    console.log("este es el visitante", visitor);
   }),
-  body('genre').isString().withMessage('El genero es requerido')
+  check('genre').isString().withMessage('El genero es requerido')
+  .notEmpty().withMessage('El genero es requerido')
   .matches(/^(M|F|O)$/).withMessage('Genero invalido'),
-  body('access').isBoolean().withMessage('El acceso es requerido'),
-  // ...resto de las validaciones
+
+  check('access').isBoolean().withMessage('El acceso es requerido'),
+
   (req, res, next) => {
     const errors = validationResult(req).formatWith(({ msg, path }) => {
       return { field: path, message: msg };
@@ -40,7 +53,7 @@ const postVisitorsValidations = [
 ];
 
 const putVisitorsValidations = [
-  body('access').isBoolean().withMessage('El acceso es requerido'),
+  check('access').isBoolean().withMessage('El acceso es requerido'),
   (req, res, next) => {
     const errors = validationResult(req).formatWith(({ msg, path }) => {
       return { field: path, message: msg };

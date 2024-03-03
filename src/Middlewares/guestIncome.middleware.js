@@ -1,16 +1,35 @@
-const { body } = require('express-validator');
+const { check } = require('express-validator');
 
 const postGuestIncomeValidations = [
-  body('idVisitor').isInt().withMessage('El visitante es requerido'),
-  body('idApartment').isInt().withMessage('El apartamento es requerido'),
-  body('startingDate').isDate().withMessage('La fecha de inicio es requerida'),
-  body('personAllowsAccess').isString().withMessage('La persona que permite el acceso es requerida'),
+  check('idVisitor').isInt().withMessage('El visitante es requerido')
+  .notEmpty().withMessage('El visitante es requerido')
+  .isLength({min: 1}).withMessage('El visitante es requerido'),
+
+  check('idApartment').isInt().withMessage('El apartamento es requerido')
+  .notEmpty().withMessage('El apartamento es requerido')
+  .isLength({min: 1}).withMessage('El apartamento es requerido'),
+  check('startingDate').notEmpty().withMessage('La fecha de inicio es requerida')
+  .custom((value) => {
+    if (isNaN(Date.parse(value))) {
+      throw new Error(`La fecha de pago debe ser valida, recibido: ${value}`);
+    }
+    const paymentDate = new Date(value);
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+    if (paymentDate < currentDate) {
+      throw new Error(`La fecha de pago no puede ser anterior al día actual`);
+    }
+    return true;
+  }),
+  check('personAllowsAccess').isString().withMessage('La persona que permite el acceso es requerida')
+  .notEmpty().withMessage('La persona que permite el acceso es requerida')
+  .isLength({min: 3}).withMessage('La persona que permite el acceso es requerida'),
 ];
 
 const putGuestIncomeValidations = [
-  body('idGuest_income').isInt().withMessage('El ingreso de visitante es requerido')
+  check('idGuest_income').isInt().withMessage('El ingreso de visitante es requerido')
   .notEmpty().withMessage('El ingreso de visitante es requerido'),
-  body('departureDate').isDate().withMessage('La fecha de salida es requerida')
+  check('departureDate').isDate().withMessage('La fecha de salida es requerida')
   .notEmpty(' La fecha de salida es requerida'),
 ];
 
