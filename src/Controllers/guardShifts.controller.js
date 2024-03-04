@@ -45,29 +45,14 @@ const getShifts = async (req, res = response) => {
   }
 };
 
+
 const postShifts = async (req, res) => {
   let mensaje = '';
   const body = req.body;
 
-  const start = moment.utc(body.start).tz('America/Bogota');
-  body.start = start.format('YYYY-MM-DD HH:mm:ss');
-
-
-  if (body.end) {
-    const end = moment.utc(body.end).tz('America/Bogota');
-    body.end = end.format('YYYY-MM-DD HH:mm:ss');
-  }
-
   try {
-
-    const existingShift = await Shifts.findOne({ where: { idwatchman: body.idwatchman, end: null } });
-    if (existingShift) {
-      await existingShift.update(body);
-      mensaje = 'Turno Actualizado Exitosamente';
-    } else {
-      await Shifts.create(body);
-      mensaje = 'Turno Registrado Exitosamente';
-    }
+    await Shifts.create(body);
+    mensaje = 'Turno Registrado Exitosamente';
   } catch (e) {
     mensaje = e.message;
   }

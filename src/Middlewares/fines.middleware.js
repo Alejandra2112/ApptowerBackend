@@ -1,56 +1,99 @@
-const yup = require('yup');
+const { check } = require('express-validator');
 
-const postFinesSchema = yup.object().shape({
-    idUser: yup.number().required('el id del usuario es requerido'),
-    fineType: yup.string().required('Tipo de multa es requerido'),
-    incidentDate: yup.date().required('Se requiere la fecha del incidente'),
-    paymentDate: yup.date().required('Se requiere la fecha de pago'),
-    amount: yup.number().required('Se requiere el monto de la multa'),
-    idApartment: yup.number().required('Se requiere el id del apartamento'),
-    state: yup.string().required('Se requiere el estado de la multa'),
-    details: yup.string().required('Se requiere una descripcion de incidente')
+const postFinesValidations = [
+  check('idUser').isInt().withMessage('el id del usuario es requerido')
+  .notEmpty().withMessage('El id del usuario es requerido')
+  .isLength({min: 1}).withMessage('El id del usuario es requerido'),
 
-});
+  check('fineType').isString().withMessage('Tipo de multa es requerido')
+  .notEmpty().withMessage('Tipo de multa es requerido')
+  .isLength({min: 3}).withMessage('Tipo de multa es requerido'),
+  check('incidentDate')
+  .custom((value) => {
+    if (isNaN(Date.parse(value))) {
+      throw new Error(`La fecha de pago debe ser valida, recibido: ${value}`);
+    }
+    return true;
+  })
+  .notEmpty().withMessage('Se requiere la fecha del incidente')
+  .isLength({min: 1}).withMessage('Se requiere la fecha del incidente'),
 
-const putFinesSchema = yup.object().shape({
-    idfines: yup.number().required('Se requiere el id de la multa'),
-    state: yup.string().required('Se requiere el estado de la multa'),
-});
+  check('paymentDate').custom((value) => {
+    if (isNaN(Date.parse(value))) {
+      throw new Error(`La fecha de pago debe ser valida, recibido: ${value}`);
+    }
+    const paymentDate = new Date(value);
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+    if (paymentDate < currentDate) {
+      throw new Error(`La fecha de pago no puede ser anterior al día actual`);
+    }
+    return true;
+  })
+  .notEmpty().withMessage('Se requiere la fecha de pago')
+  .isLength({min: 1}).withMessage('Se requiere la fecha de pago'),
+
+  check('amount').isNumeric().withMessage('Se requiere el monto de la multa')
+  .isDecimal().withMessage('El monto debe ser un número decimal')
+  .notEmpty().withMessage('Se requiere el monto de la multa')
+  .isLength({min: 5}).withMessage('El valor nimino es de 5 digitos'),
+  check('idApartment').isInt().withMessage('Se requiere el id del apartamento')
+  .notEmpty().withMessage('Se requiere el id del apartamento'),
+  check('state').isString().withMessage('Se requiere el estado de la multa')
+  .notEmpty().withMessage('Se requiere el estado de la multa')
+  .matches(/^(Pendiente|Pagada|Por pagar)$/).withMessage('Estado invalido, debe ser Pendiente, Pagada o Por pagar'),
+  check('details').isString().withMessage('Se requiere una descripcion de incidente')
+  .notEmpty().withMessage('Se requiere una descripcion de incidente')
+  .isLength({min: 3, max: 500}).withMessage('Debe tener entre 3 y 500 caracteres'),
+];
+
+const putFinesValidations = [
+  check('idfines').isInt().withMessage('Se requiere el id de la multa')
+  .notEmpty().withMessage('Se requiere el id de la multa'),
+  check('state').isString().withMessage('Se requiere el estado de la multa')
+  .notEmpty().withMessage('Se requiere el estado de la multa')
+  .matches(/^(Pendiente|Pagada|Por pagar)$/).withMessage('Estado invalido, debe ser Pendiente, Pagada o Por pagar')
+];
+
+module.exports = {
+  postFinesValidations,
+  putFinesValidations
+};
 
 
 //Se crea el middleware de validación, el cual se encarga de validar el esquema de acuerdo al método de la solicitud
 
-function finesValidations (req, res, next) {
-    try {
-      let schema;
-      // Determina el esquema a utilizar segun el mertodo de la solicitud
-      if (req.method === 'POST') {
-        schema = postFinesSchema;
-      } else if (req.method === 'PUT') {
-        schema = putFinesSchema;
-      } else {
-        // Si no es POST ni PUT, llama a next() sin validar
-        return next();
-      }
-      // Realiza la validación del esquema
-      schema.validateSync(req.body, { abortEarly: false });
-      next();
-    } catch (error) {
-      // Captura los errores de validación y envíalos en la respuesta JSON
-      const errors = error.inner.map(err => ({
-        field: err.path,
-        message: err.message
-      }));
-      res.status(400).json({ errors });
-    }
-}
+// function finesValidations (req, res, next) {
+//     try {
+//       let schema;
+//       // Determina el esquema a utilizar segun el mertodo de la solicitud
+//       if (req.method === 'POST') {
+//         schema = postFinesSchema;
+//       } else if (req.method === 'PUT') {
+//         schema = putFinesSchema;
+//       } else {
+//         // Si no es POST ni PUT, llama a next() sin validar
+//         return next();
+//       }
+//       // Realiza la validación del esquema
+//       schema.validateSync(req.check, { abortEarly: false });
+//       next();
+//     } catch (error) {
+//       // Captura los errores de validación y envíalos en la respuesta JSON
+//       const errors = error.inner.map(err => ({
+//         field: err.path,
+//         message: err.message
+//       }));
+//       res.status(400).json({ errors });
+//     }
+// }
 
-//Se exporta el middleware de validación
+// //Se exporta el middleware de validación
 
-module.exports = {
-    finesValidations,
+// module.exports = {
+//     finesValidations,
 
-}
+// }
 
 // const {check , validationResult} = require('express-validator');
 // const validateResult = (req, res, next) => {

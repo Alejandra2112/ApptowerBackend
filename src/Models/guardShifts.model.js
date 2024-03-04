@@ -16,12 +16,16 @@ const guardShifts = sequelize.define('guardShifts', {
     field: 'idwatchman',
     allowNull: false,
   },
+  date: {
+    type: DataTypes.DATEONLY,
+    field: 'date',
+  },
   start: {
-    type: DataTypes.DATE,
+    type: DataTypes.TIME,
     field: 'start',
   },
   end: {
-    type: DataTypes.DATE,
+    type: DataTypes.TIME,
     field: 'end',
   },
 }, {

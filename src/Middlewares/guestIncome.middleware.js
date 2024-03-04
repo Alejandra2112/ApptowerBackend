@@ -1,53 +1,42 @@
-const yup = require('yup');
+const { check } = require('express-validator');
 
-//Se crea el esquema de validación para el método POST
-const postGuestIncomeSchema = yup.object().shape({
-    idVisitor: yup.number().required('El visitante es requerido'),
-    idApartment: yup.number().required('El apartamento es requerido'),
-    startingDate: yup.date().required('La fecha de inicio es requerida'),
-    personAllowsAccess: yup.string().required('La persona que permite el acceso es requerida'),
-});
+const postGuestIncomeValidations = [
+  check('idVisitor').isInt().withMessage('El visitante es requerido')
+  .notEmpty().withMessage('El visitante es requerido')
+  .isLength({min: 1}).withMessage('El visitante es requerido'),
 
-//Se crea el esquema de validación para el método PUT
-const putGuestIncomeSchema = yup.object().shape({
-    idGuest_income: yup.number().required('El ingreso de visitante es requerido'),
-    departureDate: yup.date().required('La fecha de salida es requerida'),
-});
-
-//Se crea el middleware de validación, el cual se encarga de validar el esquema de acuerdo al método de la solicitud
-
-function guestIncomeValidations (req, res, next) {
-    try {
-      let schema;
-      // Determina el esquema a utilizar segun el mertodo de la solicitud
-      if (req.method === 'POST') {
-        schema = postGuestIncomeSchema;
-      } else if (req.method === 'PUT') {
-        schema = putGuestIncomeSchema;
-      } else {
-        // Si no es POST ni PUT, llama a next() sin validar
-        return next();
-      }
-      // Realiza la validación del esquema
-      schema.validateSync(req.body, { abortEarly: false });
-      next();
-    } catch (error) {
-      // Captura los errores de validación y envíalos en la respuesta JSON
-      const errors = error.inner.map(err => ({
-        field: err.path,
-        message: err.message
-      }));
-      res.status(400).json({ errors });
+  check('idApartment').isInt().withMessage('El apartamento es requerido')
+  .notEmpty().withMessage('El apartamento es requerido')
+  .isLength({min: 1}).withMessage('El apartamento es requerido'),
+  check('startingDate').notEmpty().withMessage('La fecha de inicio es requerida')
+  .custom((value) => {
+    if (isNaN(Date.parse(value))) {
+      throw new Error(`La fecha de pago debe ser valida, recibido: ${value}`);
     }
-  
-}
+    const paymentDate = new Date(value);
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+    if (paymentDate < currentDate) {
+      throw new Error(`La fecha de pago no puede ser anterior al día actual`);
+    }
+    return true;
+  }),
+  check('personAllowsAccess').isString().withMessage('La persona que permite el acceso es requerida')
+  .notEmpty().withMessage('La persona que permite el acceso es requerida')
+  .isLength({min: 3}).withMessage('La persona que permite el acceso es requerida'),
+];
 
-
-//Se exporta el middleware de validación
+const putGuestIncomeValidations = [
+  check('idGuest_income').isInt().withMessage('El ingreso de visitante es requerido')
+  .notEmpty().withMessage('El ingreso de visitante es requerido'),
+  check('departureDate').isDate().withMessage('La fecha de salida es requerida')
+  .notEmpty(' La fecha de salida es requerida'),
+];
 
 module.exports = {
-    guestIncomeValidations,
-}
+  postGuestIncomeValidations,
+  putGuestIncomeValidations
+};
 
 // const {check, validationResult} = require('express-validator');
 
