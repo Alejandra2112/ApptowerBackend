@@ -197,9 +197,9 @@ const putApartmentOwner = async (req, res = response) => {
                 iduser: body.idUserLogged,
                 type: 'warning',
                 content: {
-                    message: `Se modifico la propiedad de ${owner.user.name} ${owner.user.lastName}
-                     ${apartment ? `como propietario del apartamento ${apartment.apartmentName}` : ''}
-                    `,
+                    message: `Se modifico informacion del apartamento ${apartment.apartmentName},
+                     ${update.status == 'Inactive' ? `${owner.user.name} ${owner.user.lastName} 
+                     dejo de ser propietario del apartamento ${apartment.apartmentName}` : ''}`,
                     information: { userLogged, apartment }
                 },
                 datetime: new Date(),

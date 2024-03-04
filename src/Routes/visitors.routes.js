@@ -6,7 +6,7 @@ const {
   postVisitors,
   putVisitors,
 } = require("../Controllers/visitors.controller");
-const { visitorsValidations } = require("../Middlewares/visitors.middleware");
+const { postVisitorsValidations, putVisitorsValidations } = require("../Middlewares/visitors.middleware");
 
 // const checkPermissions = require("../Middlewares/checkPermission");
 // const verifityToken = require("../Middlewares/verifityToken");
@@ -27,14 +27,15 @@ route.get(
   ),
   route.post(
     "/",
-    visitorsValidations,
+    // visitorsValidations,
+    postVisitorsValidations,
     // checkPermissions(privilegesMap.post_visitors, permissionMap.visitantes),
     postVisitors
   );
 
 route.put(
   "/",
-  visitorsValidations,
+  putVisitorsValidations,
   // validations.putValidationVisitor,
   //   checkPermissions(privilegesMap.put_visitors, permissionMap.visitantes),
   putVisitors

@@ -144,7 +144,7 @@ const postApartment = async (req, res) => {
         message = e.message;
     }
     res.json({
-        apartments: message,
+        message: message,
         newAparments: newAparments
     });
 };
@@ -164,7 +164,7 @@ const putApartment = async (req, res = response) => {
 
         if (updatedRows > 0) {
 
-            message = 'Apartment updated successfully.';
+            message = `Apartamento ${update.apartmentName} actualizado correctamente.`;
 
         } else {
 
@@ -179,7 +179,7 @@ const putApartment = async (req, res = response) => {
     }
     res.json({
 
-        apartments: message,
+        message: message,
 
     });
 };
