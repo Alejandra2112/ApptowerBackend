@@ -2,25 +2,44 @@ const yup = require("yup");
 
 const postRolSchema = yup.object().shape({
 
-  namerole: yup.string().required("El nombre del rol es requerido")
-    .min(3, 'Debe tener minimo 3 caracteres')
-    .max(28, 'Solo puede tener maximo 50 caracteres'),
+  namerole: yup.string()
+    .matches(/^[a-zA-Z\s]+$/, 'El nombre del rol solo puede contener letras y espacios.')
+    .required("El nombre del rol es requerido")
+    .min(3, 'El nombre de rol debe tener minimo 3 caracteres.')
+    .max(20, 'El nombre de rol puede tener maximo 20 caracteres.'),
 
-  description: yup.string().required("La descripción es requerida")
-    .min(3, 'Debe tener minimo 3 caracteres')
-    .max(30, 'Solo puede tener maximo 50 caracteres'),
+  description: yup.string().required("La descripción es requerida.")
+    .min(3, 'La descripción debe tener minimo 3 caracteres.')
+    .max(30, 'La descripción puede tener maximo 30 caracteres.'),
 
+  detailsRols: yup.array()
+    .of(yup.object().shape({
+      permiso: yup.string().required('El permiso es requerido'),
+      privilege: yup.string().required('El privilegio es requerido'),
+    }))
+    .required('Los detalles de los roles son requeridos')
+    .min(1, 'Debes proporcionar al menos un permiso'),
 });
+
 
 const putRolSchema = yup.object().shape({
 
-  namerole: yup.string().min(3, 'Debe tener minimo 3 caracteres')
-    .max(28, 'Solo puede tener maximo 50 caracteres'),
+  namerole: yup.string().min(3, 'El nombre de rol debe tener minimo 3 caracteres.')
+    .max(20, 'El nombre de rol puede tener maximo 20 caracteres.')
+    .matches(/^[a-zA-Z\s]+$/, 'El nombre del rol solo puede contener letras y espacios.'),
 
-  description: yup.string().min(3, 'Debe tener minimo 3 caracteres')
-    .max(30, 'Solo puede tener maximo 50 caracteres'),
+  description: yup.string().min(3, 'La descripción debe tener minimo 3 caracteres.')
+    .max(30, 'La descripción puede tener maximo 30 caracteres.'),
 
   state: yup.string().matches(/^(Activo|Inactivo)$/, 'Estado invalido'),
+
+  detailsRols: yup.array()
+    .of(yup.object().shape({
+      permiso: yup.string().required('El permiso es requerido'),
+      privilege: yup.string().required('El privilegio es requerido'),
+    }))
+    .required('Los detalles de los roles son requeridos')
+    .min(1, 'Debes proporcionar al menos un permiso'),
 });
 
 const rolValidations = (req, res, next) => {

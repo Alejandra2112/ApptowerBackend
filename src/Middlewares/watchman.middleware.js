@@ -12,9 +12,9 @@ const postWatchmanSchema = yup.object().shape({
 
 const putWatchmanSchema = yup.object().shape({
 
-  idEnterpriseSecurity: yup.number(),
+  idEnterpriseSecurity: yup.number().required("La empresa de seguridad es requerida"),
 
-  iduser: yup.number(),
+  iduser: yup.number().required("El usuario es requerido"),
 
   state: yup.string().matches(/^(Activo|Inactivo)$/, 'Estado invalido'),
 
