@@ -179,10 +179,10 @@ const postOwner = async (req, res) => {
                 iduser: idUserLogged,
                 type: 'success',
                 content: {
-                    message: `Se agrego un nuevo propietario ${user.name} ${user.lastName}
-                     ${apartment ? `al apartamento ${apartment.apartmentName}` : ''}
-                    `,
-                    information: { user, userLogged, owner }
+                    message: `Se agrego a ${user.name} ${user.lastName} como propietario
+                    ${resident ? ` y residente ` : ''}
+                    ${apartment ? `del apartamento ${apartment.apartmentName}` : ''}`,
+                    information: { user, userLogged, apartment }
                 },
                 datetime: new Date(),
 
