@@ -187,7 +187,7 @@ const postApartmentResident = async (req, res) => {
 
         res.json({
 
-            message: notification.content.message,
+            message: notification?.content?.message,
 
         });
 

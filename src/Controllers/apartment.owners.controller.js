@@ -96,12 +96,11 @@ const getAllApartmentOwners = async (req, res) => {
 const postApartmentOwner = async (req, res) => {
 
 
-    let message = '';
-    const body = req.body;
-
-    console.log(body, 'body')
-
     try {
+
+        const body = req.body;
+
+        console.log(body, 'body')
 
         await ApartmentOwnerModel.create(body);
 
@@ -144,7 +143,6 @@ const postApartmentOwner = async (req, res) => {
         res.json({
 
             message: notification.content.message,
-            apartmentOwners: message,
 
         });
 

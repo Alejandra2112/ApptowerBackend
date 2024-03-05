@@ -175,7 +175,7 @@ const postResident = async (req, res) => {
 
         const roleData = await Rols.findByPk(userData.idrole);
 
-        
+
         const userLogged = await UserModel.findByPk(idUserLogged)
 
         let notification;
@@ -317,6 +317,68 @@ const putResident = async (req, res = response) => {
 };
 
 
+const putResidentStatus = async (req, res = response) => {
+
+    try {
+
+        const { idResident, idUserLogged } = req.body
+
+        const resident = await ResidentModel.findOne({ where: { idResident: idResident } })
+        const user = await UserModel.findOne({ where: { iduser: resident.iduser } })
+
+        let residentUpdated;
+        let message;
+
+        if (resident.status == 'Active') {
+
+            residentUpdated = await resident.update({
+                status: 'Inactive'
+            });
+
+            message = `Se desactivo el residente ${user.name} ${user.lastName}. ya no es parte del conjunto residencial.`
+
+        } else if (resident.status == 'Inactive') {
+
+            residentUpdated = await resident.update({
+                status: 'Active'
+            });
+
+            message = `Se reestablecio a ${user.name} ${user.lastName} como residente.`
+
+        }
+
+        const userLogged = await UserModel.findByPk(idUserLogged)
+
+        let notification;
+
+        if (idUserLogged && user) {
+
+            notification = await Notification.create({
+
+                iduser: idUserLogged,
+                type: residentUpdated.status == 'Inactive' ? 'danger' : 'success',
+                content: {
+                    message: `${message}`,
+                    information: { user, userLogged, resident }
+                },
+                datetime: new Date(),
+
+            })
+
+            res.json({
+
+                message: notification.content.message
+
+            })
+        }
+
+    } catch (error) {
+        console.error('Error al modificar residente:', error);
+        return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
+    }
+}
+
+
 // const deleteResident = async (req, res) => {
 
 //     const { idResident } = req.body;
@@ -376,6 +438,7 @@ module.exports = {
     getAllResidents,
     postResident,
     putResident,
+    putResidentStatus
     // deleteResident,
     // getResidentDocument
 };
