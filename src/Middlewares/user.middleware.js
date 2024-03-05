@@ -1,4 +1,5 @@
 const { check, validationResult } = require('express-validator');
+const UserModel = require('../Models/users.model');
 
 const userValidationForPost = [
     check('docType')
@@ -108,11 +109,9 @@ const userValidations = (req, res, next) => {
         .catch(next);
 };
 
-module.exports = {
-    userValidations,
-};
-const UserModel = require('../Models/users.model');
-const { check } = require('express-validator');
+
+
+
 
 const sexs = [
     {
@@ -251,6 +250,7 @@ const userPersonalInfoValidationForPut = [
 
 module.exports = {
     userPersonalInfoValidationForPut,
+    userValidations,
 };
 
 
