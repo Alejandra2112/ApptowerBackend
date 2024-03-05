@@ -22,16 +22,16 @@ const validator = (req, res, next) => {
 module.exports = validator;
 
 
-        // if (!errors.isEmpty()) {
-        //     const formattedErrors = errors.array().map(error => ({
-        //         // value: error.value,
+// if (!errors.isEmpty()) {
+//     const formattedErrors = errors.array().map(error => ({
+//         // value: error.value,
 
-        //         message: error.msg,
-        //         field: error.path,
-        //     }));
-        //     return res.status(400).json({ errors: formattedErrors });
-        // }
+//         message: error.msg,
+//         field: error.path,
+//     }));
+//     return res.status(400).json({ errors: formattedErrors });
+// }
 
 
 
-        module.exports = validator;
+module.exports = validator;
