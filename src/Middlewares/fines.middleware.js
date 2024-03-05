@@ -55,7 +55,7 @@ const putFinesValidations = [
   .notEmpty().withMessage('Se requiere el id de la multa'),
   check('state').isString().withMessage('Se requiere el estado de la multa')
   .notEmpty().withMessage('Se requiere el estado de la multa')
-  .matches(/^(Pendiente|Pagada|Por pagar)$/).withMessage('Estado invalido, debe ser Pendiente, Pagada o Por pagar')
+  .matches(/^(Pendiente|Pagada|Por revisar)$/).withMessage('Estado invalido, debe ser Pendiente, Pagada o Por pagar')
 ];
 
 module.exports = {
