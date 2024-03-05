@@ -41,10 +41,13 @@ const postFinesValidations = [
   .notEmpty().withMessage('Se requiere el id del apartamento'),
   check('state').isString().withMessage('Se requiere el estado de la multa')
   .notEmpty().withMessage('Se requiere el estado de la multa')
-  .matches(/^(Pendiente|Pagada|Por pagar)$/).withMessage('Estado invalido, debe ser Pendiente, Pagada o Por pagar'),
+  .matches(/^(Pendiente|Pagada|Por revisar)$/).withMessage('Estado invalido, debe ser Pendiente, Pagada o Por pagar'),
   check('details').isString().withMessage('Se requiere una descripcion de incidente')
   .notEmpty().withMessage('Se requiere una descripcion de incidente')
   .isLength({min: 3, max: 500}).withMessage('Debe tener entre 3 y 500 caracteres'),
+  check('idUser').isInt().withMessage('Se requiere el id del usuario')
+  .notEmpty().withMessage('Se requiere el id del usuario')
+  .isLength({min: 1}).withMessage('Se requiere el id del usuario'),
 ];
 
 const putFinesValidations = [
