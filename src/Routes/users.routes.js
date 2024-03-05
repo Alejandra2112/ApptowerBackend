@@ -4,6 +4,8 @@ const { getUser, postUser, putUser, putPersonalInformation, putChangeImg, getUse
 const validator = require('../Middlewares/validation.middleware');
 const { userValidations } = require('../Middlewares/user.middleware.js');
 
+const { userPersonalInfoValidationForPut } = require('../Middlewares/user.middleware.js')
+const validator = require('../Middlewares/validation.middleware')
 
 route.get('/:iduser', getUserOne);
 route.get('/document/:document', getUserDocument);
@@ -15,9 +17,10 @@ route.get('/', getUser)
 route.post('/', [userValidations, validator], postUser);
 
 
+route.post('/', postUser)
 route.put('/img', putChangeImg)
 route.put('/password', putPasswordUser)
-route.put('/personalInfo', putPersonalInformation)
+route.put('/personalInfo', userPersonalInfoValidationForPut, validator, putPersonalInformation)
 
 route.post('/reset', resetPassword) //cambiar contraseña desde el restablecer contraseña
 route.put('/:iduser', putUser)

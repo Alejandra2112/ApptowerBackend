@@ -47,7 +47,24 @@ const apartmentsVlidationForPost = [
 
     check('area')
         .notEmpty().withMessage('El área es obligatoria.')
-        .isFloat({ min: 0 }).withMessage('El área debe ser un número positivo.')
+        .isFloat({ min: 0 }).withMessage('El área debe ser un número positivo.'),
+
+    check('isUniqueTower')
+        .notEmpty().withMessage('La característica de torre única es obligatoria.')
+        .isBoolean().withMessage('La característica de torre única debe ser un valor booleano.'),
+
+    check('lastApartmentNumber')
+        .optional({ nullable: true }) // Este campo es opcional
+        .isInt({ min: 0 }).withMessage('El último número de apartamento debe ser un número entero positivo.')
+        .custom(async (value, { req }) => {
+
+            const existingApartmentNumbers = await ApartmentModel.findAll();
+
+            if (existingApartmentNumbers.some(num => num === parseInt(value) - 1)) {
+                throw new Error('El último número de apartamento debe ser una unidad mayor que los números de apartamento ya registrados.');
+            }
+            return true;
+        })
 ];
 
 
@@ -94,7 +111,7 @@ const apartmentValidationForPut = [
     check('area')
         .notEmpty().withMessage('El área del apartamento es obligatoria.')
         .isNumeric().withMessage('El área del apartamento debe ser un número.')
-        .isFloat({ min: 1 }).withMessage('El área del apartamento debe ser un número mayor a cero.')
+        .isFloat({ min: 1 }).withMessage('El área del apartamento debe ser un número mayor a cero.'),
 
 
 
