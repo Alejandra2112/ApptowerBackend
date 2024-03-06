@@ -11,7 +11,7 @@ route.get('/:iduser', getWatchmanOne)
 route.get('/document/:document', getWatchmanDocument)
 
 
-route.post('/', [watchmanValidations, userValidations, validator], postWatchman)
-route.put('/', [watchmanValidations, userValidations, validator], putWatchman)
+route.post('/', userValidations, validator, postWatchman)
+route.put('/', putWatchman)
 
 module.exports = route

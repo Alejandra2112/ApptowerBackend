@@ -1,15 +1,35 @@
 const { check, validationResult } = require('express-validator');
 const UserModel = require('../Models/users.model');
+const RoleModel = require('../Models/rols.model.js');
 
 const userValidationForPost = [
+
     check('docType')
         .isLength({ min: 2, max: 2 }).withMessage('El tipo de documento debe tener 2 caracteres.')
         .matches(/^(CC|CE|PA)$/, 'i').withMessage('Tipo de documento inválido.'),
 
 
     check('document')
-        .isLength({ min: 8, max: 13 }).withMessage('El documento debe tener entre 8 y 13 números.'),
+        .optional({ nullable: true })
+        .isAlphanumeric().withMessage('El número de documento solo puede contener números.')
+        .custom(async (value, { req }) => {
 
+            const body = req.body
+
+            const userById = await UserModel.findOne({ where: { iduser: body.iduser } });
+            const userByDocument = await UserModel.findOne({ where: { document: value } });
+
+            if (!userById || !userByDocument) {
+                return true;
+            } else if (userById.document !== userByDocument.document) {
+                throw new Error(`El documento "${value}" ya está en uso.`);
+            } else {
+                return true;
+            }
+
+
+
+        }),
 
     check('name')
         .notEmpty().withMessage('El nombre es requerido.')
@@ -30,7 +50,26 @@ const userValidationForPost = [
 
 
     check('email')
-        .isEmail().withMessage('El correo es inválido.'),
+        .optional({ nullable: true })
+        .isEmail().withMessage('El correo electrónico debe tener un formato válido.')
+        .custom(async (value, { req }) => {
+
+            const body = req.body
+
+            const userById = await UserModel.findOne({ where: { iduser: body.iduser } });
+            const userByEmail = await UserModel.findOne({ where: { email: value } });
+
+            if (!userById || !userByEmail) {
+                return true;
+            } else if (userById.email !== userByEmail.email) {
+                throw new Error(`El email "${value}" ya está en uso.`);
+            } else {
+                return true;
+            }
+
+
+
+        }),
 
 
     check('phone')
@@ -38,13 +77,16 @@ const userValidationForPost = [
         .matches(/^[0-9]*$/, 'i').withMessage('Solo se permiten números.'),
 
 
-    // check('birthday')
-    //     .isDate().withMessage('La fecha de nacimiento es requerida.'),
+    check('birthday')
+        .isDate().withMessage('La fecha de nacimiento es requerida.'),
 
 
     check('sex')
         .matches(/^(M|F|O|No proporcionado)$/, 'i').withMessage('Sexo inválido.'),
 ];
+
+
+
 
 const userValidationForPut = [
     check('docType')
@@ -95,19 +137,90 @@ const userValidationForPut = [
         .matches(/^(Activo|Inactivo)$/, 'i').withMessage('Estado inválido.'),
 ];
 
-const userValidations = (req, res, next) => {
+
+const watchmanValidationForPost = [
+    check('idEnterpriseSecurity').isNumeric().withMessage('El rol es requerido.'),
+
+    check('iduser').isNumeric().withMessage('El rol es requerido.'),
+
+];
+
+const watchmanValidationForPut = [
+    check('idEnterpriseSecurity').isNumeric().withMessage('La empresa de seguridad es requerida.'),
+
+    check('iduser').isNumeric().withMessage('El id del usuario es requerido.'),
+
+    check('state').isIn(['Activo', 'Inactivo']).withMessage('Estado inválido.'),
+
+];
+
+
+const residentValidationForPost = [
+    check('iduser')
+        .isNumeric()
+        .withMessage('El id del usuario es requerido.'),
+
+    check('residentType')
+        .isIn(['tenant', 'owner'])
+        .withMessage('El tipo de residente es inválido. Debe ser "tenant" o "owner".'),
+
+    check('status')
+        .optional()
+        .isIn(['Active', 'Inactive'])
+        .withMessage('El estado es inválido. Debe ser "Active" o "Inactive".'),
+];
+
+const residentValidationForPut = [
+    check('iduser')
+        .isNumeric()
+        .withMessage('El id del usuario es requerido.'),
+
+    check('residentType')
+        .isIn(['tenant', 'owner'])
+        .withMessage('El tipo de residente es inválido. Debe ser "tenant" o "owner".'),
+
+    check('status')
+        .isIn(['Active', 'Inactive'])
+        .withMessage('El estado es inválido. Debe ser "Active" o "Inactive".'),
+];
+
+
+
+const userValidations = async (req, res, next) => {
+    const { idrole } = req.body;
+    if (!idrole) {
+        return res.status(400).json({ error: 'El idrole es requerido.' });
+    }
+
+    const role = await RoleModel.findOne({ where: { idrole } });
+    if (!role) {
+        return res.status(400).json({ error: 'El idrole proporcionado no existe.' });
+    }
+
+    const roleName = role.dataValues.namerole.toLowerCase();
+    req.roleName = roleName;
+
     let checks;
     if (req.method === 'POST') {
-        checks = userValidationForPost;
+        checks = roleName.includes('residente') ? [...residentValidationForPost, ...userValidationForPost] :
+            roleName.includes('vigilante') ? [...watchmanValidationForPost, ...userValidationForPost] :
+                userValidationForPost;
     } else if (req.method === 'PUT') {
-        checks = userValidationForPut;
+        checks = roleName.includes('residente') ? [...residentValidationForPut, ...userValidationForPut] :
+            roleName.includes('vigilante') ? [...watchmanValidationForPut, ...userValidationForPut] :
+                userValidationForPut;
     } else {
         return next();
     }
+
     Promise.all(checks.map(check => check.run(req)))
         .then(() => next())
         .catch(next);
 };
+
+
+
+
 
 
 
@@ -125,6 +238,10 @@ const sexs = [
     {
         value: "O",
         label: "Otro"
+    },
+    {
+        value: "No proporcionado",
+        label: "No proporcionado"
     }
 ];
 
@@ -159,6 +276,8 @@ const docTypes = [
     }
 ];
 
+
+
 const userPersonalInfoValidationForPut = [
 
     check('docType')
@@ -168,7 +287,7 @@ const userPersonalInfoValidationForPut = [
 
     check('document')
         .optional({ nullable: true })
-        .isAlphanumeric().withMessage('El número de documento solo puede contener números y letras.')
+        .isAlphanumeric().withMessage('El número de documento solo puede contener números.')
         .custom(async (value, { req }) => {
 
             const body = req.body
@@ -192,12 +311,12 @@ const userPersonalInfoValidationForPut = [
     check('name')
         .optional({ nullable: true })
         .isString().withMessage('El nombre debe ser una cadena de caracteres.')
-        .matches(/^[a-zA-Z\s]+$/).withMessage('El nombre solo puede contener letras y espacios.'),
+        .matches(/^[a-zA-ZÁÉÍÓÚáéíóú\s]+$/).withMessage('El nombre solo puede contener letras y espacios.'),
 
     check('lastName')
         .optional({ nullable: true })
         .isString().withMessage('El apellido debe ser una cadena de caracteres.')
-        .matches(/^[a-zA-Z\s]+$/).withMessage('El apellido solo puede contener letras y espacios.'),
+        .matches(/^[a-zA-ZÁÉÍÓÚáéíóú\s]+$/).withMessage('El apellido solo puede contener letras y espacios.'),
 
     check('birthday')
         .optional({ nullable: true })

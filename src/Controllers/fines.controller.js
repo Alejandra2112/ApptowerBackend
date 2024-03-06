@@ -104,6 +104,7 @@ const postFines = async (req, res) => {
         const fine = await Fines.create({
             evidenceFiles: imagesUrl,
             idApartment: idApartment,
+            idUser: idUser,
             ...finesAtributes,
         });
 
