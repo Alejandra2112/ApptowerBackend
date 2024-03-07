@@ -187,7 +187,7 @@ const postApartmentResident = async (req, res) => {
 
         res.json({
 
-            message: notification.content.message,
+            message: notification?.content?.message,
 
         });
 
@@ -269,11 +269,13 @@ const putApartmentResident = async (req, res = response) => {
 
 const deleteApartmentResident = async (req, res) => {
 
-    const { idApartmentResident } = req.body;
-    let message = '';
+
 
     try {
 
+        const { idApartmentResident } = req.body;
+        let message = '';
+        
         const rowsDeleted = await ApartmentResidentModel.destroy({ where: { idApartmentResident: idApartmentResident } });
 
         if (rowsDeleted > 0) {
@@ -285,16 +287,17 @@ const deleteApartmentResident = async (req, res) => {
             res.status(404).json({ error: 'Id apartment resident not found' });
 
         }
-    } catch (e) {
 
-        res.status(500).json({ error: 'Error delete apartment resident', message: e.message });
+        res.json({
 
+            spaceResidents: message,
+
+        });
+    } catch (error) {
+        console.error('Error al eliminar residente del apartamento:', error);
+        return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
     }
-    res.json({
 
-        spaceResidents: message,
-
-    });
 };
 
 

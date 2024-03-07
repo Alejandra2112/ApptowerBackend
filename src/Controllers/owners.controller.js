@@ -179,10 +179,10 @@ const postOwner = async (req, res) => {
                 iduser: idUserLogged,
                 type: 'success',
                 content: {
-                    message: `Se agrego un nuevo propietario ${user.name} ${user.lastName}
-                     ${apartment ? `al apartamento ${apartment.apartmentName}` : ''}
-                    `,
-                    information: { user, userLogged, owner }
+                    message: `Se agrego a ${user.name} ${user.lastName} como propietario
+                    ${resident ? ` y residente ` : ''}
+                    ${apartment ? `del apartamento ${apartment.apartmentName}` : ''}`,
+                    information: { user, userLogged, apartment }
                 },
                 datetime: new Date(),
 
@@ -221,35 +221,60 @@ const putOwner = async (req, res = response) => {
 
     try {
 
-        res.json({
+        const { idOwner, idUserLogged } = req.body
 
-            msg: "Aqui editaria un porpietario si tuviera un rol."
+        const owner = await OwnersModel.findOne({ where: { idOwner: idOwner } })
+        const user = await UserModel.findOne({ where: { iduser: owner.iduser } })
 
-        })
-        // const owner = await OwnersModel.findByPk(req.body.idOwner);
+        let ownerUpdated;
+        let message;
 
+        if (owner.status == 'Active') {
 
-        // if (!owner) {
-        //     return res.status(400).json({ msg: "Id owner not found." });
-        // }
+            ownerUpdated = await owner.update({
+                status: 'Inactive'
+            });
 
-        // const newPdf = await updateFile(req.files, owner.pdf, ['pdf'], 'Documents')
-        // const { pdf, ...others } = req.body
+            message = `Se desactivo el propietario ${user.name} ${user.lastName}. ya no es parte del conjunto residencial.`
 
-        // const updatedSpace = await owner.update({
-        //     pdf: newPdf,
-        //     ...others
-        // }, {
-        //     where: { idOwner: req.body.idOwner }
-        // });
+        } else if (owner.status == 'Inactive') {
 
-        // res.json({
-        //     spaces: 'Owner update',
-        //     // updatedSpace: updatedSpace.toJSON()
-        // });
+            ownerUpdated = await owner.update({
+                status: 'Active'
+            });
+
+            message = `Se reestablecio a ${user.name} ${user.lastName} como propietario.`
+
+        }
+
+        const userLogged = await UserModel.findByPk(idUserLogged)
+
+        let notification;
+
+        if (idUserLogged && user) {
+
+            notification = await Notification.create({
+
+                iduser: idUserLogged,
+                type: ownerUpdated.status == 'Inactive' ? 'danger' : 'success',
+                content: {
+                    message: `${message}`,
+                    information: { user, userLogged, owner }
+                },
+                datetime: new Date(),
+
+            })
+
+            res.json({
+
+                message: notification.content.message
+
+            })
+        }
+
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ msg: "Internal server error" });
+        console.error('Error al modificar propietario:', error);
+        return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
     }
 };
 

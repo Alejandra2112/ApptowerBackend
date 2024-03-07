@@ -101,52 +101,46 @@ const getAllApartment = async (req, res = response) => {
 
 const postApartment = async (req, res) => {
 
-    let message = '';
-    let newAparments = 0;
-    const body = req.body;
-
-    const { idTower, rangeStart, rangeEnd, apartmentsFloor, ...others } = body
-
-    // console.log("Apartments per floor: " + apartmentsFloor)
-    // console.log("Floor number: " + floorNumber)
-
-    let floors = rangeEnd - rangeStart + 1;
-
-
     try {
+
+        let newAparments = 0;
+        const body = req.body;
+
+        const { idTower, rangeStart, rangeEnd, apartmentsFloor, isUniqueTower, lastApartmentNumber, ...others } = body
+        
+        let floors = rangeEnd - rangeStart + 1;
 
         for (let floor = 0; floor < floors; floor++) {
 
-            console.log(newAparments)
-            console.log(floor, "floor")
-
-
             for (let apartmentNumber = 1; apartmentNumber <= apartmentsFloor; apartmentNumber++) {
                 newAparments++
+
                 await ApartmentModel.create({
 
                     idTower: idTower,
-                    apartmentName: (apartmentNumber < 10) ? `${rangeStart + floor}0${apartmentNumber}` : `${rangeStart + floor}${apartmentNumber}`,
+                    apartmentName:
+                        (apartmentNumber < 10) ? `${parseInt(rangeStart) + floor}0${isUniqueTower == 'true' ? apartmentNumber : parseInt(lastApartmentNumber)  + apartmentNumber}`
+                            : `${parseInt(rangeStart) + floor}${isUniqueTower == 'true'? apartmentNumber : parseInt(lastApartmentNumber) + apartmentNumber}`,
                     ...others
 
                 });
-
-                console.log(`creado: ${newAparments}`)
 
 
             }
 
         }
 
-        message = `Creaste ${newAparments} apartamentos.`;
+        res.json({
+            message: `creado: ${newAparments}`,
+            newAparments: newAparments
+        });
 
-    } catch (e) {
-        message = e.message;
+
+    } catch (error) {
+        console.error('Error al agregar apartamentos:', error);
+        return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
     }
-    res.json({
-        apartments: message,
-        newAparments: newAparments
-    });
+
 };
 
 
@@ -164,7 +158,7 @@ const putApartment = async (req, res = response) => {
 
         if (updatedRows > 0) {
 
-            message = 'Apartment updated successfully.';
+            message = `Apartamento ${update.apartmentName} actualizado correctamente.`;
 
         } else {
 
@@ -179,7 +173,7 @@ const putApartment = async (req, res = response) => {
     }
     res.json({
 
-        apartments: message,
+        message: message,
 
     });
 };
