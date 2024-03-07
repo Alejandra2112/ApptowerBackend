@@ -20,6 +20,8 @@ const idApartmentValidationsForPost = [
         }),
 ]
 
+
+
 const apartmentsVlidationForPost = [
 
 

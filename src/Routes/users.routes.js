@@ -1,16 +1,22 @@
 const { Router } = require('express')
 const route = Router()
 const { getUser, postUser, putUser, putPersonalInformation, putChangeImg, getUserOne, postUserEmail, postUsersforLogin, resetPassword, getUserDocument, getEmailUser, putPasswordUser } = require('../Controllers/users.controller.js')
+const validator = require('../Middlewares/validation.middleware');
+const { userValidations } = require('../Middlewares/user.middleware.js');
+
 const { userPersonalInfoValidationForPut } = require('../Middlewares/user.middleware.js')
-const validator = require('../Middlewares/validation.middleware')
+
 
 route.get('/:iduser', getUserOne);
 route.get('/document/:document', getUserDocument);
 route.get('/email/:email', getEmailUser);
 
 
-
 route.get('/', getUser)
+
+route.post('/', postUser);
+
+
 route.post('/', postUser)
 route.put('/img', putChangeImg)
 route.put('/password', putPasswordUser)

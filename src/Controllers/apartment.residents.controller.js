@@ -160,7 +160,7 @@ const postApartmentResident = async (req, res) => {
 
         })
 
-        // Notification
+        // Notification 
 
         const userLogged = await UserModel.findByPk(body.idUserLogged)
 

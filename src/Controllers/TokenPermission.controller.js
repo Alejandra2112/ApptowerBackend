@@ -16,7 +16,7 @@ const getPermissionFromRole = async (req, res) => {
         });
 
         if (!role) {
-            return res.status(401).json({ message: 'Rol no válido' });
+            return res.status(401).json({ message: 'R   ol no válido' });
         }
 
         const permissions = role.permissionRols.map((rp) => rp.idpermission);

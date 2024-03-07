@@ -75,7 +75,7 @@ module.exports = {
     },
 
 
-    changedStatusEmail: (name, lastName, email) => {
+    changedStatusEmail: (name, lastName, email, username, password) => {
         return {
             from: 'domuscomplex.solutions@gmail.com',
             to: email,
@@ -98,7 +98,7 @@ module.exports = {
                     border-radius: 8px;
                     box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.1);
                 }
-  
+    
                 a {
                     color: #007bff;
                     text-decoration: none;
@@ -142,77 +142,9 @@ module.exports = {
                 <h1>Confirmación de Activación de Cuenta</h1>
                 <p>Estimado/a ${name} ${lastName},</p>
                 <p>Nos complace informarle que su cuenta ha sido activada con éxito.</p>
-                <p>A partir de este momento, tiene pleno acceso a nuestra plataforma y puede comenzar a disfrutar de todos los servicios que ofrecemos.</p>
-                <p>Si tiene alguna pregunta o necesita asistencia, no dude en ponerse en contacto con nuestro equipo de soporte.</p>            
-                <p class="footer">Gracias por confiar en nosotros,<br />Equipo Apptower</p>
-            </div>
-        </body>
-        </html>`,
-            from: 'domuscomplex.solutions@gmail.com',
-            to: email,
-            subject: 'Cuenta activada exitosamente',
-            html: ` <html>
-        <head>
-            <style>
-                body {
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                    background-color: #f9f9f9;
-                    margin: 0;
-                    padding: 0;
-                    text-align: center;
-                }
-                .container {
-                    max-width: 600px;
-                    margin: 10px auto;
-                    padding: 20px;
-                    background-color: #ffffff;
-                    border-radius: 8px;
-                    box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.1);
-                }
-  
-                a {
-                    color: #007bff;
-                    text-decoration: none;
-                }
-                h1 {
-                    color: #007bff;
-                    margin-bottom: 20px;
-                }
-                p {
-                    line-height: 1.6;
-                    margin-bottom: 20px;
-                    color: #333;
-                }
-                .code {
-                    font-size: 25px;
-                    margin-bottom: 20px;
-                    font-weight: bold;
-                    color: #007bff;
-                }
-                .button {
-                    display: inline-block;
-                    padding: 15px 30px;
-                    margin-bottom: 10px;
-                    background-color: rgb(176, 196, 222);
-                    color: #007bff;
-                    text-decoration: none;
-                    border-radius: 5px;
-                    transition: background-color 0.3s ease;
-                }
-                .button:hover {
-                    background-color: rgb(173, 216, 230);
-                }
-                .footer {
-                    color: #777;
-                    font-size: 14px;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>Confirmación de Activación de Cuenta</h1>
-                <p>Estimado/a ${name} ${lastName},</p>
-                <p>Nos complace informarle que su cuenta ha sido activada con éxito.</p>
+                <p>Su nombre de usuario es: ${username}</p>
+                <p>Su contraseña es: ${password}</p>
+                <p>Recuerde que debe cambiar la contraseña después de iniciar sesión por primera vez.</p>
                 <p>A partir de este momento, tiene pleno acceso a nuestra plataforma y puede comenzar a disfrutar de todos los servicios que ofrecemos.</p>
                 <p>Si tiene alguna pregunta o necesita asistencia, no dude en ponerse en contacto con nuestro equipo de soporte.</p>            
                 <p class="footer">Gracias por confiar en nosotros,<br />Equipo Apptower</p>
@@ -221,6 +153,7 @@ module.exports = {
         </html>`
         }
     },
+    
 
     recorvedPasswordEmail: (recoveryCode, email) => {
         return {

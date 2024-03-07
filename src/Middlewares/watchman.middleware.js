@@ -1,47 +1,39 @@
-const yup = require("yup");
+const { check, validationResult } = require('express-validator');
 
-const postWatchmanSchema = yup.object().shape({
+const watchmanValidationForPost = [
+  check('idEnterpriseSecurity').isNumeric().withMessage('El rol es requerido.'),
 
-  idEnterpriseSecurity: yup.number().required("La empresa de seguridad es requerida"),
+  check('iduser').isNumeric().withMessage('El rol es requerido.'),
 
-  iduser: yup.number().required("El usuario es requerido"),
+];
 
+const watchmanValidationForPut = [
+  check('idEnterpriseSecurity').isNumeric().withMessage('El rol es requerido.'),
 
-});
+  check('iduser').isNumeric().withMessage('El rol es requerido.'),
 
+  check('state').isIn(['Activo', 'Inactivo']).withMessage('Estado inválido.'),
 
-const putWatchmanSchema = yup.object().shape({
-
-  idEnterpriseSecurity: yup.number(),
-
-  iduser: yup.number(),
-
-  state: yup.string().matches(/^(Activo|Inactivo)$/, 'Estado invalido'),
-
-});
-
+];
 
 const watchmanValidations = (req, res, next) => {
-  try {
-    let schema;
-    if (req.method === 'POST') {
-      schema = postWatchmanSchema;
-    } else if (req.method === 'PUT') {
-      schema = putWatchmanSchema;
-    } else {
-      return next();
-    }
-    schema.validateSync(req.body, { abortEarly: false });
-    next();
-  } catch (error) {
-    const errors = error.inner.map(err => ({
-      field: err.path,
-      message: err.message
-    }));
-    res.status(400).json({ errors });
+  let checks;
+  if (req.method === 'POST') {
+    checks = watchmanValidationForPost;
+  } else if (req.method === 'PUT') {
+    checks = watchmanValidationForPut;
+  } else {
+    return next();
   }
-}
+  Promise.all(checks.map(check => check.run(req)))
+    .then(() => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+      next();
+    })
+    .catch(next);
+};
 
-module.exports = {
-  watchmanValidations,
-}
+module.exports = { watchmanValidations };

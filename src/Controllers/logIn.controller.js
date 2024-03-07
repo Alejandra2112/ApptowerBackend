@@ -11,9 +11,11 @@ const Permissions = require('../Models/permissions.model');
 const Privileges = require('../Models/privileges.model');
 
 const logIn = async (req, res) => {
-  const { usuario, password } = req.body;
 
   try {
+    const { usuario, password } = req.body;
+
+
     const user = await UserModel.findOne({
       where: {
         [Op.or]: [
