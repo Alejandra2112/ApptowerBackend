@@ -14,7 +14,7 @@ route.get('/email/:email', getEmailUser);
 
 route.get('/', getUser)
 
-route.post('/', userValidations, validator, postUser);
+route.post('/', postUser);
 
 
 route.post('/', postUser)
