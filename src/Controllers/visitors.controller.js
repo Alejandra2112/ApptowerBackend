@@ -43,16 +43,16 @@ const getVisitorsOne = async (req, res = response) => {
 
 const postVisitors = async (req, res) => {
     let message = '';
-    const body = req.body; 
+    const body = req.body;                                                     //| 1
     try {
         // Verificar si ya existe un visitante con el mismo número de cédula
-        const existingVisitor = await Visitors.findOne({
+        const existingVisitor = await Visitors.findOne({                       //| 2
             where: {
                 documentNumber: body.documentNumber
             }
         });
 
-        if (existingVisitor) {
+        if (existingVisitor) {                                                 //| 3
             // Si ya existe, retornar un mensaje de error
             message = 'Ya existe un visitante con este número de cédula.';
             return res.status(400).json({
@@ -61,13 +61,13 @@ const postVisitors = async (req, res) => {
         }
 
         // Si no existe, crear el nuevo visitante
-        const visitorCreated = await Visitors.create(body);
+        const visitorCreated = await Visitors.create(body);                    //| 4
         message = 'Visitante Registrado Exitosamente';
         res.json({
             visitor: visitorCreated,
             message,
         });
-    } catch (e) {
+    } catch (e) {                                                              //| 5
         message = 'Error al registrar visitante: ' + e.message;
         res.status(500).json({
             message,
