@@ -29,7 +29,8 @@ const getOneResidents = async (req, res = response) => {
 
                     model: UserModel,
                     as: "user"
-                }]
+                }],
+
             }
 
         );
@@ -91,6 +92,9 @@ const getAllResidents = async (req, res = response) => {
                     model: UserModel,
                     as: 'user'
                 },
+            ],
+            order: [
+                ['idResident', 'DESC'] // Ordenando por el ID en orden descendente
             ]
         });
 

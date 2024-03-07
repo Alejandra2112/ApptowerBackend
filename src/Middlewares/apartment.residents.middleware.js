@@ -79,6 +79,14 @@ const apartmentResidentValidationForPost = [
 
 
 
+
+
+
+
+]
+
+const residentStartDateValidationForPost = [
+
     check('residentStartDate')
         .notEmpty().withMessage('La fecha de inicio es obligatorio.')
         .custom((value) => {
@@ -90,8 +98,6 @@ const apartmentResidentValidationForPost = [
             }
             return true;
         }),
-
-
 
 ]
 
@@ -233,6 +239,7 @@ module.exports = {
 
     apartmentResidentValidationForPost,
     apartmentResidentValidationForPut,
-    apartmentResidentValidationForDelete
+    apartmentResidentValidationForDelete,
+    residentStartDateValidationForPost
 
 }

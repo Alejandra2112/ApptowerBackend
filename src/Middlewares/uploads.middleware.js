@@ -1,16 +1,29 @@
-const UploadValidation = (req, res, next) => {
+const { check } = require('express-validator');
 
-    if (!req.files || !req.files.image || Object.keys(req.files).length === 0) {
-        return res.status(400).json({
-            msg: 'No files were uploaded.'
-        });
-    }
+const fileValidationForPost = [
 
-    next()
+    check('pdf')
 
-}
+    // .custom((value, { req }) => {
+
+    //     if (!req.files.pdf) {
+    //         throw new Error('El debes sub es obligatorio.');
+    //     }
+    //     return true;
+
+    // })
+
+    .custom((value, { req }) => {
+
+        if (!req.files) {
+            throw new Error('El documento PDF es obligatorio.');
+        }
+        return true;
+
+    })
+];
 
 module.exports = {
 
-    UploadValidation
+    fileValidationForPost
 }
