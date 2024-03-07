@@ -70,6 +70,9 @@ const getAllOwners = async (req, res = response) => {
                     model: UserModel,
                     as: 'user'
                 },
+            ],
+            order: [
+                ['idOwner', 'DESC'] // Ordenando por el ID en orden descendente
             ]
         });
 
@@ -119,7 +122,7 @@ const postOwner = async (req, res) => {
         const user = await UserModel.create({
             pdf: pdfUrl,
             userImg: imgUrl,
-            idrole: 1, // resident rol 
+            idrole: 2, // resident rol 
             password: userData.password,
             status: "Activo",
             ...userData
@@ -129,20 +132,22 @@ const postOwner = async (req, res) => {
         const owner = await OwnersModel.create({
 
             iduser: user.iduser,
-            status: "Inactive"
+            status: "Inactive" // Create owner inactive
+
         })
 
+        console.log(userData.idApartment, 'userData.idApartment')
 
         const apartmentOwners = userData.idApartment ? await ApartmentOwnerModel.create({
 
             idApartment: userData.idApartment,
             idOwner: owner.idOwner,
-            OwnershipStartDate: new Date()
+            OwnershipStartDate: userData.OwnershipStartDate
 
         }) : ""
 
         let resident = null;
-        let apartment;
+        const apartment = await ApartmentModel.findByPk(userData.idApartment)
 
         if (isResident === true || isResident === "true") {
 
@@ -158,10 +163,9 @@ const postOwner = async (req, res) => {
 
                 idResident: resident.idResident,
                 idApartment: userData.idApartment,
-                residentStartDate: new Date()
+                residentStartDate: userData.OwnershipStartDate
             })
 
-            apartment = await ApartmentModel.findByPk(userData.idApartment)
 
         }
 
@@ -187,8 +191,6 @@ const postOwner = async (req, res) => {
                 datetime: new Date(),
 
             })
-
-            console.log(notification, "notification")
 
             if (notification) {
 

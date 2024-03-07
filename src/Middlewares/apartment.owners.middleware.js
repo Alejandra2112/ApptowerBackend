@@ -76,19 +76,19 @@ const apartmentOwnerValidationForPut = [
         }),
 
 
-    check('OwnershipStartDate')
-        .notEmpty().withMessage('La fecha de inicio es obligatorio.')
-        .custom((value) => {
+    // check('OwnershipStartDate')
+    //     .notEmpty().withMessage('La fecha de inicio es obligatorio.')
+    //     .custom((value) => {
 
-            const OwnershipStartDate = new Date(value);
-            const today = new Date();
+    //         const OwnershipStartDate = new Date(value);
+    //         const today = new Date();
 
-            if (OwnershipStartDate > today) {
-                throw new Error('La fecha no puede ser mayor a hoy.');
-            }
+    //         if (OwnershipStartDate > today) {
+    //             throw new Error('La fecha no puede ser mayor a hoy.');
+    //         }
 
-            return true;
-        }),
+    //         return true;
+    //     }),
 
     check('OwnershipEndDate')
         .notEmpty().withMessage('La fecha de fin es obligatorio.')
@@ -117,9 +117,28 @@ const apartmentOwnerValidationForPut = [
 
 ]
 
+
+const OwnershipStartDateValidationForPost = [
+
+    check('OwnershipStartDate')
+        .notEmpty().withMessage('La fecha de inicio es obligatorio.')
+        .custom((value) => {
+
+            const OwnershipStartDate = new Date(value);
+            const today = new Date();
+
+            if (OwnershipStartDate > today) {
+                throw new Error('La fecha no puede ser mayor a hoy.');
+            }
+
+            return true;
+        }),
+]
+
 module.exports = {
 
     apartmentOwnerValidationForPost,
     apartmentOwnerValidationForPut,
+    OwnershipStartDateValidationForPost
 
 }

@@ -4,7 +4,7 @@ const { getUser, postUser, putUser, putPersonalInformation, putChangeImg, getUse
 const validator = require('../Middlewares/validation.middleware');
 const { userValidations } = require('../Middlewares/user.middleware.js');
 
-const { userPersonalInfoValidationForPut } = require('../Middlewares/user.middleware.js')
+const { userPersonalInfoValidationForPut, passwordValidationForPost } = require('../Middlewares/user.middleware.js')
 
 
 route.get('/:iduser', getUserOne);
@@ -14,7 +14,7 @@ route.get('/email/:email', getEmailUser);
 
 route.get('/', getUser)
 
-route.post('/', userValidations, validator, postUser);
+route.post('/', userValidations, passwordValidationForPost, validator, postUser);
 
 
 route.post('/', postUser)
