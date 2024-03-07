@@ -2,11 +2,64 @@ const { check, validationResult } = require('express-validator');
 const UserModel = require('../Models/users.model');
 const RoleModel = require('../Models/rols.model.js');
 
+
+const sexs = [
+    {
+        value: "M",
+        label: "Masculino"
+    },
+    {
+        value: "F",
+        label: "Femenino"
+    },
+    {
+        value: "O",
+        label: "Otro"
+    },
+    {
+        value: "No proporcionado",
+        label: "No proporcionado"
+    }
+];
+
+const docTypes = [
+    {
+        value: "CC",
+        label: "Cédula de ciudadanía"
+    },
+    {
+        value: "TI",
+        label: "Tarjeta de identidad"
+    },
+    {
+        value: "CE",
+        label: "Cédula de extranjería"
+    },
+    {
+        value: "PAST",
+        label: "Pasaporte"
+    },
+    {
+        value: "RC",
+        label: "Registro civil"
+    },
+    {
+        value: "NIT",
+        label: "Número de identificación tributaria"
+    },
+    {
+        value: "PEP",
+        label: "Permiso especial de permanencia"
+    }
+];
+
+
 const userValidationForPost = [
 
     check('docType')
-        .isLength({ min: 2, max: 2 }).withMessage('El tipo de documento debe tener 2 caracteres.')
-        .matches(/^(CC|CE|PA)$/, 'i').withMessage('Tipo de documento inválido.'),
+        .optional({ nullable: true })
+        .isString().withMessage('El tipo de documento debe ser una cadena de caracteres.')
+        .isIn(docTypes.map(doc => doc.value)).withMessage('El tipo de documento no es válido.'),
 
 
     check('document')
@@ -45,10 +98,6 @@ const userValidationForPost = [
         .isNumeric().withMessage('El rol es requerido.'),
 
 
-    check('password')
-        .isLength({ min: 8, max: 12 }).withMessage('La contraseña debe tener entre 8 y 12 caracteres.'),
-
-
     check('email')
         .optional({ nullable: true })
         .isEmail().withMessage('El correo electrónico debe tener un formato válido.')
@@ -73,7 +122,7 @@ const userValidationForPost = [
 
 
     check('phone')
-        .isLength({ min: 10, max: 10 }).withMessage('El teléfono debe tener 10 números.')
+        .isLength({ min: 10, max: 13 }).withMessage('El teléfono debe tener 10 números.')
         .matches(/^[0-9]*$/, 'i').withMessage('Solo se permiten números.'),
 
 
@@ -90,8 +139,9 @@ const userValidationForPost = [
 
 const userValidationForPut = [
     check('docType')
-        .isLength({ min: 2, max: 2 }).withMessage('El tipo de documento debe tener 2 caracteres.')
-        .matches(/^(CC|CE|PA)$/, 'i').withMessage('Tipo de documento inválido.'),
+        .optional({ nullable: true })
+        .isString().withMessage('El tipo de documento debe ser una cadena de caracteres.')
+        .isIn(docTypes.map(doc => doc.value)).withMessage('El tipo de documento no es válido.'),
 
 
     check('document')
@@ -226,55 +276,6 @@ const userValidations = async (req, res, next) => {
 
 
 
-const sexs = [
-    {
-        value: "M",
-        label: "Masculino"
-    },
-    {
-        value: "F",
-        label: "Femenino"
-    },
-    {
-        value: "O",
-        label: "Otro"
-    },
-    {
-        value: "No proporcionado",
-        label: "No proporcionado"
-    }
-];
-
-const docTypes = [
-    {
-        value: "CC",
-        label: "Cédula de ciudadanía"
-    },
-    {
-        value: "TI",
-        label: "Tarjeta de identidad"
-    },
-    {
-        value: "CE",
-        label: "Cédula de extranjería"
-    },
-    {
-        value: "PAST",
-        label: "Pasaporte"
-    },
-    {
-        value: "RC",
-        label: "Registro civil"
-    },
-    {
-        value: "NIT",
-        label: "Número de identificación tributaria"
-    },
-    {
-        value: "PEP",
-        label: "Permiso especial de permanencia"
-    }
-];
 
 
 
