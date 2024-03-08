@@ -29,8 +29,19 @@ const postGuestIncomeValidations = [
 const putGuestIncomeValidations = [
   check('idGuest_income').isInt().withMessage('El ingreso de visitante es requerido')
   .notEmpty().withMessage('El ingreso de visitante es requerido'),
-  check('departureDate').isDate().withMessage('La fecha de salida es requerida')
-  .notEmpty(' La fecha de salida es requerida'),
+  check('departureDate').custom((value) => {
+    if (isNaN(Date.parse(value))) {
+      throw new Error(`La fecha de salida debe ser valida, recibido: ${value}`);
+    }
+    const departureDate = new Date(value);
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+    if (departureDate < currentDate) {
+      throw new Error(`La fecha de salida no puede ser anterior al día actual`);
+    }
+    return true;
+  })
+  .notEmpty().withMessage('La fecha de salida es requerida'),
 ];
 
 module.exports = {
