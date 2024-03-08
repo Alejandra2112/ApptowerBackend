@@ -8,6 +8,8 @@ const { upload, updateFile } = require('../Helpers/uploads.helpers');
 const ApartmentResidentModel = require('../Models/apartment.residents.model');
 const Mails = require('../Helpers/Mails');
 const Notification = require('../Models/notification.model');
+const { GmailTransporter } = require('../Helpers/emailConfig');
+
 
 
 const getUser = async (req, res = response) => {
@@ -204,6 +206,10 @@ const postUser = async (req, res) => {
 
 
     const { idUserLogged, pdf, userImg, idEnterpriseSecurity, residentType, idApartment, ...userData } = req.body;
+
+    passwordOrinignal = userData.password;
+
+
     const salt = bcryptjs.genSaltSync();
     userData.password = bcryptjs.hashSync(userData.password, salt);
 
@@ -215,19 +221,21 @@ const postUser = async (req, res) => {
 
     })
 
-    // if (user) {
-    //   const mailOptions = Mails.changedStatusEmail(user.name, user.lastName, user.email);
+    const isMatch = await bcryptjs.compare(passwordOrinignal, user.password);
 
-    //   GmailTransporter.sendMail(mailOptions, (error, info) => {
-    //     if (error) {
-    //       console.error('Error al enviar el correo:', error);
-    //       res.status(500).json({ message: 'Error al enviar el correo' });
-    //     } else {
-    //       console.log('Correo enviado:', info.response);
-    //       res.json({ message: 'Correo con código de recuperación enviado' });
-    //     }
-    //   });
-    // }
+    if (user) {
+      const mailOptions = Mails.changedStatusEmail(user.name, user.lastName, user.email, user.email, isMatch);
+
+      GmailTransporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error('Error al enviar el correo:', error);
+          res.status(500).json({ message: 'Error al enviar el correo' });
+        } else {
+          console.log('Correo enviado:', info.response);
+          res.json({ message: 'Correo con código de recuperación enviado' });
+        }
+      });
+    }
 
     const role = await Rols.findOne({ where: { idrole: userData.idrole } });
     const roleName = role ? role.namerole.toLowerCase() : null;

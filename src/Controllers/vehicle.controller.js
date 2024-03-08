@@ -42,11 +42,14 @@ const getOneVehicleByAparment = async (req, res = response) => {
         });
     }
 }
+
+
 const postVehicle = async (req, res) => {
-    let message = '';
 
     try {
+
         const body = req.body;
+
         const vehicle = await Vehicle.create(body);
 
         // Notification
@@ -73,8 +76,6 @@ const postVehicle = async (req, res) => {
                 datetime: new Date(),
 
             })
-
-            console.log(notification, "notification")
 
         }
 

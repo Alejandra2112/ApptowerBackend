@@ -84,7 +84,7 @@ const postBooking = async (req, res) => {
 
     console.log(body, 'datos de una reserva realizada');
 
-    if (!body.idSpace || !body.idResident || !body.StartDateBooking || !body.StartTimeBooking || !body.EndDateBooking || !body.EndTimeBooking || !body.amountPeople) {
+    if (!body.idSpace || !body.idResident || !body.StartDateBooking || !body.StartTimeBooking || !body.EndTimeBooking || !body.amountPeople) {
         return res.status(400).json({
             error: 'Faltan datos necesarios para la reserva. Por favor, verifique los datos enviados.',
         });

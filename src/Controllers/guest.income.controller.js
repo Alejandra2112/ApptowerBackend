@@ -131,6 +131,8 @@ const putGuestIncome = async (req, res = response) => {
     const body = req.body;
     let message = '';
 
+    console.log(body, "Aqui el body")
+
     try {
         const { idGuest_income, departureDate } = body;
 
@@ -139,6 +141,7 @@ const putGuestIncome = async (req, res = response) => {
         }, {
             where: { idGuest_income: idGuest_income },
         });
+        console.log(updatedRows, "Aqui las rows")
 
         if (updatedRows > 0) {
             message = 'Ingreso modificado exitosamente.';
