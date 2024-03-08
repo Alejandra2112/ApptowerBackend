@@ -100,28 +100,28 @@ const postFines = async (req, res) => {
         console.log(imagesUrl);
 
 
-        const { idUser, idApartment, videnceFiles, ...finesAtributes } = req.body;
+        const { iduser, idApartment, videnceFiles, ...finesAtributes } = req.body;
         const fine = await Fines.create({
             evidenceFiles: imagesUrl,
             idApartment: idApartment,
-            idUser: idUser,
+            idUser: iduser,
             ...finesAtributes,
         });
 
         // Notification
 
-        const userLogged = await UserModel.findByPk(idUser)
+        const userLogged = await UserModel.findByPk(iduser)
 
         let notification;
 
         let apartment = await ApartmentModel.findByPk(idApartment)
 
 
-        if (idUser && userLogged) {
+        if (iduser && userLogged) {
 
             notification = await Notification.create({
 
-                iduser: idUser,
+                iduser: iduser,
                 type: 'success',
                 content: {
                     message: `Se multo al apartamento ${apartment.apartmentName}

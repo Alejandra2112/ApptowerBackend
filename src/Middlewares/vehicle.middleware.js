@@ -64,14 +64,21 @@ const vehiclesValidationsForPut = [
         .isLength({ min: 6, max: 6 }).withMessage('La placa debe ser de 6 caracteres.')
         .matches(/^[A-Z]{3}[0-9]{3}$|^[A-Z]{3}[0-9]{2}[A-Z]$/)
         .withMessage('La placa del vehículo debe tener un formato válido, como AAA123 o AAA12A.')
-        .custom(async (value) => {
+        .custom(async (value, { req }) => {
 
-            const licenseExisting = await Vehicle.findOne({ where: { licenseplate: value } });
+            const body = req.body
 
-            if (licenseExisting) {
-                throw new Error(`La placa del vehículo '${value}' ya existe en el sistema.`);
+            const existingVehicleById = await Vehicle.findOne({ where: { idvehicle: body.idvehicle } });
+            const existingVehicleByName = await Vehicle.findOne({ where: { licenseplate: value } });
+
+            if (!existingVehicleById || !existingVehicleByName) {
+                return true;
+            } else if (existingVehicleById.licenseplate !== existingVehicleByName.licenseplate) {
+                throw new Error(`La placa "${value}" ya se encuentra en el sistema.`);
+            } else {
+                return true;
             }
-            return true;
+
         }),
 
 

@@ -283,7 +283,7 @@ const deleteApartmentResident = async (req, res) => {
             message = 'Apartment resident dalete ok';
 
         } else {
-
+            
             res.status(404).json({ error: 'Id apartment resident not found' });
 
         }

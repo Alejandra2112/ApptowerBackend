@@ -1,7 +1,7 @@
 const { check } = require('express-validator');
 
 const postFinesValidations = [
-  check('idUser').isInt().withMessage('el id del usuario es requerido')
+  check('iduser').isInt().withMessage('el id del usuario es requerido')
   .notEmpty().withMessage('El id del usuario es requerido')
   .isLength({min: 1}).withMessage('El id del usuario es requerido'),
 
@@ -45,9 +45,6 @@ const postFinesValidations = [
   check('details').isString().withMessage('Se requiere una descripcion de incidente')
   .notEmpty().withMessage('Se requiere una descripcion de incidente')
   .isLength({min: 3, max: 500}).withMessage('Debe tener entre 3 y 500 caracteres'),
-  check('idUser').isInt().withMessage('Se requiere el id del usuario')
-  .notEmpty().withMessage('Se requiere el id del usuario')
-  .isLength({min: 1}).withMessage('Se requiere el id del usuario'),
 ];
 
 const putFinesValidations = [
