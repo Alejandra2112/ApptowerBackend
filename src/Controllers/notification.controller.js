@@ -9,14 +9,86 @@ const ApartmentModel = require('../Models/apartment.model');
 // Sockets
 const notifications = async (socket, io) => {
 
-    
+
+    // Start emit notifications
+
+
+    // Get all notifications in db
+
     const allNotifications = await Notification.findAll({
         order: [['createdAt', 'DESC']]
     });
 
-    io.emit('notifications-user', allNotifications);
+    // Time to delete 
 
-    
+    const timeToDelete = new Date();
+    timeToDelete.setDate(timeToDelete.getDate() - 1);
+
+    // Filtrar las notificaciones que tienen más de una semana de antigüedad
+
+    for (const notification of allNotifications) {
+
+        let notificationCreatedAt = new Date(notification.createdAt);
+
+
+        // console.log(notificationCreatedAt, timeToDelete, notificationCreatedAt > timeToDelete)
+
+        if (notificationCreatedAt < timeToDelete) {
+            await Notification.destroy({ where: { idnotification: notification.idnotification } });
+        }
+    }
+
+    // Emitir notifications without delete
+
+    const updatedNotifications = await Notification.findAll({
+        order: [['createdAt', 'DESC']]
+    });
+
+
+    // Notifications to watchmans
+
+    const notificationsPerWatchman = updatedNotifications.filter((notification) => {
+
+        const notificationsFilteredToWatchmans =
+            notification?.content?.information?.apartment ||
+            notification?.content?.information?.fine ||
+            notification?.content?.information?.guest_income
+
+        console.log(notificationsFilteredToWatchmans?.length, 'apartmenNotifications')
+        return notificationsFilteredToWatchmans !== undefined && notificationsFilteredToWatchmans !== null;
+
+    });
+
+    // Notifications to residents 
+
+    const notificationsToResidents = updatedNotifications.filter((notification) => {
+
+        const notificationsFilteredToResidents =
+            notification?.content?.information?.booking ||
+            notification?.content?.information?.apartment &&
+            notification?.content?.information?.userLogged?.idrole === 1
+
+        return notificationsFilteredToResidents !== undefined && notificationsFilteredToResidents !== null;
+
+    });
+
+    console.log(notificationsPerWatchman.length, 'notificationsPerWatchman')
+    console.log(notificationsToResidents.length, 'notificationsToResidents')
+    console.log(updatedNotifications.length, 'updatedNotifications')
+
+    io.emit('resident-notifications', notificationsToResidents);
+    io.emit('watchman-notifications', notificationsPerWatchman);
+    io.emit('all-notifications', updatedNotifications);
+
+
+    // End emit notifications
+
+
+
+
+
+
+    // Funtion to see the notification with a click
 
     socket.on('seen-notification', async (id) => {
 
@@ -36,9 +108,9 @@ const notifications = async (socket, io) => {
         const allNotifications = await Notification.findAll({
             order: [['createdAt', 'DESC']]
         });
-    
-    
-        io.emit('notifications-user', allNotifications);
+
+
+        io.emit('all-notifications', allNotifications);
 
 
     })
