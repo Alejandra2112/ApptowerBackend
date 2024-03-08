@@ -3,6 +3,27 @@ const { check, validationResult } = require('express-validator');
 const ResidentModel = require('../Models/resident.model');
 const ApartmentResidentModel = require('../Models/apartment.residents.model');
 
+const residentsTypes = [
+
+    {
+        value: "owner",
+        label: "Propietario"
+    },
+
+    {
+        value: "tenant",
+        label: "Arrendatario"
+    }
+]   
+
+
+const residentTypeValidation = [
+
+    check('residentType')
+        // .notEmpty().withMessage('El tipo de residente es obligatorio.')
+        // .isIn(residentsTypes.map(type => type.value)).withMessage('El tipo de residente no es válido.')
+        
+];
 
 const residentStatusValidation = [
 
@@ -23,8 +44,9 @@ const residentStatusValidation = [
         .custom(async (value) => {
 
             const apartmentresidents = await ApartmentResidentModel.findAll({ where: { idResident: value, status: 'Active' } });
+            const resident = await ResidentModel.findByPk(apartmentresidents[0].idResident)
 
-            if (apartmentresidents && apartmentresidents.length > 0) {
+            if (apartmentresidents && apartmentresidents.length > 0 && resident.status == 'Active') {
 
                 throw new Error('El residente esta activos en un apartamento.');
             }
@@ -37,5 +59,6 @@ const residentStatusValidation = [
 module.exports = {
 
     residentStatusValidation,
+    residentTypeValidation
 
 }

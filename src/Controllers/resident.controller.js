@@ -130,13 +130,6 @@ const getAllResidents = async (req, res = response) => {
 };
 
 
-
-
-
-
-
-
-
 const postResident = async (req, res) => {
 
     try {
@@ -168,6 +161,25 @@ const postResident = async (req, res) => {
             status: "Active" // Active becase live in the tower
         })
 
+        let owner;
+        let apartmentOwner;
+
+        if (resident && resident.residentType == 'owner' && idApartment) {
+
+            owner = await OwnersModel.create({
+                iduser: user.iduser,
+                status: resident.status
+
+            })
+
+            apartmentOwner = await ApartmentOwnerModel.create({
+
+                idApartment: idApartment,
+                idOwner: owner.idOwner,
+                OwnershipStartDate: userData.residentStartDate
+            })
+        }
+
 
         const apartmentResident = idApartment ? await ApartmentResidentModel.create({
 
@@ -193,7 +205,7 @@ const postResident = async (req, res) => {
                 iduser: idUserLogged,
                 type: 'success',
                 content: {
-                    message: `Se agrego un nuevo residencia  ${user.name} ${user.lastName}
+                    message: `Se agrego un nuevo residencia ${owner ? `y propietario` : ''} ${user.name} ${user.lastName}
                      ${apartment ? ` al apartamento ${apartment.apartmentName}` : ''}
                     `,
                     information: { userLogged, resident }

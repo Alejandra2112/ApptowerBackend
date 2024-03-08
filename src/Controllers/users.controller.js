@@ -458,8 +458,11 @@ const putChangeImg = async (req, res = response) => {
 const putUser = async (req, res) => {
   try {
     const { iduser } = req.params;
-    const { idUserLogged, idrole, status, pdf, idEnterpriseSecurity, residentType, idApartment, ...update } = req.body;
-    console.log(pdf, 'pdf en back')
+    const { idUserLogged, idrole, status, idEnterpriseSecurity, residentType, idApartment, ...update } = req.body;
+
+    console.log(req.files, "file")
+    console.log(req.body, "body")
+
     const user = await UserModel.findOne({ where: { iduser: iduser } });
 
     if (!user) {
@@ -469,14 +472,11 @@ const putUser = async (req, res) => {
     const oldStatus = user.status;
 
 
-    const newPdf = req.files !== null ? await updateFile(req.files, user.pdf, ['pdf'], 'Documents') : null
-    const newImageUser = req.files !== null ? await updateFile(req.files, user.userImg, ['png', 'jpg', 'jpeg'], 'Images', 'userImg') : null
-
+    const newPdf = req.files !== null ? await updateFile(req.files, user.pdf, ['pdf'], 'Documents', 'pdf') : null
 
     await user.update({
       pdf: newPdf,
       idrole: idrole,
-      userImg: newImageUser,
       status: status,
       ...update
     });

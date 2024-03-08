@@ -14,7 +14,7 @@ route.get('/', getAllOwners)
 route.post('/',
     userPersonalInfoValidationForPost, ageValidation, idApartmentValidationsForPost,
     createAapartmentOwnerValidationforPost, OwnershipStartDateValidationForPost,
-    passwordValidationForPost, fileValidationForPost, validator, postOwner)
+    passwordValidationForPost, fileValidationForPost, validator, postOwner )
 
 route.put('/', ownerStatusValidation, validator, putOwner)
 // route.delete('/', deleteOwner)

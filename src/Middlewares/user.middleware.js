@@ -124,7 +124,7 @@ const userValidationForPost = [
 
 
     check('birthday')
-        .isDate().withMessage('La fecha de nacimiento es requerida.'),
+        .notEmpty().withMessage('La fecha de nacimiento es requerida.'),
 
 
     check('sex')
@@ -175,6 +175,10 @@ const userValidationForPut = [
         .isNumeric().withMessage('El rol es requerido.'),
 
 
+    check('birthday')
+        .notEmpty().withMessage('La fecha de nacimiento es requerida.'),
+
+
     check('password')
         .isLength({ min: 8, max: 12 }).withMessage('La contraseña debe tener entre 8 y 12 caracteres.'),
 
@@ -188,27 +192,11 @@ const userValidationForPut = [
         .matches(/^[0-9]*$/, 'i').withMessage('Solo se permiten números.'),
 
 
-    check('birthday')
-        .isDate().withMessage('La fecha de nacimiento es requerida.')
-        .custom((value) => {
-            if (value) {
-                const birthdayDate = new Date(value);
-                const today = new Date();
-
-                if (birthdayDate > today) {
-                    throw new Error('La fecha de nacimiento no puede ser mayor a hoy.');
-                }
-            }
-            return true;
-        }),
 
     check('sex')
         .isString().withMessage('El género debe ser una cadena de caracteres.')
         .isIn(sexs.map(sex => sex.value)).withMessage('El género no es válido.'),
 
-
-    // check('state')
-    //     .matches(/^(Activo|Inactivo)$/, 'i').withMessage('Estado inválido.'),
 ];
 
 
@@ -512,6 +500,31 @@ module.exports = {
     userValidations,
 
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
