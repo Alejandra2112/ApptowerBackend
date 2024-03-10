@@ -31,9 +31,6 @@ const notifications = async (socket, io) => {
 
         let notificationCreatedAt = new Date(notification.createdAt);
 
-
-        // console.log(notificationCreatedAt, timeToDelete, notificationCreatedAt > timeToDelete)
-
         if (notificationCreatedAt < timeToDelete) {
             await Notification.destroy({ where: { idnotification: notification.idnotification } });
         }
@@ -55,7 +52,7 @@ const notifications = async (socket, io) => {
             notification?.content?.information?.fine ||
             notification?.content?.information?.guest_income
 
-        console.log(notificationsFilteredToWatchmans?.length, 'apartmenNotifications')
+        // console.log(notificationsFilteredToWatchmans?.length, 'apartmenNotifications')
         return notificationsFilteredToWatchmans !== undefined && notificationsFilteredToWatchmans !== null;
 
     });
@@ -73,9 +70,9 @@ const notifications = async (socket, io) => {
 
     });
 
-    console.log(notificationsPerWatchman.length, 'notificationsPerWatchman')
-    console.log(notificationsToResidents.length, 'notificationsToResidents')
-    console.log(updatedNotifications.length, 'updatedNotifications')
+    // console.log(notificationsPerWatchman.length, 'notificationsPerWatchman')
+    // console.log(notificationsToResidents.length, 'notificationsToResidents')
+    // console.log(updatedNotifications.length, 'updatedNotifications')
 
     io.emit('resident-notifications', notificationsToResidents);
     io.emit('watchman-notifications', notificationsPerWatchman);
@@ -93,18 +90,18 @@ const notifications = async (socket, io) => {
 
     socket.on('seen-notification', async (id) => {
 
-        console.log('data from seen-notification', id)
+        // console.log('data from seen-notification', id)
 
         const notification = await Notification.findByPk(id);
 
-        console.log(notification, 'Notificacion buscada')
+        // console.log(notification, 'Notificacion buscada')
 
         const notificationUpdated = await notification.update({
             ...notification,
             seen: true
         })
 
-        console.log(notificationUpdated, 'notification updated')
+        // console.log(notificationUpdated, 'notification updated')
 
         const allNotifications = await Notification.findAll({
             order: [['createdAt', 'DESC']]
@@ -200,7 +197,7 @@ const dashboardInformation = async (socket, io) => {
     io.emit('dashboard-information', data);
     socket.on('dashboard-information', data => {
 
-        console.log('data from dashboard', data)
+        // console.log('data from dashboard', data)
     });
 
 
