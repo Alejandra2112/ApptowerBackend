@@ -35,6 +35,38 @@ const getBooking = async (req, res = response) => {
 }
 
 
+const getOneBooking = async (req, res = response) => {
+
+    const { idbooking } = req.params;
+
+    try {
+        const booking = await Booking.findOne({
+            where: { idbooking: idbooking },
+            include: [
+                {
+                    model: ResidentModel,
+                    include: {
+                        model: UserModel,
+                    }
+                },
+                {
+                    model: SpacesModel,
+                }
+            ]
+        });
+
+        res.json({
+            booking,
+        });
+    } catch (error) {
+        console.error('Error al obtener reserva.', error);
+        res.status(500).json({
+            error: 'Error al obtener reserva.',
+        });
+    }
+}
+
+
 const getOneBookingbySpaces = async (req, res = response) => {
     const { idSpace } = req.params;
 
@@ -152,5 +184,6 @@ module.exports = {
     getBooking,
     postBooking,
     putBooking,
-    getOneBookingbySpaces
-}
+    getOneBookingbySpaces,
+    getOneBooking
+        }

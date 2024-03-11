@@ -50,30 +50,30 @@ const getAllApartment = async (req, res = response) => {
 
         for (const apartment of apartments) {
 
-            const residents = await ApartmentResidentModel.findAll({
-                where: { idApartment: apartment.idApartment },
-            });
+            // const residents = await ApartmentResidentModel.findAll({
+            //     where: { idApartment: apartment.idApartment },
+            // });
             const guestIncomes = await Guest_income.findAll({
-                where: { idApartment: apartment.idApartment },
+                where: { idApartment: apartment.idApartment, departureDate: null },
 
             })
 
-            const vehicles = await Vehicle.findAll({
-                where: { idApartment: apartment.idApartment },
+            // const vehicles = await Vehicle.findAll({
+            //     where: { idApartment: apartment.idApartment },
 
-            })
+            // })
 
             const fines = await Fines.findAll({
-                where: { idApartment: apartment.idApartment },
+                where: { idApartment: apartment.idApartment, state: 'Pendiente' },
 
             })
 
-            apartment.dataValues.residentList = residents.map(resident => resident.toJSON());
-            apartment.dataValues.residents = residents.length;
+            // apartment.dataValues.residentList = residents.map(resident => resident.toJSON());
+            // apartment.dataValues.residents = residents.length;
 
             apartment.dataValues.guestIncomes = guestIncomes.length;
 
-            apartment.dataValues.vehicles = vehicles.length;
+            // apartment.dataValues.vehicles = vehicles.length;
 
             apartment.dataValues.fines = fines.length;
 

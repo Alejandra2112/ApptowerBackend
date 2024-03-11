@@ -7,7 +7,7 @@ const getVehicle = async (req, res = response) => {
     try {
         const vehicle = await Vehicle.findAll({
             include: [
-                { model: ApartmentModel, attributes: ['apartmentName', 'area', 'status'] },
+                { model: ApartmentModel },
             ],
 
         });
@@ -29,7 +29,7 @@ const getOneVehicleByAparment = async (req, res = response) => {
                 idApartment: idApartment,
             },
             include: [
-                { model: ApartmentModel, attributes: ['apartmentName', 'area', 'status'] },
+                { model: ApartmentModel },
             ],
         });
 

@@ -2,6 +2,7 @@ const { check } = require('express-validator');
 
 const TowerModel = require('../Models/tower.model');
 const ApartmentModel = require('../Models/apartment.model');
+const ApartmentOwnerModel = require('../Models/apartment.owners.model');
 
 const idApartmentValidationsForPost = [
 
@@ -115,8 +116,24 @@ const apartmentValidationForPut = [
         .isNumeric().withMessage('El área del apartamento debe ser un número.')
         .isFloat({ min: 1 }).withMessage('El área del apartamento debe ser un número mayor a cero.'),
 
+    check('status')
+        .optional()
+        .custom(async (value, { req }) => {
 
+            const body = req.body
 
+            const apartmentResidents = await ApartmentOwnerModel.findAll({
+
+                where: { idApartment: body.idApartment, status: 'Active' }
+
+            })
+
+            if (apartmentResidents && value == 'Inactive') {
+                throw new Error(`No puedes desactivar un apartamento que tiene residencias activas.`);
+            }
+            return true;
+
+        }),
     // check('idParkingSpace')
     //     .notEmpty().withMessage('El ID del espacio de estacionamiento es obligatorio.')
     //     .isInt().withMessage('El ID del espacio de estacionamiento debe ser un número entero positivo.')
