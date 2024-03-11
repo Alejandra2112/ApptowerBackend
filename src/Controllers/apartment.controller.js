@@ -54,7 +54,7 @@ const getAllApartment = async (req, res = response) => {
             //     where: { idApartment: apartment.idApartment },
             // });
             const guestIncomes = await Guest_income.findAll({
-                where: { idApartment: apartment.idApartment },
+                where: { idApartment: apartment.idApartment, departureDate: null },
 
             })
 

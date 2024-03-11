@@ -151,7 +151,7 @@ const postFines = async (req, res) => {
 
 const putFines = async (req, res = response) => {
     try {
-        const { idfines, state } = req.body;
+        const { idUserLogged, idfines, state } = req.body;
         console.log("Esto es lo que se envia body" + req.body)
 
         const fine = await Fines.findOne({ where: { idfines: idfines } });
@@ -160,20 +160,51 @@ const putFines = async (req, res = response) => {
             return res.status(404).json({ message: 'No se encontró una multa con ese ID' });
         }
 
+        // Notification
+
+        const userLogged = await UserModel.findByPk(idUserLogged)
+
+        let notification;
+
+        let apartment = await ApartmentModel.findByPk(fine.idApartment)
+
+
+        if (userLogged) {
+
+            notification = await Notification.create({
+
+                iduser: idUserLogged,
+                type: 'info',
+                content: {
+                    message: `Se agrega comprobante de pago a una multa del apartamento ${apartment.apartmentName}
+                por motivo de ${fine.fineType}`,
+                    information: { userLogged, fine }
+                },
+                datetime: new Date(),
+
+            })
+
+        }
+
+
         let results;
 
         if (req.files && req.files.paymentproof) {
-            const newImg = fine.paymentproof == "" || fine.paymentproof == null ?
+
+
+            const newImg = fine.paymentproof == "" && req.files ?
                 await upload(req.files.paymentproof, ['png', 'jpg', 'jpeg', 'pdf'], 'Images') :
-                await updateFile(req.files, fine.paymentproof, ['png', 'jpg', 'jpeg', 'pdf'], 'Images');
+                req.files ? await updateFile(req.files, fine.paymentproof, ['png', 'jpg', 'jpeg', 'pdf'], 'Images', "paymentproof") : ""
 
             results = await fine.update({
                 state: state,
-                paymentproof: newImg,
+                paymentproof: newImg == "" ? req.files.paymentproof : newImg,
             }, { where: { idfines: idfines } });
 
+
+
             res.json({
-                message: 'Multa modificada exitosamente con archivo.',
+                message: notification.content.message,
                 results,
             });
         } else {

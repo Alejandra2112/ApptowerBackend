@@ -193,4 +193,4 @@ module.exports = {
     putBooking,
     getOneBookingbySpaces,
     getOneBooking
-}
+        }

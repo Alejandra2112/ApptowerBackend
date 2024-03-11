@@ -4,6 +4,8 @@ const ApartmentModel = require('../Models/apartment.model');
 const { response } = require('express');
 const GuestIncomeParking = require('../Models/guestIncomeParking.model');
 const ParkingSpacesModel = require('../Models/parking.spaces.model');
+const UserModel = require('../Models/users.model');
+const Notification = require('../Models/notification.model');
 
 const getGuestIncomeAll = async (req, res = response) => {
     try {
@@ -86,7 +88,7 @@ const getGuestIncomeByApartment = async (req, res = response) => {
         const { idApartment } = req.params;
 
         const guestIncome = await GuestIncome.findAll({
-            where: { idApartment: idApartment },
+            where: { idApartment: idApartment, departureDate: null },
             include: [
                 { model: Visitors, as: 'asociatedVisitor' },
                 { model: ApartmentModel, as: 'asociatedApartment' },
@@ -109,14 +111,39 @@ const getGuestIncomeByApartment = async (req, res = response) => {
 }
 
 const postGuestIncome = async (req, res) => {
-    let message = '';
-    const body = req.body;
+
     try {
+
+        const body = req.body;
+
         const createdGuestIncome = await GuestIncome.create(body);
-        message = 'Ingreso Registrado Exitosamente';
+
+        const userLogged = await UserModel.findByPk(body.idUserLogged);
+
+        let notification;
+
+        // Buscar al visitante y al apartamento asociado
+        const visitor = await Visitors.findByPk(createdGuestIncome.idVisitor);
+        const apartment = await ApartmentModel.findByPk(createdGuestIncome.idApartment);
+
+
+        if (body.idUserLogged && userLogged) {
+            notification = await Notification.create({
+                iduser: body.idUserLogged,
+                type: 'success',
+                content: {
+                    // Crear un mensaje de notificación con información del visitante y del apartamento
+                    message: `Se registró el ingreso de ${visitor.name} ${visitor.lastname} 
+                    ${apartment ? `al apartamento ${apartment.apartmentName}` : ''} `,
+                    information: { userLogged, guest_income: createdGuestIncome }
+
+                },
+                datetime: new Date()
+            });
+        }
         res.json({
             guestIncome: createdGuestIncome,
-            message,
+            message: notification.content.message,
         });
     } catch (e) {
         res.status(500).json({
