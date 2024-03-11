@@ -3,10 +3,12 @@ const { Router } = require('express');
 const route = Router();
 const { logIn, postUsersforLogin } = require('../Controllers/logIn.controller');
 const verifityToken = require('../Middlewares/verifityToken');
+const { logInValidations } = require('../Middlewares/logIn.middleware');
+const validator = require('../Middlewares/validation.middleware');
 const User = require('../Models/users.model');
 const Rols = require('../Models/rols.model');
 
-route.post('/', logIn);
+route.post('/', logInValidations, validator, logIn);
 
 route.post('/users', postUsersforLogin);
 

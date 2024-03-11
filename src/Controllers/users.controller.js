@@ -147,44 +147,7 @@ const resetPassword = async (req, res = response) => {
 
 
 
-const postUsersforLogin = async (req, res) => {
-  try {
-    const { idrole, state, password, ...userData } = req.body;
 
-    if (userData.idrole === undefined || userData.idrole === null) {
-      userData.idrole = 2;
-      userData.state = 'Inactivo';
-    }
-
-    if (userData.password) {
-      const salt = bcryptjs.genSaltSync();
-      userData.password = bcryptjs.hashSync(userData.password, salt);
-    }
-
-    const user = await UserModel.create({
-      ...userData,
-      idrole: userData.idrole,
-      state: userData.state,
-      password: userData.password,
-    });
-
-    if (user) {
-      res.status(201).json({
-        message: 'Usuario creado exitosamente',
-        user,
-      });
-    } else {
-      res.status(400).json({
-        message: 'Error al crear el usuario',
-      });
-    }
-  } catch (error) {
-    console.error('Error al crear el usuario:', error);
-    res.status(500).json({
-      message: `Error al crear el usuario: ${error.message}`,
-    });
-  }
-};
 
 
 
@@ -207,11 +170,14 @@ const postUser = async (req, res) => {
 
     const { idUserLogged, pdf, userImg, idEnterpriseSecurity, residentType, idApartment, ...userData } = req.body;
 
+
+
     passwordOrinignal = userData.password;
 
+    passwordOrinignal = userData.name.charAt(0).toUpperCase() + userData.lastName.charAt(0).toLowerCase() + userData.document + '*';
 
     const salt = bcryptjs.genSaltSync();
-    userData.password = bcryptjs.hashSync(userData.password, salt);
+    userData.password = bcryptjs.hashSync(passwordOrinignal, salt);
 
     const user = await UserModel.create({
       pdf: pdfUrl,
@@ -221,10 +187,10 @@ const postUser = async (req, res) => {
 
     })
 
-    const isMatch = await bcryptjs.compare(passwordOrinignal, user.password);
 
     if (user) {
-      const mailOptions = Mails.changedStatusEmail(user.name, user.lastName, user.email, user.email, isMatch);
+      const mailOptions = Mails.changedStatusEmail(user.name, user.lastName, user.email, user.email,
+      );
 
       GmailTransporter.sendMail(mailOptions, (error, info) => {
         if (error) {
@@ -458,8 +424,10 @@ const putChangeImg = async (req, res = response) => {
 const putUser = async (req, res) => {
   try {
     const { iduser } = req.params;
-    const { idUserLogged, idrole, status, pdf, idEnterpriseSecurity, residentType, idApartment, ...update } = req.body;
-    console.log(pdf, 'pdf en back')
+    const { idUserLogged, idrole, status, idEnterpriseSecurity, residentType, idApartment, ...update } = req.body;
+
+    console.log(req.files, "filessssssssss")
+
     const user = await UserModel.findOne({ where: { iduser: iduser } });
 
     if (!user) {
@@ -468,15 +436,14 @@ const putUser = async (req, res) => {
 
     const oldStatus = user.status;
 
+    const oldPdf = user.pdf;
 
-    const newPdf = req.files !== null ? await updateFile(req.files, user.pdf, ['pdf'], 'Documents') : null
-    const newImageUser = req.files !== null ? await updateFile(req.files, user.userImg, ['png', 'jpg', 'jpeg'], 'Images', 'userImg') : null
-
+    const newPdf = await updateFile(req.files, oldPdf, ['pdf'], 'Documents', 'newFile');
 
     await user.update({
       pdf: newPdf,
+      userImg: null,
       idrole: idrole,
-      userImg: newImageUser,
       status: status,
       ...update
     });
@@ -626,7 +593,6 @@ module.exports = {
   putUser,
   getUserOne,
   postUserEmail,
-  postUsersforLogin,
   resetPassword,
   getEmailUser,
   putPasswordUser,
