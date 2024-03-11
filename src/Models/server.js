@@ -69,6 +69,9 @@ class Servers {
     this.vehiclePath = '/api/vehicle';
     this.notificationPath = '/api/notification';
 
+    this.excelPath = '/api/excel';
+
+
     this.middlewares();
     this.routes();
     this.db_connect();
@@ -163,6 +166,9 @@ class Servers {
     this.app.use(this.VisitorsPath, require('../Routes/visitors.routes'))
     this.app.use(this.GuestIncomePath, require('../Routes/guest.income.routes'))
     this.app.use(this.FinesPath, require('../Routes/fines.routes'))
+
+    this.app.use(this.excelPath, require('../Routes/excel.file.router'))
+
   }
 
   async db_connect() {

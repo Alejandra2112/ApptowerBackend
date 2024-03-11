@@ -190,13 +190,15 @@ const putFines = async (req, res = response) => {
         let results;
 
         if (req.files && req.files.paymentproof) {
-            const newImg = fine.paymentproof == "" || fine.paymentproof == null ?
+
+
+            const newImg = fine.paymentproof == "" && req.files ?
                 await upload(req.files.paymentproof, ['png', 'jpg', 'jpeg', 'pdf'], 'Images') :
-                await updateFile(req.files, fine.paymentproof, ['png', 'jpg', 'jpeg', 'pdf'], 'Images');
+                req.files ? await updateFile(req.files, fine.paymentproof, ['png', 'jpg', 'jpeg', 'pdf'], 'Images', "paymentproof") : ""
 
             results = await fine.update({
                 state: state,
-                paymentproof: newImg,
+                paymentproof: newImg == "" ? req.files.paymentproof : newImg,
             }, { where: { idfines: idfines } });
 
 
