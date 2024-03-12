@@ -501,10 +501,13 @@ const passwordValidationForPost = [
 
     check('password')
         .isLength({ min: 8, max: 12 }).withMessage('La contraseña debe tener entre 8 y 12 caracteres.')
-    , // .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,12}$/)
+        .not().matches(/\s/).withMessage('La contraseña no debe contener espacios.'),
+    // .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,12}$/)
     // .withMessage('La contraseña debe contener mayúsculas, minúsculas, números y símbolos.'),
 
     check('passwordConfirm')
+        .isLength({ min: 8, max: 12 }).withMessage('La contraseña debe tener entre 8 y 12 caracteres.')
+        .not().matches(/\s/).withMessage('La contraseña no debe contener espacios.')
         .custom((value, { req }) => {
             if (value !== req.body.password) {
                 throw new Error('Las contraseñas no coinciden.');
