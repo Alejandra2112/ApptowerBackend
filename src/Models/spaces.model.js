@@ -45,6 +45,12 @@ const SpacesModel = sequelize.define('Spaces', {
         allowNull: true,
     },
 
+    maxTime: {
+        type: DataTypes.TIME,
+        field: 'maxTime',
+        allowNull: true,
+    },
+
     capacity: {
         type: DataTypes.INTEGER,
         field: 'capacity',

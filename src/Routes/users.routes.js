@@ -16,7 +16,7 @@ route.get('/', getUser)
 
 route.post('/', userValidations, validator, postUser);
 route.put('/img', putChangeImg)
-route.put('/password', putPasswordUser)
+route.put('/password', passwordValidationForPost, validator, putPasswordUser)
 route.put('/personalInfo', userPersonalInfoValidationForPut, validator, putPersonalInformation)
 
 route.post('/reset', resetPassword) //cambiar contraseña desde el restablecer contraseña
