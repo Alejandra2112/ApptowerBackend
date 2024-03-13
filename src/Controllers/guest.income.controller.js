@@ -10,17 +10,17 @@ const Notification = require('../Models/notification.model');
 const getGuestIncomeAll = async (req, res = response) => {
     try {
         const guestIncome = await GuestIncome.findAll({
-            include: [
-                {
-                    model: Visitors,
-                    as: 'asociatedVisitor',
+            // include: [
+            //     {
+            //         model: Visitors,
+            //         as: 'asociatedVisitor',
 
-                },
-                {
-                    model: ApartmentModel,
-                    as: 'asociatedApartment',
-                }
-            ]
+            //     },
+            //     {
+            //         model: ApartmentModel,
+            //         as: 'asociatedApartment',
+            //     }
+            // ]
         });
 
         console.log('ingresos obtenidos correctamente:', guestIncome);
