@@ -77,9 +77,9 @@ const logIn = async (req, res) => {
       expiresIn: '365d',
     });
 
-    res.cookie('token', token, { httpOnly: false, secure: false });
-    res.cookie('user', JSON.stringify(userPayload), { httpOnly: false, secure: false });
-    res.cookie('permisosAndPrivileges', JSON.stringify(RolePrivilegesPayload), { httpOnly: false, secure: false });
+    res.cookie('token', token, { httpOnly: false, secure: true, sameSite: 'none' });
+    res.cookie('user', JSON.stringify(userPayload), { httpOnly: false, secure: true, sameSite: 'none' });
+    res.cookie('permisosAndPrivileges', JSON.stringify(RolePrivilegesPayload), { httpOnly: false, secure: true, sameSite: 'none' });
 
 
     res.json({

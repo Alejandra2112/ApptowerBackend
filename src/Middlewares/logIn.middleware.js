@@ -3,7 +3,7 @@ const UserModel = require('../Models/users.model');
 const bcryptjs = require('bcryptjs')
 
 const logInValidations = [
-    check('usuario').notEmpty().withMessage('Ingrese correo electrónico')
+    check('usuario').notEmpty().withMessage('El correo es requerido.')
         .isEmail().withMessage('Ingrese un correo electrónico válido')
 
         .custom(async (usuario) => {
@@ -14,7 +14,7 @@ const logInValidations = [
         }),
 
     check('password')
-        .notEmpty().withMessage('Ingrese contraseña')
+        .notEmpty().withMessage('La contraseña es requerida.')
         .isLength({ min: 8, max: 15 })
         .withMessage('Ingrese contraseña 8-15 caracteres')
         .custom(async (password, { req }) => {
