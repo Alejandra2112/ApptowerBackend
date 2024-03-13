@@ -149,6 +149,11 @@ const putBooking = async (req, res) => {
     const { idbooking } = req.body;
     const updateData = req.body;
 
+    if (updateData.StartDateBooking) {
+        const startDate = new Date(updateData.StartDateBooking);
+        updateData.StartDateBooking = startDate.toISOString().split('T')[0];
+    }
+
     if (!idbooking) {
         return res.status(400).json({
             error: 'ID de reserva no proporcionado.',
@@ -156,6 +161,8 @@ const putBooking = async (req, res) => {
     }
 
     try {
+
+
         const [updatedRows] = await Booking.update(updateData, {
             where: { idbooking: idbooking },
         });

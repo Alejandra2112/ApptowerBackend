@@ -1,6 +1,7 @@
 const { check, validationResult } = require('express-validator');
 const UserModel = require('../Models/users.model');
 const RoleModel = require('../Models/rols.model.js');
+const moment = require('moment');
 
 
 
@@ -60,13 +61,14 @@ const docTypes = [
 const userValidationForPost = [
 
     check('docType')
-        .isLength({ min: 2, max: 2 }).withMessage('El tipo de documento debe tener 2 caracteres.')
+        .optional({ nullable: true })
         .isString().withMessage('El tipo de documento debe ser una cadena de caracteres.')
         .isIn(docTypes.map(doc => doc.value)).withMessage('El tipo de documento no es válido.'),
 
+
     check('document')
         .optional({ nullable: true })
-        .isAlphanumeric().withMessage('El número de documento solo puede contener números.')
+        .isAlphanumeric().withMessage('El documento solo puede contener números.')
         .custom(async (value, { req }) => {
 
             const userByDocument = await UserModel.findOne({ where: { document: value } });
@@ -94,43 +96,66 @@ const userValidationForPost = [
         .isNumeric().withMessage('El rol es requerido.'),
 
 
-    check('password')
-        .isLength({ min: 8, max: 12 }).withMessage('La contraseña debe tener entre 8 y 12 caracteres.'),
-
-
     check('email')
         .optional({ nullable: true })
-        .isEmail().withMessage('El correo electrónico debe tener un formato válido.')
+        .isEmail().withMessage('El correo es inválido.')
         .custom(async (value, { req }) => {
 
-            const body = req.body
+            const userByDocument = await UserModel.findOne({ where: { email: value } });
 
-            const userById = await UserModel.findOne({ where: { iduser: body.iduser } });
-            const userByEmail = await UserModel.findOne({ where: { email: value } });
-
-            if (!userById || !userByEmail) {
-                return true;
-            } else if (userById.email !== userByEmail.email) {
-                throw new Error(`El email "${value}" ya está en uso.`);
-            } else {
-                return true;
+            if (userByDocument) {
+                throw new Error(`El documento "${value}" ya está en uso.`);
             }
 
+            return true;
+
+
+        }),
+
+
+
+    check('document')
+        .optional({ nullable: true })
+        .isAlphanumeric().withMessage('El documento solo puede contener números.')
+        .custom(async (value, { req }) => {
+
+            const userByDocument = await UserModel.findOne({ where: { document: value } });
+
+            if (userByDocument) {
+                throw new Error(`El documento "${value}" ya está en uso.`);
+            }
+
+            return true;
 
 
         }),
 
 
     check('phone')
-        .isLength({ min: 10, max: 10 }).withMessage('El teléfono debe tener 10 números.')
+        .isLength({ min: 10, max: 13 }).withMessage('El teléfono debe tener 10 números.')
         .matches(/^[0-9]*$/, 'i').withMessage('Solo se permiten números.'),
 
 
     check('birthday')
-        .isDate().withMessage('La fecha de nacimiento es requerida.'),
+        .custom((value, { req }) => {
+            if (!value) {
+                throw new Error('La fecha de nacimiento es requerida.');
+            }
+
+            const date = moment(new Date(value));
+
+            if (!date.isValid()) {
+                throw new Error('La fecha no fue proporcionada.');
+            }
+            req.body.birthday = date.toDate();
+
+            return true;
+        }),
+
 
 
     check('sex')
+        .optional({ checkFalsy: true })
         .matches(/^(M|F|O|No proporcionado)$/, 'i').withMessage('Sexo inválido.'),
 ];
 
@@ -139,9 +164,10 @@ const userValidationForPost = [
 
 const userValidationForPut = [
     check('docType')
-        .isLength({ min: 2, max: 2 }).withMessage('El tipo de documento debe tener 2 caracteres.')
+        .optional({ nullable: true })
         .isString().withMessage('El tipo de documento debe ser una cadena de caracteres.')
         .isIn(docTypes.map(doc => doc.value)).withMessage('El tipo de documento no es válido.'),
+
 
     check('document')
         .isLength({ min: 8, max: 13 }).withMessage('El documento debe tener entre 8 y 13 números.')
@@ -177,8 +203,21 @@ const userValidationForPut = [
         .isNumeric().withMessage('El rol es requerido.'),
 
 
-    check('password')
-        .isLength({ min: 8, max: 12 }).withMessage('La contraseña debe tener entre 8 y 12 caracteres.'),
+    check('birthday')
+        .custom((value, { req }) => {
+            if (!value) {
+                throw new Error('La fecha de nacimiento es requerida.');
+            }
+
+            const date = moment(new Date(value));
+
+            if (!date.isValid()) {
+                throw new Error('La fecha no fue proporcionada.');
+            }
+            req.body.birthday = date.toDate();
+
+            return true;
+        }),
 
 
     check('email')
@@ -190,41 +229,21 @@ const userValidationForPut = [
         .matches(/^[0-9]*$/, 'i').withMessage('Solo se permiten números.'),
 
 
-    check('birthday')
-        .isDate().withMessage('La fecha de nacimiento es requerida.')
-        .custom((value) => {
-            if (value) {
-                const birthdayDate = new Date(value);
-                const today = new Date();
-
-                if (birthdayDate > today) {
-                    throw new Error('La fecha de nacimiento no puede ser mayor a hoy.');
-                }
-            }
-            return true;
-        }),
 
     check('sex')
-        .isString().withMessage('El género debe ser una cadena de caracteres.')
-        .isIn(sexs.map(sex => sex.value)).withMessage('El género no es válido.'),
+        .optional({ checkFalsy: true })
+        .matches(/^(M|F|O|No proporcionado)$/, 'i').withMessage('Sexo inválido.'),
 
-
-    // check('state')
-    //     .matches(/^(Activo|Inactivo)$/, 'i').withMessage('Estado inválido.'),
 ];
 
 
 const watchmanValidationForPost = [
-    check('idEnterpriseSecurity').isNumeric().withMessage('El rol es requerido.'),
-
-    check('iduser').isNumeric().withMessage('El rol es requerido.'),
+    check('idEnterpriseSecurity').isNumeric().withMessage('La empresa de seguridad es requerida.'),
 
 ];
 
 const watchmanValidationForPut = [
     check('idEnterpriseSecurity').isNumeric().withMessage('La empresa de seguridad es requerida.'),
-
-    check('iduser').isNumeric().withMessage('El id del usuario es requerido.'),
 
     check('state').isIn(['Activo', 'Inactivo']).withMessage('Estado inválido.'),
 
@@ -232,37 +251,27 @@ const watchmanValidationForPut = [
 
 
 const residentValidationForPost = [
-    check('iduser')
-        .isNumeric()
-        .withMessage('El id del usuario es requerido.'),
-
     check('residentType')
         .isIn(['tenant', 'owner'])
-        .withMessage('El tipo de residente es inválido. Debe ser "tenant" o "owner".'),
+        .withMessage('El tipo de residente es inválido. Debe ser "residente" o "propietario".'),
 
-    check('status')
-        .optional()
-        .isIn(['Active', 'Inactive'])
-        .withMessage('El estado es inválido. Debe ser "Active" o "Inactive".'),
+    check('idApartment')
+        .isNumeric().withMessage('El Apartamento es requerido.'),
+
 ];
 
 const residentValidationForPut = [
-    check('iduser')
-        .isNumeric()
-        .withMessage('El id del usuario es requerido.'),
 
     check('residentType')
         .isIn(['tenant', 'owner'])
         .withMessage('El tipo de residente es inválido. Debe ser "tenant" o "owner".'),
 
-    check('status')
-        .isIn(['Active', 'Inactive'])
-        .withMessage('El estado es inválido. Debe ser "Active" o "Inactive".'),
+    check('idApartment')
+        .isNumeric().withMessage('El Apartamento es requerido.'),
 ];
 
-
 const userValidations = async (req, res, next) => {
-    const { idrole } = req.body;
+    const { idrole, user } = req.body;
     if (!idrole) {
         return res.status(400).json({ error: 'El idrole es requerido.' });
     }
@@ -274,6 +283,11 @@ const userValidations = async (req, res, next) => {
 
     const roleName = role.dataValues.namerole.toLowerCase();
     req.roleName = roleName;
+
+
+    if (roleName.includes('vigilante') && user) {
+        req.body = { ...req.body, ...user };
+    }
 
     let checks;
     if (req.method === 'POST') {
@@ -486,7 +500,7 @@ const userPersonalInfoValidationForPut = [
 const passwordValidationForPost = [
 
     check('password')
-        .isLength({ min: 6, max: 12 }).withMessage('La contraseña debe tener entre 8 y 12 caracteres.')
+        .isLength({ min: 8, max: 12 }).withMessage('La contraseña debe tener entre 8 y 12 caracteres.')
     , // .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,12}$/)
     // .withMessage('La contraseña debe contener mayúsculas, minúsculas, números y símbolos.'),
 
@@ -512,6 +526,31 @@ module.exports = {
     userValidations,
 
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
