@@ -37,26 +37,43 @@ const SpacesModel = sequelize.define('Spaces', {
         field: 'area',
         allowNull: true,
 
+    },      
+
+    openingTime: {
+        type: DataTypes.TIME,
+        field: 'openingTime',
+        allowNull: true,
     },
 
-    schedule: {
-        type: DataTypes.JSON,
-        field: 'schedule',
+    closingTime: {
+        type: DataTypes.TIME,
+        field: 'closingTime',
+        allowNull: true,
+    },
+
+    minTime: {
+        type: DataTypes.INTEGER,
+        field: 'minTime',
         allowNull: true,
     },
 
     maxTime: {
-        type: DataTypes.TIME,
+        type: DataTypes.INTEGER,
         field: 'maxTime',
         allowNull: true,
+        validate: {
+            min: 1,
+            isInt: true,
+        },
     },
 
     capacity: {
         type: DataTypes.INTEGER,
         field: 'capacity',
         allowNull: true,
-
     },
+
+
 
     status: {
         type: DataTypes.STRING,

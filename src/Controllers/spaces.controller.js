@@ -53,20 +53,18 @@ const postSpace = async (req, res) => {
 
         const imgUrl = req.files !== null ? await upload(req.files.image, ['png', 'jpg', 'jpeg'], 'Images') : null;
 
-        console.log()
+        console.log(spaceAttributes, 'spaceAttributes')
 
-        spaceAttributes.schedule = JSON.parse(spaceAttributes.schedule)
+        // spaceAttributes.schedule = JSON.parse(spaceAttributes.schedule)
 
-        if (!spaceAttributes.schedule.startHour || !spaceAttributes.schedule.endHour) {
-            spaceAttributes.schedule = { startHour: '10:00', endHour: '18:00' };
-        }
+        // if (!spaceAttributes.schedule.startHour || !spaceAttributes.schedule.endHour) {
+        //     spaceAttributes.schedule = { startHour: '10:00', endHour: '18:00' };
+        // }
 
         const space = await SpacesModel.create({
             image: imgUrl,
             ...spaceAttributes
         });
-
-        console.log(space, 'spaces created');
 
         res.json({
             message: `Se agregó la zona común ${space.spaceName}`,
@@ -86,9 +84,6 @@ const putSpace = async (req, res = response) => {
 
         const space = await SpacesModel.findOne({ where: { idSpace: idSpace } });
 
-        // Parsea schedule 
-        newData.schedule = JSON.parse(newData.schedule);
-
         const newImg = space.image == "" && req.files ?
             await upload(req.files.image, ['png', 'jpg', 'jpeg'], 'Images') :
             req.files ? await updateFile(req.files, space.image, ['png', 'jpg', 'jpeg', 'pdf'], 'Images', "image") : ""
@@ -99,13 +94,8 @@ const putSpace = async (req, res = response) => {
 
 
         const updatedSpace = await space.update({
-            spaceName: newData.spaceName,
-            spaceType: newData.spaceType,
             image: newImg == "" ? newData.image : newImg,
-            area: newData.area,
-            capacity: newData.capacity,
-            schedule: newData.schedule,
-            status: newData.status
+            ...newData
         });
 
 
@@ -126,8 +116,8 @@ const putSpace = async (req, res = response) => {
                 content: {
                     message: `Se modifico ${updatedSpace.spaceName}
                       ${updatedSpace.status == 'Active' ?
-                            ` ahora esta disponible en el horario de ${updatedSpace.schedule.startHour} 
-                        hasta ${updatedSpace.schedule.endHour} ` : 'ahora NO esta disponible'}`,
+                            ` ahora esta disponible en el horario de ${updatedSpace.openingTime } 
+                        hasta ${updatedSpace.closingTime} ` : 'ahora NO esta disponible'}`,
                     information: { userLogged, space }
                 },
                 datetime: new Date(),
