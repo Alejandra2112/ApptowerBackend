@@ -2,10 +2,6 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
 const Visitors = require('./visitors.model');
 
-const ApartmentModel = require('./apartment.model');
-const GuestIncomeToApartments = require('./guest.income.to.apartments.model');
-
-
 const Guest_income = sequelize.define('guest_income', {
     idGuest_income: {
         type: DataTypes.INTEGER,
@@ -43,9 +39,7 @@ const Guest_income = sequelize.define('guest_income', {
 
 
 
-Guest_income.associate = models => {
-    Guest_income.hasMany(models.GuestIncomeToApartments);
-}
+
 
 
 // Guest_income.belongsToMany(ApartmentModel, {

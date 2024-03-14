@@ -5,7 +5,6 @@ const AssignedParkingModel = require('./assigned.parking.model')
 const ApartmentOwnerModel = require('./apartment.owners.model')
 const OwnersModel = require('./owners.model');
 const TowerModel = require('./tower.model');
-const GuestIncomeToApartments = require('./guest.income.to.apartments.model');
 const Guest_income = require('./guest.income.model');
 
 const ApartmentModel = sequelize.define('Apartments', {
@@ -74,7 +73,7 @@ ApartmentModel.belongsToMany(
 });
 
 
-// ApartmentModel.belongsToMany(Guest_income, { through: GuestIncomeToApartments });
+
 
 ApartmentModel.belongsToMany(
     OwnersModel, {
@@ -84,9 +83,6 @@ ApartmentModel.belongsToMany(
 });
 
 
-ApartmentModel.associate = models => {
-    ApartmentModel.hasMany(models.GuestIncomeToApartments);
-}
 
 // ApartmentModel.belongsToMany(
 //     ResidentModel, {

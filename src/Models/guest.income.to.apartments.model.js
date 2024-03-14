@@ -28,10 +28,23 @@ const GuestIncomeToApartments = sequelize.define(
 
 
 
-GuestIncomeToApartments.associate = models => {
-  GuestIncomeToApartments.belongsTo(models.Guest_income)
+// GuestIncomeToApartments.associate = models => {
+//   GuestIncomeToApartments.belongsTo(models.Guest_income)
 
-  GuestIncomeToApartments.belongsTo(models.ApartmentModel);
+//   GuestIncomeToApartments.belongsTo(models.ApartmentModel);
+// }
+
+GuestIncomeToApartments.belongsTo(Guest_income, {
+  foreignKey: "idGuest_income",
+  as: "asociatedGuestIncome",
+});
+GuestIncomeToApartments.belongsTo(ApartmentModel,{
+  foreignKey: "idApartment",
+  as: "asociatedApartment",
+});
+
+GuestIncomeToApartments.associate = models => {
+  GuestIncomeToApartments.belongsTo(models.Guest_income);
 }
 
 
