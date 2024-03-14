@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
 const Visitors = require('./visitors.model');
-const GuestIncomeToApartments = require('./guest.income.to.apartments.model');
+
 const ApartmentModel = require('./apartment.model');
 const GuestIncomeToApartments = require('./guest.income.to.apartments.model');
 
