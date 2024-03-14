@@ -11,32 +11,30 @@ const GuestIncomeToApartments = require("../Models/guest.income.to.apartments.mo
 const getGuestIncomeAll = async (req, res = response) => {
   try {
     const guestIncome = await GuestIncome.findAll({
-      // include: [
-      //     {
-      //         model: Visitors,
-      //         as: 'asociatedVisitor',
-      //     },
-      //     {
-      //         model: ApartmentModel,
-      //         as: 'asociatedApartment',
-      //     }
-      // ]
-    });
-
-    const guestIncomeParking = await GuestIncomeParking.findAll({
-        include: [{ model: ParkingSpacesModel, as: "asociatedParkingSpace" }],
+      include: [
+        {
+          model: Visitors,
+          as: "asociatedVisitor",
+        },
+      ],
     });
 
     const guestIncomeApartment = await GuestIncomeToApartments.findAll({
-        // include: [{ model: ApartmentModel, as: "asociatedApartment" }],
     });
 
-    console.log("ingresos obtenidos correctamente:", guestIncome);
+
+    //Se le adiciona a cada respuesta el apartamento asociado a ese ingreso
+    const guestIncomeWithApartment = guestIncome.map((income) => {
+      const apartment = guestIncomeApartment.find(
+        (apartment) => apartment.idGuest_income === income.idGuest_income
+      );
+      return { ...income.toJSON(), guestIncomeApartment: apartment };
+    });
+
+    console.log("ingresos obtenidos correctamente:", guestIncomeWithApartment);
 
     res.json({
-        guestIncome: guestIncome,
-        guestIncomeParking: guestIncomeParking,
-        guestIncomeApartment: guestIncomeApartment,
+      guestIncome: guestIncomeWithApartment,
     });
   } catch (error) {
     console.error("Error al obtener ingresos:", error);
@@ -95,22 +93,30 @@ const getGuestIncomeByApartment = async (req, res = response) => {
   try {
     const { idApartment } = req.params;
 
-    const guestIncome = await GuestIncome.findAll({
-      where: { idApartment: idApartment, departureDate: null },
+    const guestIncomeToApartment = await GuestIncomeToApartments.findAll({
+      where: { idApartment: idApartment },
       include: [
-        { model: Visitors, as: "asociatedVisitor" },
+        { model: GuestIncome, as: "asociatedGuestIncome" },
         { model: ApartmentModel, as: "asociatedApartment" },
       ],
     });
 
-    if (guestIncome.length === 0) {
+    // const guestIncome = await GuestIncome.findAll({
+    //   where: { idApartment: idApartment, departureDate: null },
+    //   include: [
+    //     { model: Visitors, as: "asociatedVisitor" },
+    //     { model: ApartmentModel, as: "asociatedApartment" },
+    //   ],
+    // });
+
+    if (guestIncomeToApartment.length === 0) {
       return res
         .status(404)
         .json({ error: "No se encontraron ingresos para ese apartamento" });
     }
 
     res.json({
-      guestIncome,
+      guestIncomeToApartment: guestIncomeToApartment,
     });
   } catch (error) {
     console.error("Error al obtener ingresos por apartamento:", error);
@@ -125,24 +131,72 @@ const postGuestIncome = async (req, res) => {
     console.log(req.body, "Aqui el body");
     const { idApartment, idParkingSpace, isGuestIncomeVehicle, ...body } =
       req.body;
-
-    
-
-    const createdGuestIncome = await GuestIncome.create(body);
     let guestIncomeApartment;
     let guestIncomeParking;
+    let createdGuestIncome;
 
+    // Consulta la existenca del visitante
+    const visitor = await Visitors.findOne({
+      where: { idVisitor: body.idVisitor },
+    });
+    // Verifica si el visitante tiene existe y si no, se devuelve el error
+    if (!visitor) {
+      return res.status(404).json({
+        error: "No se encontró un visitante con ese ID",
+      });
+    }
+    // Verifica si el visitante tiene acceso
+    if (visitor.access==false) {
+      return res.status(400).json({
+        error: "El visitante no tiene acceso",
+      });
+    }
+    // Verifica si el visitante tiene un ingreso activo
+    const existincome = await GuestIncome.findOne({
+      where: { idVisitor: body.idVisitor, departureDate: null },
+    });
+    // Si el visitante tiene un ingreso activo, se devuelve el error
+    if (existincome) {
+      return res.status(400).json({
+        error: "El visitante ya tiene un ingreso activo",
+      });
+    } else {
+      // Si el visitante no tiene un ingreso activo, se crea el ingreso
+      createdGuestIncome = await GuestIncome.create(body);
+    }
+      // Si el ingreso es a un apartamento, se crea el ingreso al apartamento
     if (idApartment) {
-        guestIncomeApartment = await GuestIncomeToApartments.create({
+      guestIncomeApartment = await GuestIncomeToApartments.create({
         idGuest_income: createdGuestIncome.idGuest_income,
         idApartment: idApartment,
       });
-
-      if (isGuestIncomeVehicle && idParkingSpace) {
-          guestIncomeParking = await GuestIncomeParking.create({
-          idGuest_income: createdGuestIncome.idGuest_income,
-          idParkingSpace: idParkingSpace,
-        });
+    }
+    // Si el ingreso es a un vehículo, se crea el ingreso al vehículo
+    if (isGuestIncomeVehicle && idParkingSpace) {
+      guestIncomeParking = await GuestIncomeParking.create({
+        idGuest_income: createdGuestIncome.idGuest_income,
+        idParkingSpace: idParkingSpace,
+      });
+      // Se actualiza el estado del espacio de parqueo
+      const parkingSpace = await ParkingSpacesModel.findOne({
+        where: { idParkingSpace: idParkingSpace },
+      });
+      // Si el espacio de parqueo no existe, se devuelve el error
+      if (!parkingSpace) {
+        return res
+          .status(404)
+          .json({ error: "No se encontró un espacio de parqueo con ese ID" });
+      } else if (parkingSpace.status == "Inactive") {
+        // Si el espacio de parqueo está inactivo, se devuelve el error
+        throw new Error("El espacio de parqueo se encuentra inactivo");
+      } else {
+        // Si el espacio de parqueo está activo, se actualiza el estado del espacio de parqueo
+        await ParkingSpacesModel.update(
+          { status: "Inactive" },
+          {
+            where: { idParkingSpace: idParkingSpace },
+          }
+        );
       }
     }
 
@@ -220,6 +274,49 @@ const putGuestIncome = async (req, res = response) => {
   try {
     const { idGuest_income, departureDate } = body;
 
+    // Verifica si el ingreso existe
+    const verifyGuestIncome = await GuestIncome.findOne({
+      where: { idGuest_income: idGuest_income },
+    });
+    // Si el ingreso no existe, se devuelve el error
+    if (!verifyGuestIncome) {
+      return res.status(404).json({
+        error: "No se encontró un ingreso con ese ID",
+      });
+    }
+    // Si el ingreso ya tiene fecha de salida registrada, se devuelve el error
+    if (verifyGuestIncome.departureDate !== null) {
+      return res.status(400).json({
+        error: "El ingreso ya ha sido cerrado",
+      });
+
+    }
+    // Se consulta si hay un ingreso con parqueadero asociado
+    const guestIncomeparking = await GuestIncomeParking.findOne({
+      where: { idGuest_income: idGuest_income },
+    });
+    // Si hay un ingreso con parqueadero asociado se busca el espacio de parqueo
+    if (guestIncomeparking) {
+      const parkingSpace = await ParkingSpacesModel.findOne({
+        where: { idParkingSpace: guestIncomeparking.idParkingSpace },
+      });
+      // Si el espacio de parqueo no existe, se devuelve el error
+      if (!parkingSpace) {
+        return res
+          .status(404)
+          .json({ error: "No se encontró un espacio de parqueo con ese ID" });
+      }
+      // Si el espacio de parqueo existe, se actualiza el estado del espacio de parqueo
+      if (parkingSpace) {
+        await ParkingSpacesModel.update(
+          { status: "Active" },
+          {
+            where: { idParkingSpace: guestIncomeparking.idParkingSpace },
+          }
+        );
+      }
+    }
+    // Se actualiza el ingreso con la fecha de salida
     const [updatedRows] = await GuestIncome.update(
       {
         departureDate: departureDate,
@@ -228,7 +325,6 @@ const putGuestIncome = async (req, res = response) => {
         where: { idGuest_income: idGuest_income },
       }
     );
-    console.log(updatedRows, "Aqui las rows");
 
     if (updatedRows > 0) {
       message = "Ingreso modificado exitosamente.";

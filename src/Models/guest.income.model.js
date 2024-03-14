@@ -30,43 +30,13 @@ const Guest_income = sequelize.define('guest_income', {
         type: DataTypes.INTEGER,
         field: 'idVisitor',
     },
-    // idApartment: {
-    //     type: DataTypes.INTEGER,
-    //     field: 'idApartment',
-    // }
-
 });
 
 
-
-
-
-
-// Guest_income.belongsToMany(ApartmentModel, {
-//     through: GuestIncomeToApartments,
-//     foreignKey: 'idGuest_income',
-//     otherKey: 'idGuest_income'
-// });
-
-// ApartmentModel.belongsToMany(Guest_income, {
-//     through: GuestIncomeToApartments,
-//     foreignKey: 'idApartment',
-//     otherKey: 'idApartment'
-// });
-
-
-// Guest_income.belongsToMany(ApartmentModel, { through: GuestIncomeToApartments });
 
 Guest_income.belongsTo(Visitors, {
     foreignKey: 'idVisitor', as: 'asociatedVisitor'
 });
-// Guest_income.belongsTo(ApartmentModel, {
-//     foreignKey: 'idApartment',
-//     as: 'asociatedApartment'
-// });
-
-
-
 
 
 module.exports = Guest_income;
