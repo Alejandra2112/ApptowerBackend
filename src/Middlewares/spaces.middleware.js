@@ -37,8 +37,8 @@ const spaceValidationForPost = [
         .isInt({ min: 0 })
         .withMessage('Capacidad debe ser un numero entero.'),
 
-    check('schedule')
-        .notEmpty().withMessage('El horario es obligatorio.')
+    // check('schedule')
+    //     .notEmpty().withMessage('El horario es obligatorio.')
 
 
 

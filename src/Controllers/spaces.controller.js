@@ -53,20 +53,18 @@ const postSpace = async (req, res) => {
 
         const imgUrl = req.files !== null ? await upload(req.files.image, ['png', 'jpg', 'jpeg'], 'Images') : null;
 
-        console.log()
+        console.log(spaceAttributes, 'spaceAttributes')
 
-        spaceAttributes.schedule = JSON.parse(spaceAttributes.schedule)
+        // spaceAttributes.schedule = JSON.parse(spaceAttributes.schedule)
 
-        if (!spaceAttributes.schedule.startHour || !spaceAttributes.schedule.endHour) {
-            spaceAttributes.schedule = { startHour: '10:00', endHour: '18:00' };
-        }
+        // if (!spaceAttributes.schedule.startHour || !spaceAttributes.schedule.endHour) {
+        //     spaceAttributes.schedule = { startHour: '10:00', endHour: '18:00' };
+        // }
 
         const space = await SpacesModel.create({
             image: imgUrl,
             ...spaceAttributes
         });
-
-        console.log(space, 'spaces created');
 
         res.json({
             message: `Se agregó la zona común ${space.spaceName}`,
@@ -105,6 +103,7 @@ const putSpace = async (req, res = response) => {
             area: newData.area,
             capacity: newData.capacity,
             schedule: newData.schedule,
+            maxTime: newData.maxTime,
             status: newData.status
         });
 
