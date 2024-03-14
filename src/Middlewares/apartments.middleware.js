@@ -18,6 +18,20 @@ const idApartmentValidationsForPost = [
             }
             else throw new Error('El apartamento selecionado no esta en el sistema.');
 
+        })
+        .custom(async (value, { req }) => {
+
+            const body = req.body;
+
+            const apartment = await ApartmentModel.findOne({
+                where: { idApartment: value, status: 'Active' }
+            });
+
+            if (apartment) {
+                return true;
+            } else {
+                throw new Error('El apartamento debe estar activo.');
+            }
         }),
 ]
 

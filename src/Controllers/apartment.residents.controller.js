@@ -201,12 +201,15 @@ const postApartmentResident = async (req, res) => {
 
 const putApartmentResident = async (req, res = response) => {
 
-    const body = req.body;
-    let message = '';
+
 
     try {
+        const body = req.body;
+        let message = '';
+
         const { idApartmentResident, ...update } = body;
 
+        
         const [updatedRows] = await ApartmentResidentModel.update(update, {
             where: { idApartmentResident: idApartmentResident },
         });
@@ -275,7 +278,7 @@ const deleteApartmentResident = async (req, res) => {
 
         const { idApartmentResident } = req.body;
         let message = '';
-        
+
         const rowsDeleted = await ApartmentResidentModel.destroy({ where: { idApartmentResident: idApartmentResident } });
 
         if (rowsDeleted > 0) {
@@ -283,7 +286,7 @@ const deleteApartmentResident = async (req, res) => {
             message = 'Apartment resident dalete ok';
 
         } else {
-            
+
             res.status(404).json({ error: 'Id apartment resident not found' });
 
         }

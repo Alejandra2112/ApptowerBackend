@@ -36,6 +36,21 @@ const apartmentOwnerValidationForPost = [
             } else {
                 return true;
             }
+        })
+
+        .custom(async (value, { req }) => {
+
+            const body = req.body;
+
+            const owner = await OwnersModel.findOne({
+                where: { idOwner: value, status: 'Active' }
+            });
+
+            if (owner) {
+                return true;
+            } else {
+                throw new Error('El propietario debe estar activo.');
+            }
         }),
 
 
@@ -73,6 +88,20 @@ const apartmentOwnerValidationForPut = [
             }
             else throw new Error('El propietario selecionado no esta en el sistema');
 
+        })
+        .custom(async (value, { req }) => {
+
+            const body = req.body;
+
+            const owner = await OwnersModel.findOne({
+                where: { idOwner: value, status: 'Active' }
+            });
+
+            if (owner) {
+                return true;
+            } else {
+                throw new Error('El propietario debe estar activo.');
+            }
         }),
 
 
@@ -100,18 +129,35 @@ const apartmentOwnerValidationForPut = [
             }
             return true;
 
+        })
+        .custom((value) => {
+            const OwnershipEndDate = new Date(value);
+            const today = new Date();
+
+            if (OwnershipEndDate > today) {
+                throw new Error('La fecha de fin no puede ser superior a hoy.');
+            }
+            return true;
         }),
 
     check('status')
         .isIn(['Active', 'Inactive'])
         .withMessage('El estado del propietario no es válido.')
-        .custom((value, { req }) => {
-            const status = req.body.status;
+        .custom(async (value, { req }) => {
+            const body = req.body;
 
-            console.log(status, 'estado')
-            if (status === 'Active') throw new Error('Debe estar inactivo paramarcar la fecha de fin.')
+            const apartmentOwner = await ApartmentOwnerModel.findOne({
+                where: { idApartmentOwner: body.idApartmentOwner }
+            })
 
-            return true;
+            console.log(apartmentOwner, value, 'value jeje')
+
+            if (apartmentOwner.status == 'Active'&& body.OwnershipEndDate && value == 'Inactive') return true;
+            if (apartmentOwner.status == 'Inactive' && value == 'Active') return true;
+
+            throw new Error('Debe estar inactivo para marcar la fecha de fin.')
+
+
 
         }),
 
@@ -135,10 +181,32 @@ const OwnershipStartDateValidationForPost = [
         }),
 ]
 
+const apartmentOwnerValidationForDelete = [
+
+    check('idApartmentOwner')
+        .notEmpty().withMessage('El ID es obligatorio.')
+        .isInt().withMessage('El ID debe ser un número entero positivo.')
+    // .custom(async (value, { req }) => {
+
+    //     const body = req.body;
+
+    //     console.log(value, 'value')
+    //     const apartmentOwner = await ApartmentOwnerModel.findOne({
+    //         idApartmentOwner: body.idApartmentOwner, status: 'Active'
+    //     })
+
+    //     if (apartmentOwner && value == 'Inactive') {
+    //         throw new Error('No se puede realizar esta acción porque el propi está actualmente activo en el apartamento.')
+    //     }
+
+    //     return true
+    // })
+]
+
 module.exports = {
 
     apartmentOwnerValidationForPost,
     apartmentOwnerValidationForPut,
-    OwnershipStartDateValidationForPost
-
+    OwnershipStartDateValidationForPost,
+    apartmentOwnerValidationForDelete
 }

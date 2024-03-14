@@ -11,7 +11,9 @@ const { residentStartDateValidationForPost } = require('../Middlewares/apartment
 route.get('/:iduser', getOneResidents)
 route.get('/', getAllResidents)
 route.post('/', userPersonalInfoValidationForPost, idApartmentValidationsForPost,
-    residentStartDateValidationForPost, residentTypeValidation, passwordValidationForPost, fileValidationForPost, validator, postResident)
+    residentStartDateValidationForPost, residentTypeValidation,
+    // passwordValidationForPost,
+    fileValidationForPost, validator, postResident)
 route.put('/', putResident)
 route.put('/status', residentStatusValidation, validator, putResidentStatus)
 
