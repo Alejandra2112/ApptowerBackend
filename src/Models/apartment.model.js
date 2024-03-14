@@ -5,6 +5,7 @@ const AssignedParkingModel = require('./assigned.parking.model')
 const ApartmentOwnerModel = require('./apartment.owners.model')
 const OwnersModel = require('./owners.model');
 const TowerModel = require('./tower.model');
+const Guest_income = require('./guest.income.model');
 
 const ApartmentModel = sequelize.define('Apartments', {
 
@@ -71,12 +72,17 @@ ApartmentModel.belongsToMany(
     otherKey: 'idParkingSpace'
 });
 
+
+
+
 ApartmentModel.belongsToMany(
     OwnersModel, {
     through: ApartmentOwnerModel,
     foreignKey: 'idApartment',
     otherKey: 'idOwner'
 });
+
+
 
 // ApartmentModel.belongsToMany(
 //     ResidentModel, {
