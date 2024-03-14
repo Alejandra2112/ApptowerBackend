@@ -28,13 +28,6 @@ const GuestIncomeToApartments = sequelize.define(
 
 
 
-GuestIncomeToApartments.associate = models => {
-  GuestIncomeToApartments.belongsTo(models.Guest_income)
-
-  GuestIncomeToApartments.belongsTo(models.ApartmentModel);
-}
-
-
 module.exports = GuestIncomeToApartments;
 
 

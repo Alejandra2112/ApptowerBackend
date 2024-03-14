@@ -39,13 +39,12 @@ const Guest_income = sequelize.define('guest_income', {
     //     field: 'idApartment',
     // }
 
-});
+}, 
 
 
+);
 
-Guest_income.associate = models => {
-    Guest_income.hasMany(models.GuestIncomeToApartments);
-}
+
 
 
 // Guest_income.belongsToMany(ApartmentModel, {
