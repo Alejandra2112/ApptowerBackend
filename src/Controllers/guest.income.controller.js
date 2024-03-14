@@ -6,7 +6,7 @@ const GuestIncomeParking = require("../Models/guestIncomeParking.model");
 const ParkingSpacesModel = require("../Models/parking.spaces.model");
 const UserModel = require("../Models/users.model");
 const Notification = require("../Models/notification.model");
-const GuestIncomeToApartments = require("../Models/guest.income.to.apartments.model");
+const GuestIncomeToApartments = require("../Models/guest.income.to.apartents.model");
 
 const getGuestIncomeAll = async (req, res = response) => {
   try {

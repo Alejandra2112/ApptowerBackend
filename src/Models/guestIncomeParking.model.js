@@ -30,4 +30,5 @@ GuestIncomeParking.belongsTo(ParkingSpacesModel, {
   foreignKey: "idParkingSpace",
   as: "asociatedParkingSpace",
 });
+
 module.exports = GuestIncomeParking;

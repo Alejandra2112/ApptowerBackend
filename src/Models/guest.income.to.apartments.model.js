@@ -26,20 +26,18 @@ const GuestIncomeToApartments = sequelize.define(
   }
 );
 
-// GuestIncomeToApartments.belongsTo(Guest_income, {
-//   foreignKey: "idGuest_income",
-//   targetKey: "idGuest_income",
-// });
 
-// GuestIncomeToApartments.belongsTo(ApartmentModel, {
-//   foreignKey: "idApartment",
-//   targetKey: "idApartment",
-// });
-// ApartmentModel.belongsToMany(Guest_income, { through: GuestIncomeToApartments });
-// Guest_income.belongsToMany(ApartmentModel, { through: GuestIncomeToApartments });
+
+GuestIncomeToApartments.belongsTo(Guest_income, {
+  foreignKey: "idGuest_income",
+  as: "asociatedGuestIncome",
+});
+
+GuestIncomeToApartments.belongsTo(ApartmentModel, {
+  foreignKey: "idApartment",
+  as: "asociatedApartment",
+});
 
 module.exports = GuestIncomeToApartments;
 
-//   GuestIncomeToApartments.belongsTo(Visitors, {
-//     foreignKey: 'idVisitor', as: 'asociatedVisitor'
-//   });
+
