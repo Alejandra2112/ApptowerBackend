@@ -1,11 +1,52 @@
-const {Router} = require ('express');
+const { Router } = require("express");
 const route = Router();
-const {getFines, postFines, putFines, deleteFines} = require('../Controllers/fines.controller');
-const validations = require('../Middlewares/fines.middleware');
+const {
+  getFinesAll,
+  getFinesOne,
+  getFinesByApartment,
+  postFines,
+  putFines,
 
-route.get('/', getFines)
-route.post('/', validations.postFinesValidation ,postFines)
-route.put('/', validations.putFinesValidation , putFines)
-// route.delete('/', deleteFines)
+} = require("../Controllers/fines.controller");
+const {postFinesValidations, putFinesValidations} = require("../Middlewares/fines.middleware");
+const validator = require("../Middlewares/validation.middleware");
+// const checkPermissions = require("../Middlewares/checkPermission");
+// const verifityToken = require("../Middlewares/verifityToken");
+// const privilegesMap = require("../Helpers/Privileges.js");
+// const permissionMap = require("../Helpers/Permission.js");
 
-module.exports = route
+// route.use(verifityToken);
+
+route.get(
+  "/",
+  // checkPermissions(privilegesMap.get_fines, permissionMap.multas),
+  getFinesAll
+);
+route.get(
+  "/:idfines",
+  // checkPermissions(privilegesMap.get_fines, permissionMap.multas),
+  getFinesOne);
+route.get(
+
+  "/byApartment/:idApartment",
+  // checkPermissions(privilegesMap.get_fines, permissionMap.multas),
+  getFinesByApartment
+);
+route.post(
+  "/",
+  // validations.postFinesValidation,
+  postFinesValidations,
+  validator,
+
+  // checkPermissions(privilegesMap.post_fines, permissionMap.multas),
+  postFines
+);
+route.put(
+  "/",
+  putFinesValidations,
+  validator,
+  // checkPermissions(privilegesMap.put_fines, permissionMap.multas),
+  putFines
+);
+
+module.exports = route;

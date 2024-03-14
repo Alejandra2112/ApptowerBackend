@@ -1,13 +1,5 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
-const ParkingSpaceModel = require('../Models/parking.spaces.model')
-const AssignedParkingModel = require('../Models/assigned.parking.model')
-const SpaceOwnerModel = require('../Models/space.owners.model')
-const OwnersModel = require('../Models/owners.model');
-const ResidentModel = require('./resident.model');
-const SpaceResidentModel = require('./space.residents.model');
-
-
 
 const SpacesModel = sequelize.define('Spaces', {
 
@@ -22,9 +14,15 @@ const SpacesModel = sequelize.define('Spaces', {
         type: DataTypes.STRING,
         field: 'spaceType',
         validate: {
-            isIn: [['Apartament', 'Social area', 'Wet area']],
+            isIn: [['Social area', 'Wet area']],
         },
         // allowNull: false,
+    },
+
+    image: {
+        type: DataTypes.STRING,
+        field: 'image',
+        allowNull: true
     },
 
     spaceName: {
@@ -39,6 +37,18 @@ const SpacesModel = sequelize.define('Spaces', {
         field: 'area',
         allowNull: true,
 
+    },
+
+    schedule: {
+        type: DataTypes.JSON,
+        field: 'schedule',
+        allowNull: true,
+    },
+
+    maxTime: {
+        type: DataTypes.TIME,
+        field: 'maxTime',
+        allowNull: true,
     },
 
     capacity: {
@@ -63,25 +73,5 @@ const SpacesModel = sequelize.define('Spaces', {
         timestamps: false,
     }
 );
-
-SpacesModel.belongsToMany(
-    ParkingSpaceModel, {
-         through: AssignedParkingModel, 
-         foreignKey: 'idSpace', 
-         otherKey: 'idParkingSpace' });
-         
-SpacesModel.belongsToMany(
-    OwnersModel, {
-         through: SpaceOwnerModel, 
-         foreignKey: 'idSpace', 
-         otherKey: 'idOwner' });
-         
-SpacesModel.belongsToMany(
-    ResidentModel, {
-         through: SpaceResidentModel, 
-         foreignKey: 'idSpace', 
-         otherKey: 'idResident' });
-         
-
 
 module.exports = SpacesModel;

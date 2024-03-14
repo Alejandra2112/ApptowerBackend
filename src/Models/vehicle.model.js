@@ -1,8 +1,8 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
-const Users = require('./users.model');
+const ApartmentModel = require('./apartment.model');
 
-const Vehicle = sequelize.define('vehicle', {
+const Vehicle = sequelize.define('vehicles', {
     idvehicle: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -10,28 +10,41 @@ const Vehicle = sequelize.define('vehicle', {
         field: 'idvehicle',
     },
 
-    iduser: {
+    idApartment: {
         type: DataTypes.INTEGER,
-        field: 'iduser',
+        field: 'idApartment',
+        required: true,
     },
 
-    typeuser: {
+    state: {
         type: DataTypes.STRING,
-        field: 'typeuser',
+        field: 'state',
+        defaultValue: 'Activo',
+        required: true,
+
+    },
+    description: {
+        type: DataTypes.STRING,
+        field: 'description',
+        required: true,
     },
 
     licenseplate: {
         type: DataTypes.STRING,
         field: 'licenseplate',
+        required: true,
     },
 
 },
-{
-    timestamps: false,
-},
+    {
+        timestamps: false,
+    },
 );
-Vehicle.belongsTo(Users, { 
-    foreignKey: 'iduser', 
-    targetKey: 'iduser',
+
+
+Vehicle.belongsTo(ApartmentModel, {
+    foreignKey: 'idApartment',
+    targetKey: 'idApartment',
+
 });
 module.exports = Vehicle;

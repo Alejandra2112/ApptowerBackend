@@ -3,6 +3,8 @@ const Rols = require('../Models/rols.model');
 const Permission = require('../Models/permissions.model');
 const rolsPermissions = require('../Models/rolsPermissions.model');
 const Privileges = require('../Models/privileges.model');
+const { Sequelize } = require('sequelize');
+const UserModel = require('../Models/users.model');
 
 const getRols = async (req, res = response) => {
   try {
@@ -57,39 +59,66 @@ const getRolsOne = async (req, res = response) => {
   }
 };
 
+const getRolsNameRole = async (req, res = response) => {
+  try {
+    const { namerole } = req.params;
+
+    const rols = await Rols.findOne({
+      where: {
+        namerole: Sequelize.where(
+          Sequelize.fn('lower', Sequelize.col('namerole')),
+          Sequelize.fn('lower', namerole)
+        )
+      }
+    });
+
+    if (rols) {
+      return res.status(409).json({ message: 'Ya existe un rol con ese nombre.' });
+    }
+
+    res.status(200).json({
+      rols,
+    });
+
+  } catch (error) {
+    console.error('Error al obtener roles:', error);
+    res.status(500).json({
+      error: 'Error al obtener roles',
+    });
+  }
+}
 
 
 const postRols = async (req, res) => {
   let message = '';
-  const { namerole, description, permissions, privileges } = req.body;
+  const { namerole, description, detailsRols } = req.body;
+  console.log(detailsRols, 'detailsRols')
+
 
   try {
-    if (!permissions || !Array.isArray(permissions)) {
+    if (!detailsRols || !Array.isArray(detailsRols)) {
       return res.status(400).json({
-        error: "Invalid permissions",
-      });
-    }
-
-    if (!privileges || !Array.isArray(privileges)) {
-      return res.status(400).json({
-        error: "Invalid privileges",
+        error: "Invalid detailsRols",
       });
     }
 
     const rols = await Rols.create({ namerole, description });
-    const roleId = rols.idrole;
 
-    const selectedPermissions = permissions.map((permissionId) =>
-      privileges.map((privilegeId) => ({
-        idrole: roleId,
-        idpermission: permissionId,
-        idprivilege: privilegeId,
-      }))
-    );
-    const iteratedpermissions = [].concat(...selectedPermissions);
+    const detailInstances = await Promise.all(detailsRols.map(async (detail) => {
+      const permission = await Permission.findOne({ where: { permission: detail.permiso } });
+      const privilege = await Privileges.findOne({ where: { privilege: detail.privilege } });
 
-    await rolsPermissions.bulkCreate(iteratedpermissions);
+      console.log('permission:', permission);
+      console.log('privilege:', privilege);
 
+      return {
+        idrole: rols.idrole,
+        idpermission: permission ? permission.idpermission : null,
+        idprivilege: privilege ? privilege.idprivilege : null,
+      };
+    }));
+
+    await rolsPermissions.bulkCreate(detailInstances);
     message = 'Rol registrado correctamente';
     res.json({
       rols: message,
@@ -104,7 +133,9 @@ const postRols = async (req, res) => {
 
 
 const putRols = async (req, res) => {
-  const { idrole, permissions, privileges } = req.body;
+  const { detailsRols, ...others } = req.body;
+  const { idrole } = req.params;
+  console.log('ID del rol recibido:', idrole);
 
   try {
     const existingRole = await Rols.findByPk(idrole);
@@ -112,21 +143,40 @@ const putRols = async (req, res) => {
       return res.status(404).json({ error: 'No se encontró un rol con ese ID' });
     }
 
+    await existingRole.update(others);
+
+
     await rolsPermissions.destroy({ where: { idrole } });
 
-    if (permissions && Array.isArray(permissions) && privileges && Array.isArray(privileges)) {
+    if (detailsRols && Array.isArray(detailsRols) && detailsRols.length > 0) {
+      const resolvedInstances = [];
 
-      const permissionPrivilegeAsso = permissions.map((permissionId) =>
+      for (const detail of detailsRols) {
+        const { permiso, privilege } = detail;
 
-        privileges.map((privilegeId) => ({
+        const permission = await Permission.findOne({ where: { permission: permiso } });
+        const privilegeObj = await Privileges.findOne({ where: { privilege } });
+
+        if (!permission || !privilegeObj) {
+          return res.status(400).json({
+            error: `El permiso '${permiso}' o el privilegio '${privilege}' no existen en la base de datos.`,
+          });
+        }
+
+        resolvedInstances.push({
           idrole,
-          idpermission: permissionId,
-          idprivilege: privilegeId,
-        }))
-      );
-      const iteratedAsso = [].concat(...permissionPrivilegeAsso);
+          idpermission: permission.idpermission,
+          idprivilege: privilegeObj.idprivilege,
+        });
+      }
 
-      await rolsPermissions.bulkCreate(iteratedAsso);
+      await rolsPermissions.bulkCreate(resolvedInstances);
+    }
+
+    const updatedStateUser = await UserModel.findAll({ where: { idrole } });
+
+    if (updatedStateUser) {
+      await UserModel.update({ status: others.state }, { where: { idrole } });
     }
 
     return res.json({ message: 'Rol actualizado exitosamente' });
@@ -138,30 +188,31 @@ const putRols = async (req, res) => {
 
 
 
-const deleteRols = async (req, res) => {
-  const { idrole } = req.body;
-  let message = '';
-  try {
-    const rowsDeleted = await Rols.destroy({ where: { idrole: idrole } });
 
-    if (rowsDeleted > 0) {
-      message = 'Rol eliminado exitosamente';
-    } else {
-      res.status(404).json({ error: 'No se encontró un rol con ese ID' });
-    }
-  } catch (e) {
-    res.status(500).json({ error: 'Error al eliminar rol', message: e.message });
-  }
-  res.json({
-    rols: message,
-  });
-};
+// const deleteRols = async (req, res) => {
+//   const { idrole } = req.body;
+//   let message = '';
+//   try {
+//     const rowsDeleted = await Rols.destroy({ where: { idrole: idrole } });
+
+//     if (rowsDeleted > 0) {
+//       message = 'Rol eliminado exitosamente';
+//     } else {
+//       res.status(404).json({ error: 'No se encontró un rol con ese ID' });
+//     }
+//   } catch (e) {
+//     res.status(500).json({ error: 'Error al eliminar rol', message: e.message });
+//   }
+//   res.json({
+//     rols: message,
+//   });
+// };
 
 
 module.exports = {
   getRols,
   postRols,
   putRols,
-  deleteRols,
-  getRolsOne
+  getRolsOne,
+  getRolsNameRole
 };

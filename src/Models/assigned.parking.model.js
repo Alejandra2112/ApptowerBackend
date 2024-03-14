@@ -1,9 +1,8 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
-const SpaceModel = require('./spaces.model'); 
-const ParkingSpaceModel = require('./parking.spaces.model'); 
 
-const AssignedParking = sequelize.define('AssignedParking', { 
+
+const AssignedParking = sequelize.define('AssignedParking', {
 
   idAssignedParking: {
 
@@ -14,10 +13,10 @@ const AssignedParking = sequelize.define('AssignedParking', {
 
   },
 
-  idSpace: {
+  idApartment: {
 
     type: DataTypes.INTEGER,
-    field: 'idSpace',
+    field: 'idApartment',
 
   },
 
@@ -25,7 +24,7 @@ const AssignedParking = sequelize.define('AssignedParking', {
 
     type: DataTypes.INTEGER,
     field: 'idParkingSpace',
-    
+
   },
 }, {
   timestamps: false,

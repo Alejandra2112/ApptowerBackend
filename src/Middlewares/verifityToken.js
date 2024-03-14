@@ -1,18 +1,18 @@
 const jwt = require('jsonwebtoken');
 
 const verificarToken = (req, res, next) => {
-  const token = req.header('Authorization');
+  const authHeader = req.headers.authorization;
 
-  if (!token) {
+  if (!authHeader) {
     return res.status(401).json({ mensaje: 'Acceso denegado' });
   }
 
-  const tokenSecret = token.split(' ')[1]
+  const token = authHeader.split(' ')[1];
 
+  console.log(token)
+  
   try {
-    console.log(JSON.stringify(token));
-    console.log(JSON.stringify(tokenSecret));
-    const decoded = jwt.verify(tokenSecret, process.env.MISECRETKEY, { ignoreExpiration: false });
+    const decoded = jwt.verify(token, process.env.MISECRETKEY);
     req.user = decoded;
     console.log('Contenido de req.user:', req.user);
 

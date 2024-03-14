@@ -1,18 +1,17 @@
 const { Router } = require('express')
 const route = Router()
-const { getWatchman, postWatchman, putWatchman, deleteWatchman } = require('../Controllers/watchmans.controller');
-const validateWatchman = require('../Middlewares/watchman.middleware');
-const checkPermissions = require('../Middlewares/checkPermission');
-const verifityToken = require('../Middlewares/verifityToken');
-const privilegesMap = require('../Helpers/Privileges.js');
-const permissionMap = require('../Helpers/Permission.js');
+const { getWatchman, postWatchman, putWatchman, getWatchmanOne, getWatchmanDocument } = require('../Controllers/watchmans.controller');
+const { watchmanValidations } = require('../Middlewares/watchman.middleware')
+const validator = require('../Middlewares/validation.middleware');
+const { userValidations, passwordValidationForPost } = require('../Middlewares/user.middleware');
 
-route.use(verifityToken);
 
-route.get('/', checkPermissions(privilegesMap.get_watchman, permissionMap.vigilantes), getWatchman) // posicion one: privilege, posicion two: permission
+route.get('/', getWatchman)
+route.get('/:iduser', getWatchmanOne)
+route.get('/document/:document', getWatchmanDocument)
 
-route.post('/', validateWatchman, checkPermissions(privilegesMap.post_watchman, permissionMap.vigilantes), postWatchman)
-route.put('/', validateWatchman, checkPermissions(privilegesMap.put_watchman, permissionMap.vigilantes), putWatchman)
-route.delete('/', checkPermissions(privilegesMap.delete_watchman, permissionMap), deleteWatchman)
+
+route.post('/', postWatchman)
+route.put('/', userValidations, validator, putWatchman)
 
 module.exports = route

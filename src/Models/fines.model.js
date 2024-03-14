@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
-const SpacesModel = require('./spaces.model');
-
+const ApartmentModel = require('./apartment.model');
+const UsersModel = require('./users.model');
 
 const Fines = sequelize.define('fines', {
     idFines: {
@@ -14,7 +14,7 @@ const Fines = sequelize.define('fines', {
         type: DataTypes.STRING,
         field: 'fine_type',
     },
-    incidentDate:{
+    incidentDate: {
         type: DataTypes.DATE,
         field: 'incident_date',
     },
@@ -23,37 +23,48 @@ const Fines = sequelize.define('fines', {
         field: 'payment_date',
     },
     amount: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.DECIMAL(10, 2),
         field: 'amount',
     },
     details: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(500),
         field: 'details',
     },
-    idSpace: {
+    idApartment: {
         type: DataTypes.INTEGER,
-        field: 'idspace',
-    },
-    apartmentNumber: {
-        type: DataTypes.INTEGER,
-        field: 'apartment_number',
+        field: 'idApartment',
     },
     state: {
         type: DataTypes.STRING,
         field: 'state',
     },
     evidenceFiles: {
-        type: DataTypes.TEXT,
+        type: DataTypes.ARRAY(DataTypes.TEXT),
         field: 'evidence_files',
     },
     paymentproof: {
         type: DataTypes.TEXT,
         field: 'payment_proof',
     },
+    idUser: {
+        type: DataTypes.INTEGER,
+        field: 'iduser',
+    },
+},
+    {
+        timestamps: true,
+    }
+
+);
+
+Fines.belongsTo(ApartmentModel, {
+    foreignKey: 'idApartment',
+    as: 'apartment'
 });
 
-Fines.belongsTo(SpacesModel, {
-    foreignKey: 'idspace', as:'space'
+Fines.belongsTo(UsersModel, {
+    foreignKey: 'iduser',
+    as: 'user'
 });
 
 module.exports = Fines;

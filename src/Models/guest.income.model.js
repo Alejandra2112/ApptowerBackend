@@ -1,7 +1,10 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
 const Visitors = require('./visitors.model');
-const SpacesModel = require('./spaces.model');
+const GuestIncomeToApartments = require('./guest.income.to.apartments.model');
+const ApartmentModel = require('./apartment.model');
+// const ApartmentModel = require('./apartment.model');
+// const GuestIncomeToApartments = require('./guest.income.to.apartents.model');
 
 
 const Guest_income = sequelize.define('guest_income', {
@@ -9,7 +12,7 @@ const Guest_income = sequelize.define('guest_income', {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-        field: 'idguest_income',
+        field: 'idGuest_income',
     },
     startingDate: {
         type: DataTypes.DATE,
@@ -23,33 +26,42 @@ const Guest_income = sequelize.define('guest_income', {
         type: DataTypes.STRING,
         field: 'person_allows_access',
     },
-    // state:{
-    //     type: DataTypes.STRING,
-    //     field: 'state',	
-    //     allowNull: false,
-    // },
-    observations:{
+    observations: {
         type: DataTypes.STRING,
         field: 'observations',
         defaultValue: "Without observations",
     },
     idVisitor: {
         type: DataTypes.INTEGER,
-        field: 'idvisitor',
+        field: 'idVisitor',
     },
-    idSpace: {
-        type: DataTypes.INTEGER,
-        field: 'idspace',
-    }
+    // idApartment: {
+    //     type: DataTypes.INTEGER,
+    //     field: 'idApartment',
+    // }
 
 });
 
-    Guest_income.belongsTo(Visitors, {
-        foreignKey: 'idvisitor',as:'visitor'
-    });
-    Guest_income.belongsTo(SpacesModel, {
-        foreignKey: 'idspace', as:'space'
-    });
+// Guest_income.belongsToMany(ApartmentModel, { through: GuestIncomeToApartments });
+
+// Guest_income.belongsToMany(ApartmentModel, {
+//     through: GuestIncomeToApartments,
+//     foreignKey: 'idGuest_income',
+//     otherKey: 'idGuest_income'
+// });
+
+// ApartmentModel.belongsToMany(Guest_income, {
+//     through: GuestIncomeToApartments,
+//     foreignKey: 'idApartment',
+//     otherKey: 'idApartment'
+// });
+Guest_income.belongsTo(Visitors, {
+    foreignKey: 'idVisitor', as: 'asociatedVisitor'
+});
+// Guest_income.belongsTo(ApartmentModel, {
+//     foreignKey: 'idApartment',
+//     as: 'asociatedApartment'
+// });
 
 
 

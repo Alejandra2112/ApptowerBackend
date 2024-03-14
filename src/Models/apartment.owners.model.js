@@ -1,9 +1,9 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
 
-const SpaceOwnerModel = sequelize.define('SpaceOwners', {
+const ApartmentOwnerModel = sequelize.define('ApartmentOwners', {
 
-  idSpaceOwner: {
+  idApartmentOwner: {
 
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -12,10 +12,10 @@ const SpaceOwnerModel = sequelize.define('SpaceOwners', {
 
   },
 
-  idSpace: {
+  idApartment: {
 
     type: DataTypes.INTEGER,
-    field: 'idSpace',
+    field: 'idApartment',
 
   },
 
@@ -56,4 +56,4 @@ const SpaceOwnerModel = sequelize.define('SpaceOwners', {
 });
 
 
-module.exports = SpaceOwnerModel;
+module.exports = ApartmentOwnerModel;

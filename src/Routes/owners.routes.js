@@ -1,13 +1,22 @@
 const { Router } = require('express')
 const route = Router()
-const { postPersonalInfoValidation, postDocNumberOwner, putDocNumberOwner, putPersonalInfoValidation } = require('../Middlewares/personal.information.middleware')
-const validation = require('../Middlewares/validation.middleware')
-const { getOneOwners, getAllOwners, postOwner, putOwner } = require('../Controllers/owners.controller')
+const validator = require('../Middlewares/validation.middleware')
+const { getOneOwner, getAllOwners, postOwner, putOwner } = require('../Controllers/owners.controller')
+const { ownerStatusValidation, createAapartmentOwnerValidationforPost } = require('../Middlewares/owner.middleware')
+const { passwordValidationForPost, userPersonalInfoValidationForPost, ageValidation } = require('../Middlewares/user.middleware')
+const { idApartmentValidationsForPost } = require('../Middlewares/apartments.middleware')
+const { OwnershipStartDateValidationForPost } = require('../Middlewares/apartment.owners.middleware');
+const { fileValidationForPost } = require('../Middlewares/uploads.middleware')
 
-route.get('/:idOwner', getOneOwners)
+route.get('/:idOwner', getOneOwner)
 route.get('/', getAllOwners)
-route.post('/', postPersonalInfoValidation, postDocNumberOwner, validation, postOwner)
-route.put('/', putDocNumberOwner, putPersonalInfoValidation, validation, putOwner)
+
+route.post('/',
+    userPersonalInfoValidationForPost, ageValidation, idApartmentValidationsForPost,
+    createAapartmentOwnerValidationforPost, OwnershipStartDateValidationForPost,
+    passwordValidationForPost, fileValidationForPost, validator, postOwner )
+
+route.put('/', ownerStatusValidation, validator, putOwner)
 // route.delete('/', deleteOwner)
 
 module.exports = route  

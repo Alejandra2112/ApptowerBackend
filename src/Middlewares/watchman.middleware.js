@@ -1,46 +1,39 @@
-const { validationResult, check } = require('express-validator')
+const { check, validationResult } = require('express-validator');
 
-const validateWatchman = [
-  check('namewatchman')
-    .isString()
-    .withMessage('El campo "namewatchman" debe ser una cadena'),
+const watchmanValidationForPost = [
+  check('idEnterpriseSecurity').isNumeric().withMessage('El rol es requerido.'),
 
-  check('lastnamewatchman')
-    .isString()
-    .withMessage('El campo "lastnamewatchman" debe ser una cadena'),
+  check('iduser').isNumeric().withMessage('El rol es requerido.'),
 
-  check('documentType')
-    .isIn(['CC', 'CE'])
-    .withMessage('El campo "documentType" debe ser "CC" o "CE'),
-  
-  check('document')
-    .isString()
-    .withMessage('El campo "document" debe ser una cadena')
-    .isLength({ min: 8, max: 10 })
-    .withMessage('El campo "document" debe tener entre 8 y 10 caracteres'),
-
-  check('phone')
-    .isString()
-    .withMessage('El campo "phone" debe ser una cadena')
-    .isLength({ min: 10, max: 10 })
-    .withMessage('El campo "phone" debe tener 10 caracteres'),
-
-  check('email')
-    .isEmail()
-    .withMessage('El campo "email" debe ser un correo electrónico válido'),
-
-  check('dateOfbirth')
-    .isISO8601()
-    .withMessage('El campo "dateOfbirth" debe ser una fecha válida en formato (YYYY-MM-DD)'),
-
-
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json(errors);
-    }
-    next();
-  },
 ];
 
-module.exports = validateWatchman;
+const watchmanValidationForPut = [
+  check('idEnterpriseSecurity').isNumeric().withMessage('El rol es requerido.'),
+
+  check('iduser').isNumeric().withMessage('El rol es requerido.'),
+
+  check('state').isIn(['Activo', 'Inactivo']).withMessage('Estado inválido.'),
+
+];
+
+const watchmanValidations = (req, res, next) => {
+  let checks;
+  if (req.method === 'POST') {
+    checks = watchmanValidationForPost;
+  } else if (req.method === 'PUT') {
+    checks = watchmanValidationForPut;
+  } else {
+    return next();
+  }
+  Promise.all(checks.map(check => check.run(req)))
+    .then(() => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+      next();
+    })
+    .catch(next);
+};
+
+module.exports = { watchmanValidations };

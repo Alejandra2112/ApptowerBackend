@@ -4,7 +4,7 @@ const Permission = require('../Models/permissions.model');
 const getPermissions = async (req, res = response) => {
   try {
     const permission = await Permission.findAll();
-    console.log('datos de permisos obtenidos correctamente:', permission );
+    console.log('datos de permisos obtenidos correctamente:', permission);
 
     res.json({
       permission
@@ -17,12 +17,37 @@ const getPermissions = async (req, res = response) => {
   }
 };
 
+const getNamePermissions = async (req, res = response) => {
+  const { permission } = req.params;
+  try {
+    const permissions = await Permission.findAll({
+      where: { permission: permission },
+      attributes: ['permission']
+    });
+
+    permission = permission.toLowerCase();
+    if (!permissions.length) {
+      return res.status(404).json({
+        message: 'No se encontraron permisos con ese nombre'
+      });
+    }
+    console.log('datos de permisos obtenidos correctamente:', permissions);
+
+    res.json({
+      permissions
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error al cargar datos permisos.');
+  }
+}
+
 const postPermissions = async (req, res) => {
   let message = '';
-  const body = req.body; 
+  const permissions = req.body;
   try {
-    await Permission.create(body); 
-    message = 'Permiso Registrado Exitosamente';
+    await Permission.bulkCreate(permissions);
+    message = 'Permisos registrados exitosamente';
   } catch (e) {
     message = e.message;
   }
@@ -81,5 +106,6 @@ module.exports = {
   putPermission,
   getPermissions,
   postPermissions,
-  deletePermissions
+  deletePermissions,
+  getNamePermissions
 }

@@ -1,11 +1,13 @@
-const {Router} = require ('express')
+const { Router } = require('express')
 const route = Router()
-const {getSpacesWithAssignedParking, getAllAssignedParking, postAssignedParking, putAssignedParking, deleteAssignedParking } = require ('../Controllers/assigned.parkings.controller')
+const { getApartmentWithAssignedParking, getAllAssignedParking, postAssignedParking, putAssignedParking, deleteAssignedParking } = require('../Controllers/assigned.parkings.controller');
+const { assignedParkingValidationForPost, assignedParkingValidationForPut } = require('../Middlewares/assigned.parking.middleware');
+const validator = require('../Middlewares/validation.middleware');
 
-route.get('/:idSpace', getSpacesWithAssignedParking);
+route.get('/:idApartment', getApartmentWithAssignedParking);
 route.get('/', getAllAssignedParking)
-route.post('/', postAssignedParking)
-route.put('/', putAssignedParking)
+route.post('/', assignedParkingValidationForPost, validator, postAssignedParking)
+route.put('/', assignedParkingValidationForPut, validator, putAssignedParking)
 route.delete('/', deleteAssignedParking)
 
 module.exports = route  

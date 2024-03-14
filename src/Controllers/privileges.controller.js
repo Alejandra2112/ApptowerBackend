@@ -21,8 +21,8 @@ const postPrivileges = async (req, res) => {
     let message = '';
     const body = req.body;
     try {
-        await Privileges.create(body);
-        message = 'Privilegio Registrado Exitosamente';
+        await Privileges.bulkCreate(body);
+        message = 'Privilegios Registrados Exitosamente';
     } catch (e) {
         message = e.message;
     }

@@ -2,72 +2,89 @@ const { check, validationResult } = require('express-validator');
 const SpacesModel = require('../Models/spaces.model');
 
 
-const spacesCreateValidation = [
+const spaceValidationForPost = [
 
     check('spaceType')
-        .isIn(['Apartament', 'Social area', 'Wet area'])
-        .withMessage('Space type is not valid.'),
+        .notEmpty().withMessage('El tipo de la zona comun es obligatorio.'),
+
+    //     .isIn(['Social area', 'Wet area'])
+    //     .withMessage('Tipo de zona comun no es valida.'),
 
     check('spaceName')
-        .optional()
+        .notEmpty().withMessage('El nombre de la zona comun es obligatorio.')
         .isLength({ min: 3, max: 50 })
-        .withMessage('Space name must be between 3 and 50 characters.')
+        .withMessage('Nombre de la zona comun debe tener entre 3 y 50 caracteres.')
         .trim()
         .matches(/^[a-zA-Z0-9\s]+$/)
-        .withMessage('Space name must contain only letters and numbers.')
+        .withMessage('Nombre de la zona comun solo debe tener numeros y letras.')
         .custom(async (value) => {
             const existingSpace = await SpacesModel.findOne({ where: { spaceName: value } });
 
             if (existingSpace) {
-                throw new Error('Space name is already in use');
+                throw new Error(`Nombre del la zona comun "${value}" ya está en uso.`);
             }
 
             return true;
         }),
 
     check('area')
-        .optional()
+        .notEmpty().withMessage('El area de la zona comun es obligatorio.')
         .isNumeric({ min: 0 })
-        .withMessage('Area must be a number.'),
+        .withMessage('Area debe ser un numero.'),
 
     check('capacity')
-        .optional()
+        .notEmpty().withMessage('La capacidad de la zona comun es obligatorio.')
         .isInt({ min: 0 })
-        .withMessage('Capacity must be a positive integer.'),
+        .withMessage('Capacidad debe ser un numero entero.'),
 
-    check('status')
-        .isIn(['Active', 'Inactive'])
-        .withMessage('Status spaces is not valid.')
+    check('schedule')
+        .notEmpty().withMessage('El horario es obligatorio.')
+
+
+
 ];
 
-const spacesUpdateValidation = [
+const spaceValidationForPut = [
+
 
     check('spaceType')
-        .optional()
-        .isIn(['Apartament', 'Social area', 'Wet area'])
-        .withMessage('Space type is not valid.'),
+        .optional(),
+    // .isIn(['Social area', 'Wet area'])
+    // .withMessage('Tipo de zona comun no es valida.'),
 
     check('spaceName')
-        .optional()
         .isLength({ min: 3, max: 50 })
-        .withMessage('Space name must be between 3 and 50 characters.')
+        .withMessage('Nombre de la zona comun debe tener entre 3 y 50 caracteres.')
         .trim()
         .matches(/^[a-zA-Z0-9\s]+$/)
-        .withMessage('Space name must contain only letters and numbers.')
-        .custom(async (value) => {
-            const existingSpace = await SpacesModel.findOne({ where: { spaceName: value } });
+        .withMessage('Nombre de la zona comun solo debe tener numeros y letras.')
 
-            if (existingSpace) {
-                throw new Error('Space name is already in use');
+        .custom(async (value, { req }) => {
+
+            const body = req.body
+
+            const existingSpaceById = await SpacesModel.findOne({ where: { idSpace: body.idSpace } });
+            const existingSpaceByName = await SpacesModel.findOne({ where: { spaceName: value } });
+
+            if (!existingSpaceById || !existingSpaceByName) {
+                return true;
+            } else if (existingSpaceById.spaceName !== existingSpaceByName.spaceName) {
+                throw new Error(`Nombre del la zona comun "${value}" ya está en uso.`);
+            } else {
+                return true;
             }
 
-            return true;
+
+
         }),
+
+
+
 
     check('area')
         .optional()
         .isNumeric({ min: 0 })
-        .withMessage('Area must be a number.'),
+        .withMessage('Area debe ser un numero.'),
 
     check('capacity')
         .optional()
@@ -75,13 +92,12 @@ const spacesUpdateValidation = [
         .withMessage('Capacity must be a positive integer.'),
 
     check('status')
-        .optional()
         .isIn(['Active', 'Inactive'])
-        .withMessage('Status spaces is not valid.')
+        .withMessage('El estado no es válido.')
 ];
 
 module.exports = {
 
-    spacesCreateValidation,
-    spacesUpdateValidation
+    spaceValidationForPost,
+    spaceValidationForPut
 }

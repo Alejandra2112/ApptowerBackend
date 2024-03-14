@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../Database/config');
+const UserModel = require('./users.model');
 
 const OwnersModel = sequelize.define('Owners', {
 
@@ -11,63 +12,11 @@ const OwnersModel = sequelize.define('Owners', {
         field: 'idOwner'
 
     },
+    
+    iduser: {
 
-    docType: {
-
-        type: DataTypes.STRING(5),
-        field: 'docType',
-        validate: {
-            isIn: [['CC', 'CE']]
-        }
-        // allowNull: false
-
-    },
-
-    docNumber: {
-
-        type: DataTypes.STRING(15),
-        field: 'docNumber',
-        // allowNull: false
-
-    },
-
-    name: {
-
-        type: DataTypes.STRING(255),
-        field: 'name',
-        // allowNull: false
-
-    },
-
-    lastName: {
-
-        type: DataTypes.STRING(255),
-        field: 'lastName',
-        // allowNull: false
-
-    },
-
-    birthday: {
-
-        type: DataTypes.DATE,
-        field: 'birthday',
-        // allowNull: false
-
-    },
-
-    email: {
-
-        type: DataTypes.STRING(80),
-        field: 'email',
-        // allowNull: false
-
-    },
-
-    phoneNumber: {
-
-        type: DataTypes.STRING(15),
-        field: 'phoneNumber',
-
+        type: DataTypes.INTEGER,
+        field: "iduser"
     },
 
     status: {
@@ -81,8 +30,19 @@ const OwnersModel = sequelize.define('Owners', {
     }
 }, {
 
-    timestamps: false
+    timestamps: true
     
+});
+
+
+UserModel.hasMany(OwnersModel, {
+    foreignKey: 'iduser',
+    sourceKey: 'iduser',
+});
+
+OwnersModel.belongsTo(UserModel, {
+    foreignKey: 'iduser',
+    targetKey: 'iduser',
 });
 
 module.exports = OwnersModel;

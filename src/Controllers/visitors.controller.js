@@ -1,7 +1,7 @@
 const { response } = require('express');
 const Visitors = require('../Models/visitors.model');
 
-const getVisitors = async (req, res = response) => {
+const getVisitorsAll = async (req, res = response) => {
     try {
       const visitors = await Visitors.findAll();
 
@@ -20,18 +20,61 @@ const getVisitors = async (req, res = response) => {
     }  
 };
 
+const getVisitorsOne = async (req, res = response) => {
+    try {
+        const { idVisitor } = req.params;
+
+        const visitors = await Visitors.findOne({ where: { idVisitor: idVisitor } });
+
+        if (!visitors) {
+            return res.status(404).json({ error: 'No se encontró un visitante con ese ID' });
+        }
+
+        res.json({
+            visitors,
+        });
+    } catch (error) {
+        console.error('Error al obtener visitante:', error);
+        res.status(500).json({
+            error: 'Error al obtener visitante',
+        });
+    }
+}
+
 const postVisitors = async (req, res) => {
     let message = '';
-    const body = req.body; 
+    const body = req.body;
+    console.log(body)                                                     //| 1
     try {
-        await Visitors.create(body); 
+        // Verificar si ya existe un visitante con el mismo número de cédula
+        const existingVisitor = await Visitors.findOne({                       //| 2
+            where: {
+                documentNumber: body.documentNumber
+            }
+        });
+
+        if (existingVisitor) {                                                 //| 3
+            // Si ya existe, retornar un mensaje de error
+            message = 'Ya existe un visitante con este número de cédula.';
+            return res.status(400).json({
+                message,
+            });
+        }
+
+        // Si no existe, crear el nuevo visitante
+        const visitorCreated = await Visitors.create(body);                    //| 4
         message = 'Visitante Registrado Exitosamente';
-    } catch (e) {
-        message = e.message;
+        res.json({
+            visitor: visitorCreated,
+            message,
+        });
+    } catch (e) {            
+        console.log(e)                                                  //| 5
+        message = 'Error al registrar visitante: ' + e.message;
+        res.status(500).json({
+            message,
+        });
     }
-    res.json({
-        visitors: message,
-    });
 };
 
 const putVisitors = async (req, res = response) => {
@@ -39,9 +82,9 @@ const putVisitors = async (req, res = response) => {
     let message = '';
 
     try {
-        const { idVisitor, ...update } = body;
+        const { idVisitor, access } = body;
 
-        const [updatedRows] = await Visitors.update(update, {
+        const [updatedRows] = await Visitors.update({ access:access}, {
             where: { idVisitor: idVisitor },
         });
 
@@ -58,33 +101,11 @@ const putVisitors = async (req, res = response) => {
     });
 };
 
-const deleteVisitors = async (req, res = response) => {
-    const body = req.body;
-    let message = '';
 
-    try {
-        const { idVisitor } = body;
-
-        const destroy = await Visitors.destroy({
-            where: { idVisitor: idVisitor },
-        });
-
-        if (destroy) {
-            message = 'Visitante eliminado exitosamente.';
-        } else {
-            message = 'No se encontró un visitante con ese ID';
-        }
-    } catch (error) {
-        message = 'Error al eliminar visitante: ' + error.message;
-    }
-    res.json({
-        visitors: message,
-    });
-};
 
 module.exports={
-    getVisitors,
+    getVisitorsAll,
+    getVisitorsOne,
     postVisitors,
     putVisitors,
-    deleteVisitors,
 }

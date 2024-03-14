@@ -1,31 +1,45 @@
+
 const { Router } = require('express');
 const route = Router();
-const { logIn } = require('../Controllers/logIn.controller');
+const { logIn, postUsersforLogin } = require('../Controllers/logIn.controller');
 const verifityToken = require('../Middlewares/verifityToken');
+const { logInValidations } = require('../Middlewares/logIn.middleware');
+const validator = require('../Middlewares/validation.middleware');
 const User = require('../Models/users.model');
+const Rols = require('../Models/rols.model');
 
-route.post('/', logIn);
+route.post('/', logInValidations, validator, logIn);
 
-route.get('/access', verifityToken, (req, res) => {
-  const user = req.user;
-  const rol = user.idrole;
-  let message = '';
+route.post('/users', postUsersforLogin);
 
-  if (rol == 1) {
-    message = 'Es 1: Administrador';
-  } else if (rol == 2) {
-    message = 'Es 2: residente';
-  } else if (rol == 3) {
-    message = 'Es 3: vigilante';
+route.get('/access', verifityToken, async (req, res) => {
+  try {
+    const user = req.user;
+    const rol = user.idrole;
+    const iduser = user.iduser;
+    let roleName = '';
+
+    const roleData = await Rols.findByPk(rol);
+
+    if (roleData) {
+      roleName = roleData.namerole;
+      console.log(roleName);
+    }
+
+    res.json({
+      role: roleName,
+      message: `Es ${roleName}`,
+      user: iduser,
+
+    });
+
+    console.log('Rol:', roleName);
+  } catch (error) {
+    console.error('Error fetching role:', error);
+    res.status(500).json({ message: 'Error fetching role' });
   }
-  else {
-    message = '';
-  }
-
-  res.json({
-    message: message,
-  });
 });
+
 
 module.exports = route;
 

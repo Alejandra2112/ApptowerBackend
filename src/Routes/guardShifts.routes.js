@@ -1,8 +1,9 @@
 const { Router } = require('express')
 const route = Router()
-const { getShifts, postShifts, deleteShifts } = require('../Controllers/guardShifts.controller')
+const { getShifts, postShifts, deleteShifts, getAllShifts } = require('../Controllers/guardShifts.controller')
 
-route.get('/', getShifts)
+route.get('/:idwatchman', getShifts)
+route.get('/', getAllShifts)
 route.post('/', postShifts)
 route.delete('/', deleteShifts)
 

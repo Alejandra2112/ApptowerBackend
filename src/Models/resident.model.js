@@ -1,6 +1,7 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes, INTEGER } = require('sequelize');
 const sequelize = require('../Database/config');
-const OwnersModel = require('./owners.model');
+const UserModel = require('./users.model');
+
 
 const ResidentModel = sequelize.define('Residents', {
 
@@ -13,73 +14,10 @@ const ResidentModel = sequelize.define('Residents', {
 
     },
 
-    docType: {
+    iduser: {
 
-        type: DataTypes.STRING(5),
-        field: 'docType',
-        validate: {
-            isIn: [['CC', 'CE']]
-        }
-        // allowNull: false
-
-    },
-
-    docNumber: {
-
-        type: DataTypes.STRING(15),
-        field: 'docNumber',
-        // allowNull: false
-
-    },
-
-    name: {
-
-        type: DataTypes.STRING(255),
-        field: 'name',
-        // allowNull: false
-
-    },
-
-    lastName: {
-
-        type: DataTypes.STRING(255),
-        field: 'lastName',
-        // allowNull: false
-
-    },
-
-    sex: {
-
-        type: DataTypes.STRING(1),
-        field: 'sex',
-        validate: {
-            isIn: [['M', 'F']]
-        }
-        // allowNull: false
-
-    },
-
-    birthday: {
-
-        type: DataTypes.DATE,
-        field: 'birthday',
-        // allowNull: false
-
-    },
-
-    email: {
-
-        type: DataTypes.STRING(80),
-        field: 'email',
-        // allowNull: false
-
-    },
-
-    phoneNumber: {
-
-        type: DataTypes.STRING(15),
-        field: 'phoneNumber',
-
+        type: DataTypes.INTEGER,
+        field: "iduser"
     },
 
     residentType: {
@@ -95,7 +33,7 @@ const ResidentModel = sequelize.define('Residents', {
     status: {
 
         type: DataTypes.STRING(20),
-        defaultValue: 'Active',
+        defaultValue: 'Inactive',
         field: 'status',
         validate: {
             isIn: [['Active', 'Inactive']]
@@ -103,60 +41,75 @@ const ResidentModel = sequelize.define('Residents', {
     }
 }, {
 
-    timestamps: false
+    timestamps: true
 
 });
+  
+
+UserModel.hasMany(ResidentModel, {
+    foreignKey: 'iduser',
+    sourceKey: 'iduser',
+});
+
+ResidentModel.belongsTo(UserModel, {
+    foreignKey: 'iduser',
+    targetKey: 'iduser',
+});
+
+
+
+
 
 // Hooks for create and update owners
 
-ResidentModel.afterCreate(async (resident) => {
+// ResidentModel.afterCreate(async (resident) => {
 
-    if (resident.residentType === 'owner') {
+//     if (resident.residentType === 'owner') {
 
-        const owner = await OwnersModel.create({
+//         const owner = await OwnersModel.create({
 
-            docType: resident.docType,
-            docNumber: resident.docNumber,
-            name: resident.name,
-            lastName: resident.lastname,
-            birthday: resident.birthday,
-            email: resident.email,
-            phoneNumber: resident.phoneNumber,
-            status: 'Active',
+//             docType: resident.docType,
+//             docNumber: resident.docNumber,
+//             name: resident.name,
+//             lastName: resident.lastname,
+//             birthday: resident.birthday,
+//             email: resident.email,
+//             phoneNumber: resident.phoneNumber,
+//             status: 'Active',
 
-        });
-    }
-})
-
-
+//         });
+//     }
+// })
 
 
-ResidentModel.afterUpdate(async (resident) => {
-
-    console.log(resident + 'hola')
-
-    const ownerToUpdate = await OwnersModel.findOne({ where: { docNumber: resident.docNumber } });
-
-    if (ownerToUpdate) {
 
 
-        await ownerToUpdate.update({
+// ResidentModel.afterUpdate(async (resident) => {
 
-            docType: resident.docType,
-            docNumber: resident.docNumber,
-            name: resident.name,
-            lastName: resident.lastname,
-            birthday: resident.birthday,
-            email: resident.email,
-            phoneNumber: resident.phoneNumber,
-            status: ownerToUpdate.status
-        });
+//     console.log(resident + 'hola')
+
+//     const ownerToUpdate = await OwnersModel.findOne({ where: { docNumber: resident.docNumber } });
+
+//     if (ownerToUpdate) {
 
 
-    }
+//         await ownerToUpdate.update({
 
-}
-)
+//             docType: resident.docType,
+//             docNumber: resident.docNumber,
+//             name: resident.name,
+//             lastName: resident.lastname,
+//             birthday: resident.birthday,
+//             email: resident.email,
+//             phoneNumber: resident.phoneNumber,
+//             status: ownerToUpdate.status
+//         });
+
+
+//     }
+
+// }
+// )
 
 module.exports = ResidentModel;
 

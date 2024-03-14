@@ -1,44 +1,81 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = require('../Database/config'); 
-const Users = require('./users.model');
-const Residents = require('./resident.model');
-
+const sequelize = require('../Database/config');
+const SpacesModel = require('./spaces.model');
+const ResidentModel = require('./resident.model');
 
 const Booking = sequelize.define('booking', {
   idbooking: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
-    field: 'idbooking', 
+    field: 'idbooking',
   },
-  iduser: {
+  idSpace: {
     type: DataTypes.INTEGER,
-    field: 'iduser',
+    field: 'idSpace',
+    required: true,
+
   },
   idResident: {
-      type: DataTypes.INTEGER,
-      field: 'idResident',
-    },
-  bookingtype: {
-      type: DataTypes.INTEGER,
-      field: 'bookingtype',
+    type: DataTypes.INTEGER,
+    field: 'idResident',
+    required: true,
+
   },
-  bookingdate: {
+  StartDateBooking: {
     type: DataTypes.DATE,
-    field: 'bookingdate', 
-  }
+    field: 'StartDateBooking',
+    required: true,
+
+  },
+
+  StartTimeBooking: {
+    type: DataTypes.TIME,
+    field: 'StartTimeBooking',
+    required: true,
+
+  },
+
+  EndDateBooking: {
+    type: DataTypes.DATE,
+    field: 'EndDateBooking',
+    required: true,
+
+  },
+
+  EndTimeBooking: {
+    type: DataTypes.TIME,
+    field: 'EndTimeBooking',
+    required: true,
+
+  },
+
+  amountPeople: {
+    type: DataTypes.INTEGER,
+    field: 'amountPeople',
+    required: true,
+
+  },
+  status: {
+    type: DataTypes.STRING,
+    field: 'status',
+    validate: {
+      isIn: [['Por revisar', 'Cancelado', 'Aprobado']],
+    },
+    defaultValue: 'Por revisar',
+  },
+
 },
-{
-  timestamps: false, 
+  {
+    timestamps: false,
+  });
+Booking.belongsTo(SpacesModel, {
+  foreignKey: 'idSpace',
+  targetKey: 'idSpace',
 });
-Booking.belongsTo(Users, { 
-  foreignKey: 'iduser', 
-  targetKey: 'iduser',
-}); 
-Booking.belongsTo(Residents, {
-  foreignKey: 'idResident', 
-  targetKey: 'idResident', 
+Booking.belongsTo(ResidentModel, {
+  foreignKey: 'idResident',
+  targetKey: 'idResident',
 });
 
 module.exports = Booking;
-  
