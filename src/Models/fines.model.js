@@ -50,7 +50,12 @@ const Fines = sequelize.define('fines', {
         type: DataTypes.INTEGER,
         field: 'iduser',
     },
-});
+},
+    {
+        timestamps: true,
+    }
+
+);
 
 Fines.belongsTo(ApartmentModel, {
     foreignKey: 'idApartment',

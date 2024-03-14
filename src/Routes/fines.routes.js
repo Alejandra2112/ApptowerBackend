@@ -6,6 +6,7 @@ const {
   getFinesByApartment,
   postFines,
   putFines,
+
 } = require("../Controllers/fines.controller");
 const {postFinesValidations, putFinesValidations} = require("../Middlewares/fines.middleware");
 const validator = require("../Middlewares/validation.middleware");

@@ -43,7 +43,8 @@ const getVisitorsOne = async (req, res = response) => {
 
 const postVisitors = async (req, res) => {
     let message = '';
-    const body = req.body;                                                     //| 1
+    const body = req.body;
+    console.log(body)                                                     //| 1
     try {
         // Verificar si ya existe un visitante con el mismo número de cédula
         const existingVisitor = await Visitors.findOne({                       //| 2
@@ -67,7 +68,8 @@ const postVisitors = async (req, res) => {
             visitor: visitorCreated,
             message,
         });
-    } catch (e) {                                                              //| 5
+    } catch (e) {            
+        console.log(e)                                                  //| 5
         message = 'Error al registrar visitante: ' + e.message;
         res.status(500).json({
             message,

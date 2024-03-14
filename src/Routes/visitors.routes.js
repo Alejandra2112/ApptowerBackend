@@ -7,6 +7,7 @@ const {
   putVisitors,
 } = require("../Controllers/visitors.controller");
 const { postVisitorsValidations, putVisitorsValidations } = require("../Middlewares/visitors.middleware");
+const validator = require("../Middlewares/validation.middleware");
 
 // const checkPermissions = require("../Middlewares/checkPermission");
 // const verifityToken = require("../Middlewares/verifityToken");
