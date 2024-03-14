@@ -53,10 +53,10 @@ const getAllApartment = async (req, res = response) => {
             // const residents = await ApartmentResidentModel.findAll({
             //     where: { idApartment: apartment.idApartment },
             // });
-            const guestIncomes = await Guest_income.findAll({
-                where: { idApartment: apartment.idApartment, departureDate: null },
+            // const guestIncomes = await Guest_income.findAll({
+            //     where: { idApartment: apartment.idApartment, departureDate: null },
 
-            })
+            // })
 
             // const vehicles = await Vehicle.findAll({
             //     where: { idApartment: apartment.idApartment },
@@ -71,7 +71,7 @@ const getAllApartment = async (req, res = response) => {
             // apartment.dataValues.residentList = residents.map(resident => resident.toJSON());
             // apartment.dataValues.residents = residents.length;
 
-            apartment.dataValues.guestIncomes = guestIncomes.length;
+            // apartment.dataValues.guestIncomes = guestIncomes.length;
 
             // apartment.dataValues.vehicles = vehicles.length;
 

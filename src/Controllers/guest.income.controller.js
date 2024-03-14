@@ -1,194 +1,252 @@
-const GuestIncome = require('../Models/guest.income.model');
-const Visitors = require('../Models/visitors.model');
-const ApartmentModel = require('../Models/apartment.model');
-const { response } = require('express');
-const GuestIncomeParking = require('../Models/guestIncomeParking.model');
-const ParkingSpacesModel = require('../Models/parking.spaces.model');
-const UserModel = require('../Models/users.model');
-const Notification = require('../Models/notification.model');
+const GuestIncome = require("../Models/guest.income.model");
+const Visitors = require("../Models/visitors.model");
+const ApartmentModel = require("../Models/apartment.model");
+const { response } = require("express");
+const GuestIncomeParking = require("../Models/guestIncomeParking.model");
+const ParkingSpacesModel = require("../Models/parking.spaces.model");
+const UserModel = require("../Models/users.model");
+const Notification = require("../Models/notification.model");
+const GuestIncomeToApartments = require("../Models/guest.income.to.apartments.model");
 
 const getGuestIncomeAll = async (req, res = response) => {
-    try {
-        const guestIncome = await GuestIncome.findAll({
-            // include: [
-            //     {
-            //         model: Visitors,
-            //         as: 'asociatedVisitor',
+  try {
+    const guestIncome = await GuestIncome.findAll({
+      // include: [
+      //     {
+      //         model: Visitors,
+      //         as: 'asociatedVisitor',
+      //     },
+      //     {
+      //         model: ApartmentModel,
+      //         as: 'asociatedApartment',
+      //     }
+      // ]
+    });
 
-            //     },
-            //     {
-            //         model: ApartmentModel,
-            //         as: 'asociatedApartment',
-            //     }
-            // ]
-        });
+    const guestIncomeParking = await GuestIncomeParking.findAll({
+        include: [{ model: ParkingSpacesModel, as: "asociatedParkingSpace" }],
+    });
 
-        console.log('ingresos obtenidos correctamente:', guestIncome);
+    const guestIncomeApartment = await GuestIncomeToApartments.findAll({
+        // include: [{ model: ApartmentModel, as: "asociatedApartment" }],
+    });
 
-        res.json({
-            guestIncome,
-        });
-    } catch (error) {
+    console.log("ingresos obtenidos correctamente:", guestIncome);
 
-        console.error('Error al obtener ingresos:', error);
+    res.json({
+        guestIncome: guestIncome,
+        guestIncomeParking: guestIncomeParking,
+        guestIncomeApartment: guestIncomeApartment,
+    });
+  } catch (error) {
+    console.error("Error al obtener ingresos:", error);
 
-        res.status(500).json({
-            error: 'Error al obtener ingresos',
-            errormessage: error.message,
-        });
-    }
+    res.status(500).json({
+      error: "Error al obtener ingresos",
+      errormessage: error.message,
+    });
+  }
 };
 
 const getGuestIncomeOne = async (req, res = response) => {
-    try {
-        const { idGuest_income } = req.params;
+  try {
+    const { idGuest_income } = req.params;
 
-        const parkingGuestIncome = await GuestIncomeParking.findOne({
-            where: { idGuest_income: idGuest_income },
-            include: [
-                { model: ParkingSpacesModel, as: 'asociatedParkingSpace' },
-            ],
-        });
+    const parkingGuestIncome = await GuestIncomeParking.findOne({
+      where: { idGuest_income: idGuest_income },
+      include: [{ model: ParkingSpacesModel, as: "asociatedParkingSpace" }],
+    });
 
-        const guestIncome = await GuestIncome.findOne({
-            where: { idGuest_income: idGuest_income },
-            include: [
-                { model: Visitors, as: 'asociatedVisitor' },
-                { model: ApartmentModel, as: 'asociatedApartment' },
-            ],
-        });
+    const guestIncome = await GuestIncome.findOne({
+      where: { idGuest_income: idGuest_income },
+      include: [
+        { model: Visitors, as: "asociatedVisitor" },
+        { model: ApartmentModel, as: "asociatedApartment" },
+      ],
+    });
 
-        const guestIncomeVehicle = await GuestIncomeParking.findOne({
-            where: { idGuest_income: idGuest_income },
-            include: [
-                { model: ParkingSpacesModel, as: 'asociatedParkingSpace' } // Adjusted alias
-            ]
-        });
+    const guestIncomeVehicle = await GuestIncomeParking.findOne({
+      where: { idGuest_income: idGuest_income },
+      include: [
+        { model: ParkingSpacesModel, as: "asociatedParkingSpace" }, // Adjusted alias
+      ],
+    });
 
-
-        if (!guestIncome) {
-            return res.status(404).json({ error: 'No se encontró un ingreso con ese ID' });
-        }
-
-        res.json({
-            guestIncome,
-            guestIncomeVehicle: guestIncomeVehicle ? guestIncomeVehicle : null
-        });
-    } catch (error) {
-        console.error('Error al obtener ingreso:', error);
-        res.status(500).json({
-            error: 'Error al obtener ingreso', msg: error.message,
-        });
+    if (!guestIncome) {
+      return res
+        .status(404)
+        .json({ error: "No se encontró un ingreso con ese ID" });
     }
 
-}
+    res.json({
+      guestIncome,
+      guestIncomeVehicle: guestIncomeVehicle ? guestIncomeVehicle : null,
+    });
+  } catch (error) {
+    console.error("Error al obtener ingreso:", error);
+    res.status(500).json({
+      error: "Error al obtener ingreso",
+      msg: error.message,
+    });
+  }
+};
 
 const getGuestIncomeByApartment = async (req, res = response) => {
-    try {
-        const { idApartment } = req.params;
+  try {
+    const { idApartment } = req.params;
 
-        const guestIncome = await GuestIncome.findAll({
-            where: { idApartment: idApartment, departureDate: null },
-            include: [
-                { model: Visitors, as: 'asociatedVisitor' },
-                { model: ApartmentModel, as: 'asociatedApartment' },
-            ],
-        });
+    const guestIncome = await GuestIncome.findAll({
+      where: { idApartment: idApartment, departureDate: null },
+      include: [
+        { model: Visitors, as: "asociatedVisitor" },
+        { model: ApartmentModel, as: "asociatedApartment" },
+      ],
+    });
 
-        if (guestIncome.length === 0) {
-            return res.status(404).json({ error: 'No se encontraron ingresos para ese apartamento' });
-        }
-
-        res.json({
-            guestIncome,
-        });
-    } catch (error) {
-        console.error('Error al obtener ingresos por apartamento:', error);
-        res.status(500).json({
-            error: 'Error al obtener ingresos por apartamento',
-        });
+    if (guestIncome.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "No se encontraron ingresos para ese apartamento" });
     }
-}
+
+    res.json({
+      guestIncome,
+    });
+  } catch (error) {
+    console.error("Error al obtener ingresos por apartamento:", error);
+    res.status(500).json({
+      error: "Error al obtener ingresos por apartamento",
+    });
+  }
+};
 
 const postGuestIncome = async (req, res) => {
+  try {
+    console.log(req.body, "Aqui el body");
+    const { idApartment, idParkingSpace, isGuestIncomeVehicle, ...body } =
+      req.body;
 
-    try {
+    
 
-        const body = req.body;
+    const createdGuestIncome = await GuestIncome.create(body);
+    let guestIncomeApartment;
+    let guestIncomeParking;
 
-        const createdGuestIncome = await GuestIncome.create(body);
+    if (idApartment) {
+        guestIncomeApartment = await GuestIncomeToApartments.create({
+        idGuest_income: createdGuestIncome.idGuest_income,
+        idApartment: idApartment,
+      });
 
-        const userLogged = await UserModel.findByPk(body.idUserLogged);
-
-        let notification;
-
-        // Buscar al visitante y al apartamento asociado
-        const visitor = await Visitors.findByPk(createdGuestIncome.idVisitor);
-        const apartment = await ApartmentModel.findByPk(createdGuestIncome.idApartment);
-
-
-        if (body.idUserLogged && userLogged) {
-            notification = await Notification.create({
-                iduser: body.idUserLogged,
-                type: 'success',
-                content: {
-                    // Crear un mensaje de notificación con información del visitante y del apartamento
-                    message: `Se registró el ingreso de ${visitor.name} ${visitor.lastname} 
-                    ${apartment ? `al apartamento ${apartment.apartmentName}` : ''} `,
-                    information: { userLogged, guest_income: createdGuestIncome }
-
-                },
-                datetime: new Date()
-            });
-        }
-        res.json({
-            guestIncome: createdGuestIncome,
-            message: notification.content.message,
+      if (isGuestIncomeVehicle && idParkingSpace) {
+          guestIncomeParking = await GuestIncomeParking.create({
+          idGuest_income: createdGuestIncome.idGuest_income,
+          idParkingSpace: idParkingSpace,
         });
-    } catch (e) {
-        res.status(500).json({
-            error: e.message
-        })
-
+      }
     }
 
+    res.json({
+      guestIncome: createdGuestIncome,
+      guestIncomeApartment: guestIncomeApartment,
+      guestIncomeParking: guestIncomeParking,
+      message: "Ingreso registrado exitosamente",
+    });
+
+    // const userLogged = await UserModel.findByPk(body.idUserLogged);
+
+    // let notification;
+
+    // Buscar al visitante y al apartamento asociado
+    // const visitor = await Visitors.findByPk(createdGuestIncome.idVisitor);
+    // const apartment = await ApartmentModel.findByPk(createdGuestIncome.idApartment);
+  } catch (e) {
+    console.error("Error al registrar ingreso:", e);
+    res.status(500).json({
+      error: e.message,
+    });
+  }
 };
+
+// const postGuestIncome = async (req, res) => {
+
+//     try {
+
+//         const body = req.body;
+
+//         const createdGuestIncome = await GuestIncome.create(body);
+
+//         const userLogged = await UserModel.findByPk(body.idUserLogged);
+
+//         let notification;
+
+//         // Buscar al visitante y al apartamento asociado
+//         const visitor = await Visitors.findByPk(createdGuestIncome.idVisitor);
+//         const apartment = await ApartmentModel.findByPk(createdGuestIncome.idApartment);
+
+//         if (body.idUserLogged && userLogged) {
+//             notification = await Notification.create({
+//                 iduser: body.idUserLogged,
+//                 type: 'success',
+//                 content: {
+//                     // Crear un mensaje de notificación con información del visitante y del apartamento
+//                     message: `Se registró el ingreso de ${visitor.name} ${visitor.lastname}
+//                     ${apartment ? `al apartamento ${apartment.apartmentName}` : ''} `,
+//                     information: { userLogged, guest_income: createdGuestIncome }
+
+//                 },
+//                 datetime: new Date()
+//             });
+//         }
+//         res.json({
+//             guestIncome: createdGuestIncome,
+//             message: notification.content.message,
+//         });
+//     } catch (e) {
+//         res.status(500).json({
+//             error: e.message
+//         })
+
+//     }
+
+// };
 
 const putGuestIncome = async (req, res = response) => {
-    const body = req.body;
-    let message = '';
+  const body = req.body;
+  let message = "";
 
-    console.log(body, "Aqui el body")
+  console.log(body, "Aqui el body");
 
-    try {
-        const { idGuest_income, departureDate } = body;
+  try {
+    const { idGuest_income, departureDate } = body;
 
-        const [updatedRows] = await GuestIncome.update({
-            departureDate: departureDate,
-        }, {
-            where: { idGuest_income: idGuest_income },
-        });
-        console.log(updatedRows, "Aqui las rows")
+    const [updatedRows] = await GuestIncome.update(
+      {
+        departureDate: departureDate,
+      },
+      {
+        where: { idGuest_income: idGuest_income },
+      }
+    );
+    console.log(updatedRows, "Aqui las rows");
 
-        if (updatedRows > 0) {
-            message = 'Ingreso modificado exitosamente.';
-        } else {
-            message = 'No se encontró un ingreso con ese ID';
-        }
-    } catch (error) {
-        message = 'Error al modificar ingreso: ' + error.message;
+    if (updatedRows > 0) {
+      message = "Ingreso modificado exitosamente.";
+    } else {
+      message = "No se encontró un ingreso con ese ID";
     }
-    res.json({
-        guestIncome: message,
-    });
+  } catch (error) {
+    message = "Error al modificar ingreso: " + error.message;
+  }
+  res.json({
+    guestIncome: message,
+  });
 };
 
-
-
 module.exports = {
-    getGuestIncomeAll,
-    getGuestIncomeOne,
-    postGuestIncome,
-    putGuestIncome,
-    getGuestIncomeByApartment,
+  getGuestIncomeAll,
+  getGuestIncomeOne,
+  postGuestIncome,
+  putGuestIncome,
+  getGuestIncomeByApartment,
 };
