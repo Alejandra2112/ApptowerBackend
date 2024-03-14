@@ -84,9 +84,6 @@ const putSpace = async (req, res = response) => {
 
         const space = await SpacesModel.findOne({ where: { idSpace: idSpace } });
 
-        // Parsea schedule 
-        newData.schedule = JSON.parse(newData.schedule);
-
         const newImg = space.image == "" && req.files ?
             await upload(req.files.image, ['png', 'jpg', 'jpeg'], 'Images') :
             req.files ? await updateFile(req.files, space.image, ['png', 'jpg', 'jpeg', 'pdf'], 'Images', "image") : ""
@@ -97,14 +94,8 @@ const putSpace = async (req, res = response) => {
 
 
         const updatedSpace = await space.update({
-            spaceName: newData.spaceName,
-            spaceType: newData.spaceType,
             image: newImg == "" ? newData.image : newImg,
-            area: newData.area,
-            capacity: newData.capacity,
-            schedule: newData.schedule,
-            maxTime: newData.maxTime,
-            status: newData.status
+            ...newData
         });
 
 
@@ -125,8 +116,8 @@ const putSpace = async (req, res = response) => {
                 content: {
                     message: `Se modifico ${updatedSpace.spaceName}
                       ${updatedSpace.status == 'Active' ?
-                            ` ahora esta disponible en el horario de ${updatedSpace.schedule.startHour} 
-                        hasta ${updatedSpace.schedule.endHour} ` : 'ahora NO esta disponible'}`,
+                            ` ahora esta disponible en el horario de ${updatedSpace.openingTime } 
+                        hasta ${updatedSpace.closingTime} ` : 'ahora NO esta disponible'}`,
                     information: { userLogged, space }
                 },
                 datetime: new Date(),
