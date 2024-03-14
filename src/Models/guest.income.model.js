@@ -3,8 +3,7 @@ const sequelize = require('../Database/config');
 const Visitors = require('./visitors.model');
 const GuestIncomeToApartments = require('./guest.income.to.apartments.model');
 const ApartmentModel = require('./apartment.model');
-// const ApartmentModel = require('./apartment.model');
-// const GuestIncomeToApartments = require('./guest.income.to.apartents.model');
+const GuestIncomeToApartments = require('./guest.income.to.apartments.model');
 
 
 const Guest_income = sequelize.define('guest_income', {
@@ -42,7 +41,12 @@ const Guest_income = sequelize.define('guest_income', {
 
 });
 
-// Guest_income.belongsToMany(ApartmentModel, { through: GuestIncomeToApartments });
+
+
+Guest_income.associate = models => {
+    Guest_income.hasMany(models.GuestIncomeToApartments);
+}
+
 
 // Guest_income.belongsToMany(ApartmentModel, {
 //     through: GuestIncomeToApartments,
@@ -55,6 +59,10 @@ const Guest_income = sequelize.define('guest_income', {
 //     foreignKey: 'idApartment',
 //     otherKey: 'idApartment'
 // });
+
+
+// Guest_income.belongsToMany(ApartmentModel, { through: GuestIncomeToApartments });
+
 Guest_income.belongsTo(Visitors, {
     foreignKey: 'idVisitor', as: 'asociatedVisitor'
 });
@@ -62,6 +70,8 @@ Guest_income.belongsTo(Visitors, {
 //     foreignKey: 'idApartment',
 //     as: 'asociatedApartment'
 // });
+
+
 
 
 

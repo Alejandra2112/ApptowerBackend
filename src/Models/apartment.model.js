@@ -73,6 +73,7 @@ ApartmentModel.belongsToMany(
     otherKey: 'idParkingSpace'
 });
 
+
 // ApartmentModel.belongsToMany(Guest_income, { through: GuestIncomeToApartments });
 
 ApartmentModel.belongsToMany(
@@ -81,6 +82,11 @@ ApartmentModel.belongsToMany(
     foreignKey: 'idApartment',
     otherKey: 'idOwner'
 });
+
+
+ApartmentModel.associate = models => {
+    ApartmentModel.hasMany(models.GuestIncomeToApartments);
+}
 
 // ApartmentModel.belongsToMany(
 //     ResidentModel, {

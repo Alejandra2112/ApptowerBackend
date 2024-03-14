@@ -20,7 +20,14 @@ const GuestIncomeParking = sequelize.define("guestincomevehicle", {
     type: DataTypes.INTEGER,
     field: "idGuest_income",
   },
-});
+
+
+}
+  , {
+
+    timestamps: false
+
+  });
 
 GuestIncomeParking.belongsTo(Guest_income, {
   foreignKey: "idGuest_income",
