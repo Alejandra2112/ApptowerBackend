@@ -20,8 +20,14 @@ const getGuestIncomeAll = async (req, res = response) => {
     });
 
     const guestIncomeApartment = await GuestIncomeToApartments.findAll({
+      include: [
+        {
+          model: ApartmentModel,
+          as: "asociatedApartment",
+          attributes: ["apartmentName"],
+        },
+      ],
     });
-
 
     //Se le adiciona a cada respuesta el apartamento asociado a ese ingreso
     const guestIncomeWithApartment = guestIncome.map((income) => {
@@ -96,7 +102,11 @@ const getGuestIncomeByApartment = async (req, res = response) => {
     const guestIncomeToApartment = await GuestIncomeToApartments.findAll({
       where: { idApartment: idApartment },
       include: [
-        { model: GuestIncome, as: "asociatedGuestIncome" },
+        {
+          model: GuestIncome,
+          as: "asociatedGuestIncome",
+          include: [{ model: Visitors, as: "asociatedVisitor" }],
+        },
         { model: ApartmentModel, as: "asociatedApartment" },
       ],
     });
@@ -146,7 +156,7 @@ const postGuestIncome = async (req, res) => {
       });
     }
     // Verifica si el visitante tiene acceso
-    if (visitor.access==false) {
+    if (visitor.access == false) {
       return res.status(400).json({
         error: "El visitante no tiene acceso",
       });
@@ -164,7 +174,7 @@ const postGuestIncome = async (req, res) => {
       // Si el visitante no tiene un ingreso activo, se crea el ingreso
       createdGuestIncome = await GuestIncome.create(body);
     }
-      // Si el ingreso es a un apartamento, se crea el ingreso al apartamento
+    // Si el ingreso es a un apartamento, se crea el ingreso al apartamento
     if (idApartment) {
       guestIncomeApartment = await GuestIncomeToApartments.create({
         idGuest_income: createdGuestIncome.idGuest_income,
@@ -289,7 +299,6 @@ const putGuestIncome = async (req, res = response) => {
       return res.status(400).json({
         error: "El ingreso ya ha sido cerrado",
       });
-
     }
     // Se consulta si hay un ingreso con parqueadero asociado
     const guestIncomeparking = await GuestIncomeParking.findOne({
