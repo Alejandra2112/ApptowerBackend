@@ -100,16 +100,17 @@ const getGuestIncomeByApartment = async (req, res = response) => {
     const { idApartment } = req.params;
 
     const guestIncomeToApartment = await GuestIncomeToApartments.findAll({
-      where: { idApartment: idApartment },
-      include: [
+    where: { idApartment: idApartment },
+    include: [
         {
-          model: GuestIncome,
-          as: "asociatedGuestIncome",
-          include: [{ model: Visitors, as: "asociatedVisitor" }],
+            model: GuestIncome,
+            as: "asociatedGuestIncome",
+            where: { departureDate: null },
+            include: [{ model: Visitors, as: "asociatedVisitor" }],
         },
         { model: ApartmentModel, as: "asociatedApartment" },
-      ],
-    });
+    ],
+});
 
     // const guestIncome = await GuestIncome.findAll({
     //   where: { idApartment: idApartment, departureDate: null },
