@@ -43,14 +43,31 @@ const residentStatusValidation = [
 
         .custom(async (value) => {
 
-            const apartmentresidents = await ApartmentResidentModel.findAll({ where: { idResident: value, status: 'Active' } });
-            const resident = await ResidentModel.findByPk(apartmentresidents[0].idResident)
+            try {
 
-            if (apartmentresidents && apartmentresidents.length > 0 && resident.status == 'Active') {
+                const apartmentResident = await ApartmentResidentModel.findAll({ where: { idResident: value, status: 'Active' } });
+                const owner = await ResidentModel.findByPk(value);
 
-                throw new Error('El residente esta activos en un apartamento.');
+                // const resident = await ResidentModel.findOne({ where: { iduser: owner.iduser } });;
+                // let apartmentResident;
+
+                // if (resident ) {
+
+                //     apartmentResident = await ApartmentResidentModel.findAll({ where: { idResident: resident.idResident, status: 'Active' } });
+                //     if (apartmentResident && apartmentResident.length > 0) {
+                //         throw new Error('El residente tiene residencia activas.');
+                //     }
+                // }
+
+                if (apartmentResident && apartmentResident.length > 0 || req.status == 'Inactive') {
+                    throw new Error('El residente tiene propiedades activas.');
+                }
+
+                return true;
+            } catch (error) {
+                console.error('Error en la validación:', error.message);
+                throw error; // Re-lanzamos el error para que sea capturado por el manejo de errores del validador
             }
-            return true
 
         })
 

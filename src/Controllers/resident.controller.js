@@ -100,7 +100,7 @@ const getAllResidents = async (req, res = response) => {
 
         const residentList = await Promise.all(residents.map(async (resident) => {
             const apartmentResidents = await ApartmentResidentModel.findAll({
-                where: { idResident: resident.idResident },
+                where: { idResident: resident.idResident,  status: 'Active' },
             });
 
             const apartmentList = await Promise.all(apartmentResidents.map(async (apartment) => {
@@ -138,28 +138,64 @@ const postResident = async (req, res) => {
         const imgUrl = req.files !== null ? await upload(req.files.userImg, ['png', 'jpg', 'jpeg'], 'Images') : null
 
         const { idUserLogged, pdf, idApartment, ...userData } = req.body;
-        console.log(userData, 'userData en back')
+
+
+        passwordOrinignal = userData.password;
+
+        passwordOrinignal = userData.name.charAt(0).toUpperCase() + userData.lastName.charAt(0).toLowerCase() + userData.document + '*';
 
         const salt = bcryptjs.genSaltSync();
-        userData.password = bcryptjs.hashSync(userData.password, salt);
+        userData.password = bcryptjs.hashSync(passwordOrinignal, salt);
 
         const user = await UserModel.create({
-
             pdf: pdfUrl,
             userImg: imgUrl,
+            idrole: 2, // resident rol 
             password: userData.password,
-            idrole: userData.idrole,
-            status: "Inactivo", // Creste user for wait admin permission
+            status: "Inactivo",
+
             ...userData
 
         })
+
+        // Email funtion
+
+        if (user) {
+            const mailOptions = Mails.changedStatusEmail(user.name, user.lastName, user.email, user.email,
+            );
+
+            GmailTransporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.error('Error al enviar el correo:', error);
+                    res.status(500).json({ message: 'Error al enviar el correo' });
+                } else {
+                    console.log('Correo enviado:', info.response);
+                    res.json({ message: 'Correo con código de recuperación enviado' });
+                }
+            });
+        }
 
         const resident = await ResidentModel.create({
 
             iduser: user.iduser,
             residentType: userData.residentType,
-            status: "Active" // Active becase live in the tower
+            status: "Inactive" // Active becase live in the tower
         })
+
+        // const salt = bcryptjs.genSaltSync();
+        // userData.password = bcryptjs.hashSync(userData.password, salt);
+
+        // const user = await UserModel.create({
+
+        //     pdf: pdfUrl,
+        //     userImg: imgUrl,
+        //     password: userData.password,
+        //     idrole: userData.idrole,
+        //     status: "Inactivo", // Creste user for wait admin permission
+        //     ...userData
+
+        // })
+
 
         let owner;
         let apartmentOwner;

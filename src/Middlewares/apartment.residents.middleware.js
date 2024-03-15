@@ -27,7 +27,7 @@ const apartmentResidentValidationForPost = [
         .isInt().withMessage('El ID del residente debe ser un número entero positivo.')
         .custom(async (value) => {
 
-            const existingResident = await ResidentModel.findOne({ where: { idResident: value } });
+            const existingResident = await ResidentModel.findOne({ where: { idResident: value, } });
 
             if (existingResident) {
                 return true
@@ -60,13 +60,13 @@ const apartmentResidentValidationForPost = [
             const body = req.body;
 
             const existingRecord = await ApartmentResidentModel.findAll({
-                where: { idResident: value }
+                where: { idResident: value, status: 'Active' }
             });
 
             console.log(existingRecord, 'New validation')
 
 
-            if (existingRecord && existingRecord.length >= 1 && existingRecord[0].status == 'Active') {
+            if (existingRecord && existingRecord.length >= 1) {
 
                 throw new Error('Este residente ya fue asignado a otro apartamento.');
 
@@ -74,6 +74,20 @@ const apartmentResidentValidationForPost = [
 
                 return true;
 
+            }
+        })
+        .custom(async (value, { req }) => {
+
+            const body = req.body;
+
+            const resident = await ResidentModel.findOne({
+                where: { idResident: value, status: 'Active' }
+            });
+
+            if (resident) {
+                return true;
+            } else {
+                throw new Error('El residente debe estar activo.');
             }
         }),
 
@@ -123,58 +137,38 @@ const apartmentResidentValidationForPut = [
         .isInt().withMessage('El ID del residente debe ser un número entero positivo.')
         .custom(async (value) => {
 
-            const existingResident = await ResidentModel.findOne({ where: { idResident: value } });
+            const existingResident = await ResidentModel.findOne({ where: { idResident: value, status: 'Active' } });
 
             if (existingResident) {
                 return true
             }
-            else throw new Error('El residente selecionado no esta en el sistema.');
+            else throw new Error('El residente debe estar activo.');
 
         })
 
-    // // Validation to prevent a resident from being registered more than once in the same apartment
+        .custom(async (value, { req }) => {
 
-    // .custom(async (value, { req }) => {
+            const body = req.body
 
-    //     const body = req.body;
+            const apartmentResident = await ApartmentResidentModel.findOne({
+                where: {
 
-    //     const existingRecord = await ApartmentResidentModel.findOne({
-    //         where: { idResident: value, idApartment: body.idApartment }
-    //     });
+                    idResident: value,
+                    status: 'Active'
 
-    //     if (existingRecord) {
-    //         throw new Error('Este residente ya fue asignado a este apartamento apartamento.');
-    //     } else {
-    //         return true;
-    //     }
-    // })
+                }
+            });
 
-    // Validation to ensure that a resident is not assigned to another apartment
+            if(body.status == 'Active' && !apartmentResident) return true
+            
+            if (apartmentResident?.idApartmentResident !== body.idApartmentResident && body.status == 'Active')
+                throw new Error('El residente ya fue asignado a otro apartamento.')
 
-    // .custom(async (value, { req }) => {
+            // return true
 
-    //     const body = req.body;
+        })
 
-    //     const existingRecord = await ApartmentResidentModel.findAll({
-    //         where: { idResident: value }
-    //     });
-
-    //     console.log(existingRecord, 'New validation')
-
-
-    //     if (existingRecord && existingRecord.length >= 1) {
-
-    //         throw new Error('Este residente ya fue asignado a otro apartamento.');
-
-    //     } else {
-
-    //         return true;
-
-    //     }
-    // })
     ,
-
-
 
 
     check('residentStartDate')
@@ -201,17 +195,36 @@ const apartmentResidentValidationForPut = [
             }
             return true;
 
+        })
+        .custom((value) => {
+            const residentEndDate = new Date(value);
+            const today = new Date();
+
+            if (residentEndDate > today) {
+                throw new Error('La fecha de fin no puede ser superior a hoy.');
+            }
+            return true;
         }),
+
     check('status')
         .isIn(['Active', 'Inactive'])
-        .withMessage('El estado del propietario no es válido.')
-        .custom((value, { req }) => {
-            const status = req.body.status;
+        .withMessage('El estado del residente no es válido.')
 
-            console.log(status, 'estado')
-            if (status === 'Active') throw new Error('Debe estar inactivo paramarcar la fecha de fin.')
+        .custom(async (value, { req }) => {
+            const body = req.body;
 
-            return true;
+            const apartmentResident = await ApartmentResidentModel.findOne({
+                where: { idApartmentResident: body.idApartmentResident }
+            })
+
+            console.log(apartmentResident, value, 'value jeje')
+
+            if (apartmentResident.status == 'Active' && body.residentEndDate && value == 'Inactive') return true;
+            if (apartmentResident.status == 'Inactive' && value == 'Active') return true;
+
+            throw new Error('Debe estar inactivo para marcar la fecha de fin.')
+
+
 
         }),
 
