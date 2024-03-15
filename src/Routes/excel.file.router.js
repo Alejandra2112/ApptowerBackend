@@ -3,6 +3,6 @@ const { getExcelFile } = require('../Controllers/excel.file.controller')
 const route = Router()
 
 
-route.get('/', getExcelFile)
+route.post('/', getExcelFile)
 
 module.exports = route  

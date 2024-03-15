@@ -1,5 +1,6 @@
 const { check } = require("express-validator");
 const ParkingSpacesModel = require("../Models/parking.spaces.model");
+const AssignedParking = require("../Models/assigned.parking.model");
 
 const parkingValidationForPost = [
   check("floor")
@@ -41,6 +42,35 @@ const parkingValidationForPost = [
 ];
 
 const parkingValidationForPut = [
+  check('idParkingSpace')
+    .custom(async (value, { req }) => {
+      try {
+        console.log(value, 'idOwner');
+
+        const assignedParking = await AssignedParking.findAll({ where: { idParkingSpace: value } });
+        const parking = await ParkingSpacesModel.findByPk(value);
+
+        // const resident = await ResidentModel.findOne({ where: { iduser: owner.iduser } });;
+        // let apartmentResident;
+
+        // if (resident ) {
+
+        //     apartmentResident = await ApartmentResidentModel.findAll({ where: { idResident: resident.idResident, status: 'Active' } });
+        //     if (apartmentResident && apartmentResident.length > 0) {
+        //         throw new Error('El residente tiene residencia activas.');
+        //     }
+        // }
+
+        if (assignedParking && assignedParking.length > 0 || req.status == 'Inactive') {
+          throw new Error('El parqueadero esta asignado a un apartamento.');
+        }
+
+        return true;
+      } catch (error) {
+        console.error('Error en la validación:', error.message);
+        throw error; // Re-lanzamos el error para que sea capturado por el manejo de errores del validador
+      }
+    }),
   check("parkingName")
     .optional()
     .isLength({ min: 4 })
@@ -79,7 +109,9 @@ const parkingValidationForPut = [
 
   check("status")
     .isIn(["Active", "Inactive"])
-    .withMessage("El estado del espacio de estacionamiento no es válido."),
+    .withMessage("El estado del espacio de estacionamiento no es válido.")
+
+
 ];
 
 module.exports = {

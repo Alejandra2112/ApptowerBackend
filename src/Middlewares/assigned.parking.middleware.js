@@ -6,20 +6,19 @@ const AssignedParking = require('../Models/assigned.parking.model');
 
 const assignedParkingValidationForPost = [
 
-    check('idApartment')
-        .notEmpty().withMessage('El ID del apartamento es obligatorio.')
-        .isInt().withMessage('El ID del apartamento es obligatorio.')
-        .custom(async (value) => {
+    // check('idApartment')
+    //     .notEmpty().withMessage('El ID del apartamento es obligatorio.')
+    //     .isInt().withMessage('El ID del apartamento es obligatorio.')
+    //     .custom(async (value) => {
 
-            const existingApartment = await ApartmentModel.findOne({ where: { idApartment: value } });
+    //         const existingApartment = await ApartmentModel.findOne({ where: { idApartment: value } });
 
-            if (existingApartment) {
-                return true
-            }
-            else throw new Error('El apartamento selecionado no esta en el sistema.');
+    //         if (existingApartment) {
+    //             return true
+    //         }
+    //         else throw new Error('El apartamento selecionado no esta en el sistema.');
 
-        }),
-
+    //     }),
 
 
     check('idParkingSpace')
@@ -32,6 +31,20 @@ const assignedParkingValidationForPost = [
             }
             throw new Error(`El parqueadero no esta en el sistema`);
 
+        })
+        .custom(async (value, { req }) => {
+
+            const body = req.body;
+
+            const parkingSpace = await ParkingSpacesModel.findOne({
+                where: { idParkingSpace: value, status: 'Active' }
+            });
+
+            if (parkingSpace) {
+                return true;
+            } else {
+                throw new Error('El parqueadero debe estar activo.');
+            }
         })
         .custom(async (value, { req }) => {
 
@@ -74,19 +87,19 @@ const assignedParkingValidationForPost = [
 const assignedParkingValidationForPut = [
 
 
-    check('idApartment')
-        .notEmpty().withMessage('El ID del apartamento es obligatorio.')
-        .isInt().withMessage('El ID del apartamento es obligatorio.')
-        .custom(async (value) => {
+    // check('idApartment')
+    //     .notEmpty().withMessage('El ID del apartamento es obligatorio.')
+    //     .isInt().withMessage('El ID del apartamento es obligatorio.')
+    //     .custom(async (value) => {
 
-            const existingApartment = await ApartmentModel.findOne({ where: { idApartment: value } });
+    //         const existingApartment = await ApartmentModel.findOne({ where: { idApartment: value } });
 
-            if (existingApartment) {
-                return true
-            }
-            else throw new Error('El apartamento selecionado no esta en el sistema.');
+    //         if (existingApartment) {
+    //             return true
+    //         }
+    //         else throw new Error('El apartamento selecionado no esta en el sistema.');
 
-        }),
+    //     }),
 
 
 
@@ -100,6 +113,21 @@ const assignedParkingValidationForPut = [
             }
             throw new Error(`El parqueadero no esta en el sistema`);
 
+        })
+
+        .custom(async (value, { req }) => {
+
+            const body = req.body;
+
+            const parkingSpace = await ParkingSpacesModel.findOne({
+                where: { idParkingSpace: value, status: 'Active' }
+            });
+
+            if (parkingSpace) {
+                return true;
+            } else {
+                throw new Error('El parqueadero debe estar activo.');
+            }
         })
         .custom(async (value, { req }) => {
 
