@@ -1,23 +1,38 @@
 const { check } = require('express-validator');
+const ParkingSpacesModel = require('../Models/parking.spaces.model');
 
 const postGuestIncomeValidations = [
+  check('idParkingSpace').optional().isInt().withMessage('El espacio de parqueo es requerido')
+  .custom(async (value) =>{
+    if (value < 1) {
+      throw new Error('El espacio de parqueo es requerido');
+    }
+    const parkingSpace = await ParkingSpacesModel.findOne({where: {idParkingSpace: value}});
+    if (parkingSpace.parkingType == 'Private'){
+      throw new Error('El espacio de parqueo es privado');
+    }
+      
+    if (parkingSpace.status == 'Inactive'){
+      throw new Error('El espacio de parqueo esta inactivo');
+    }
+    return true;
+  }),
   check('idVisitor').isInt().withMessage('El visitante es requerido')
   .notEmpty().withMessage('El visitante es requerido')
   .isLength({min: 1}).withMessage('El visitante es requerido'),
 
-  check('idApartment').isInt().withMessage('El apartamento es requerido')
-  .notEmpty().withMessage('El apartamento es requerido')
+  check('idApartment').optional().isInt().withMessage('El apartamento es requerido')
   .isLength({min: 1}).withMessage('El apartamento es requerido'),
   check('startingDate').notEmpty().withMessage('La fecha de inicio es requerida')
   .custom((value) => {
     if (isNaN(Date.parse(value))) {
-      throw new Error(`La fecha de pago debe ser valida, recibido: ${value}`);
+      throw new Error(`La fecha del ingreso no puedeser anterior al dia actual: ${value}`);
     }
     const paymentDate = new Date(value);
     const currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0);
     if (paymentDate < currentDate) {
-      throw new Error(`La fecha de pago no puede ser anterior al día actual`);
+      throw new Error(`La fecha de ingreso no puede ser anterior al día actual`);
     }
     return true;
   }),

@@ -37,8 +37,8 @@ route.get(
 route.post(
   "/",
   // validations.postValidationGuestIncome,
-  // postGuestIncomeValidations,
-  // validator,
+  postGuestIncomeValidations,
+  validator,
   //   checkPermissions(privilegesMap.get_guest_income, permissionMap.ingresos),
   postGuestIncome
 ),
