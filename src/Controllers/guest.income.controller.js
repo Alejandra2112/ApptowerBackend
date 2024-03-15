@@ -20,6 +20,13 @@ const getGuestIncomeAll = async (req, res = response) => {
     });
 
     const guestIncomeApartment = await GuestIncomeToApartments.findAll({
+      include: [
+        {
+          model: ApartmentModel,
+          as: 'asociatedApartment',
+          attributes: ['apartmentName'],
+        },
+      ],
     });
 
 
