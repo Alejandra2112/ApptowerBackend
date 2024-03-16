@@ -62,9 +62,7 @@ const notifications = async (socket, io) => {
     const notificationsToResidents = updatedNotifications.filter((notification) => {
 
         const notificationsFilteredToResidents =
-            notification?.content?.information?.booking ||
-            notification?.content?.information?.apartment &&
-            notification?.content?.information?.userLogged?.idrole === 1
+            notification?.content?.information?.resident
 
         return notificationsFilteredToResidents !== undefined && notificationsFilteredToResidents !== null;
 

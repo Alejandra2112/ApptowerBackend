@@ -1,4 +1,284 @@
 module.exports = {
+
+    payFineEmail: (name, lastName, email, fine) => {
+
+        const incidentDate = new Date(fine?.incidentDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+        const paymentDate = new Date(fine?.paymentDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+
+        return {
+            from: 'domuscomplex.solutions@gmail.com',
+            to: email,
+            subject: `Multa pagada exitosamente`,
+            html: ` <html>
+        <head>
+            <style>
+            body {
+                font-family: 'Arial', sans-serif;
+                background-color: #f4f4f4;
+                margin: 0;
+                padding: 0;
+                text-align: center;
+            }
+            .container {
+                max-width: 600px;
+                margin: 20px auto;
+                padding: 20px;
+                background-color: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.1);
+            }
+                h1 {
+                    color: #007bff;
+                    margin-bottom: 20px;
+                    font-size: 24px;
+                }
+                p {
+                    line-height: 1.6;
+                    margin-bottom: 20px;
+                    color: #666;
+                    font-size: 16px;
+                    text-align: left;
+                }
+                .footer {
+                    color: #777;
+                    font-size: 14px;
+                    text-align: center;
+                    margin-top: 20px;
+                }
+                .logo {
+                    margin-top: -110px;
+                }
+                img {
+                    max-width: 100%;
+                    height: auto;
+                    margin-top: -110px;
+                }
+
+                .left-align {
+                    text-align: left;
+                }
+            
+                .no-bullet {
+                    list-style-type: none;
+                    padding-left: 0;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <p>Estimado/a ${name} ${lastName},</p>
+                <p>Nos complace informarle que su multa ha sido registrada como pagada en nuestros registros.
+                 Queremos expresar nuestro agradecimiento por su pronta atención a este asunto.</p>
+                
+                <ul class="left-align no-bullet">
+                    <li>Fecha del incidente: ${incidentDate}</li>
+                    <li>Fecha limite de pago: ${paymentDate}</li>
+                    <li>Estado: <a href="http://localhost:5173/#/admin/fines/details/${fine?.idFines}">${fine.state}</a></li>
+                </ul>
+
+                <p>Si tiene alguna pregunta o necesita asistencia, no dude en ponerse en contacto con administración.</p>
+                <p class="footer">Gracias por confiar en nosotros,<br />Equipo Domus Complex</p>
+                <img class="logo" src="https://res.cloudinary.com/ddptpzasb/image/upload/v1709731660/DomusLogo/jxqemopqnvnnrri02vgm.png" alt="Logo-Domus-Complex" border="0">
+            </div>
+        </body>
+    </html>`
+        }
+    },
+
+    proofFineEmail: (name, lastName, email, fine) => {
+
+        const incidentDate = new Date(fine?.incidentDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+        const paymentDate = new Date(fine?.paymentDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+
+        return {
+            from: 'domuscomplex.solutions@gmail.com',
+            to: email,
+            subject: `Confirmación de recepción del comprobante de pago para multa`,
+            html: ` <html>
+        <head>
+            <style>
+            body {
+                font-family: 'Arial', sans-serif;
+                background-color: #f4f4f4;
+                margin: 0;
+                padding: 0;
+                text-align: center;
+            }
+            .container {
+                max-width: 600px;
+                margin: 20px auto;
+                padding: 20px;
+                background-color: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.1);
+            }
+                h1 {
+                    color: #007bff;
+                    margin-bottom: 20px;
+                    font-size: 24px;
+                }
+                p {
+                    line-height: 1.6;
+                    margin-bottom: 20px;
+                    color: #666;
+                    font-size: 16px;
+                    text-align: left;
+                }
+                .footer {
+                    color: #777;
+                    font-size: 14px;
+                    text-align: center;
+                    margin-top: 20px;
+                }
+                .logo {
+                    margin-top: -110px;
+                }
+                img {
+                    max-width: 100%;
+                    height: auto;
+                    margin-top: -110px;
+                }
+
+                .left-align {
+                    text-align: left;
+                }
+            
+                .no-bullet {
+                    list-style-type: none;
+                    padding-left: 0;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+            
+                <p>Estimado/a ${name} ${lastName},</p>
+                <p>Confirmamos la recepción del <a href="${fine.paymentproof}">comprobante de pago</a> y queremos informarle que nuestro equipo administrativo 
+                está en proceso de revisión.</br>Una vez que se haya verificado la validez del pago, procederemos
+                 a marcar la multa como pagada en nuestros registros. Por favor, tenga en cuenta que este 
+                 proceso puede tomar un tiempo breve.</br>
+                 Le agradecemos su colaboración y paciencia mientras completamos esta revisión. Si tiene alguna pregunta adicional, no dude en comunicarse con nosotros.</p>
+                 
+                 <ul class="left-align no-bullet">
+                    <li><a href="http://localhost:5173/#/admin/fines/details/${fine?.idFines}">Multa de referencia </a></li>
+                    <li>Estado: ${fine.state}</li>
+                </ul>
+                 
+
+                <p>Si tiene alguna pregunta o necesita asistencia, no dude en ponerse en contacto con administracion.</p>
+                <p class="footer">Gracias por confiar en nosotros,<br />Equipo Domus Complex</p>
+                <img class="logo" src="https://res.cloudinary.com/ddptpzasb/image/upload/v1709731660/DomusLogo/jxqemopqnvnnrri02vgm.png" alt="Logo-Domus-Complex" border="0">
+            </div>
+        </body>
+    </html>`
+        }
+    },
+
+    fineEmail: (name, lastName, email, fine, apartment) => {
+
+        const incidentDate = new Date(fine?.incidentDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+        const paymentDate = new Date(fine?.paymentDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+
+        return {
+            from: 'domuscomplex.solutions@gmail.com',
+            to: email,
+            subject: `Multa por ${fine?.fineType} el dia ${incidentDate}`,
+            html: ` <html>
+        <head>
+            <style>
+            body {
+                font-family: 'Arial', sans-serif;
+                background-color: #f4f4f4;
+                margin: 0;
+                padding: 0;
+                text-align: center;
+            }
+            .container {
+                max-width: 600px;
+                margin: 20px auto;
+                padding: 20px;
+                background-color: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.1);
+            }
+                h1 {
+                    color: #007bff;
+                    margin-bottom: 20px;
+                    font-size: 24px;
+                }
+                p {
+                    line-height: 1.6;
+                    margin-bottom: 20px;
+                    color: #666;
+                    font-size: 16px;
+                    text-align: left;
+                }
+                .footer {
+                    color: #777;
+                    font-size: 14px;
+                    text-align: center;
+                    margin-top: 20px;
+                }
+                .logo {
+                    margin-top: -110px;
+                }
+                img {
+                    max-width: 100%;
+                    height: auto;
+                    margin-top: -110px;
+                }
+
+                .left-align {
+                    text-align: left;
+                }
+            
+                .no-bullet {
+                    list-style-type: none;
+                    padding-left: 0;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+            
+                <p>Estimado/a ${name} ${lastName},</p>
+                <p>Le informamos que la administracion a inpuesto una multa a los residentes del 
+                apartamento ${apartment.apartmentName} por motivo de ${fine?.fineType}. A continuación, se detallan los datos de la multa:</p>
+                <ul class="left-align no-bullet">
+
+                    <li>De: Administración</li>
+                    <li>Para: <a href="http://localhost:5173/#/admin/apartments/details/${fine?.idApartment}">Inquilinos apartamento ${apartment.apartmentName}</a></li>
+                    </br>
+                    <li>Motivo: ${fine?.fineType} <p>${fine?.details}</p></li>
+                    </br>
+                    <li>Fecha de incidente: ${incidentDate}</li>
+                    <li>Fecha limite de pago: ${paymentDate}</li>
+                    </br>
+                    <li>Monto: ${fine?.amount}</li>
+                    </br>
+                    <li>Estado de pago: ${fine?.state}</li>
+                    </br>
+                    <li>Evidencias de la multa:</li>
+                    <ul>
+                        ${fine?.evidenceFiles?.map((evidence, index) => `</br><li><a href="${evidence}">Evidencia N°${index + 1} </a></li>`).join('')}
+                    </ul>
+                    </br>
+                    <li>Link para agregar comprobante de pago</li>
+                    </br>
+                    <li><a href="http://localhost:5173/#/admin/fines/details/${fine?.idFines}">Agregar comprobante de pago</a></li>
+
+                </ul>
+                <p>Por favor, asegúrese de revisar y resolver esta situación lo antes posible.</p>
+                <p>Si tiene alguna pregunta o necesita asistencia, no dude en ponerse en contacto con administracion.</p>
+                <p class="footer">Gracias por confiar en nosotros,<br />Equipo Domus Complex</p>
+                <img class="logo" src="https://res.cloudinary.com/ddptpzasb/image/upload/v1709731660/DomusLogo/jxqemopqnvnnrri02vgm.png" alt="Logo-Domus-Complex" border="0">
+            </div>
+        </body>
+    </html>`
+        }
+    },
+
+
     registerSuccessEmail: (name, lastName, email) => {
         return {
             from: 'domuscomplex.solutions@gmail.com',
