@@ -46,6 +46,9 @@ const postGuestIncomeValidations = [
   .isLength({min: 1}).withMessage('El visitante es requerido'),
 
   check('idApartment').optional().isInt().withMessage('El apartamento es requerido')
+  .custom(async (value) => {
+    console.log("valor enviado:",value);
+  })
   .isLength({min: 1}).withMessage('El apartamento es requerido'),
   check('startingDate').notEmpty().withMessage('La fecha de inicio es requerida')
   .custom((value) => {
@@ -64,20 +67,6 @@ const postGuestIncomeValidations = [
   .notEmpty().withMessage('La persona que permite el acceso es requerida')
   .isLength({min: 3}).withMessage('La persona que permite el acceso es requerida'),
   check('idPakingSpace').optional().isInt().withMessage('El espacio de parqueo es requerido')
-  .custom(async (value) =>{
-    if (value < 1) {
-      throw new Error('El espacio de parqueo es requerido');
-    }
-    const parkingSpace = await ParkingSpacesModel.findOne({where: {idParkingSpace: value}});
-    if (parkingSpace.parkingType == 'Private'){
-      throw new Error('El espacio de parqueo es privado');
-    }
-      
-    if (parkingSpace.status == 'Inactive'){
-      throw new Error('El espacio de parqueo esta ocupado');
-    }
-    return true;
-  })
 ];
 
 const putGuestIncomeValidations = [
