@@ -36,13 +36,6 @@ const Booking = sequelize.define('booking', {
 
   },
 
-  EndDateBooking: {
-    type: DataTypes.DATE,
-    field: 'EndDateBooking',
-    required: true,
-
-  },
-
   EndTimeBooking: {
     type: DataTypes.TIME,
     field: 'EndTimeBooking',

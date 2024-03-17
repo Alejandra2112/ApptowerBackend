@@ -1,5 +1,7 @@
 const { check } = require('express-validator');
 const ParkingSpacesModel = require('../Models/parking.spaces.model');
+const Visitors = require('../Models/visitors.model');
+const Guest_income = require('../Models/guest.income.model');
 
 const postGuestIncomeValidations = [
   check('idParkingSpace').optional().isInt().withMessage('El espacio de parqueo es requerido')
@@ -19,6 +21,28 @@ const postGuestIncomeValidations = [
   }),
   check('idVisitor').isInt().withMessage('El visitante es requerido')
   .notEmpty().withMessage('El visitante es requerido')
+  .custom(async (value) => {
+    const visitor = await Visitors.findOne({
+      where: { idVisitor: value },
+    });
+
+    if (!visitor) {
+      throw new Error('El visitante no existe');
+    }
+
+    if (visitor.access == false) {
+      throw new Error('El visitante no tiene acceso');
+    }
+    const existincome = await Guest_income.findOne({
+      where: { idVisitor: value, departureDate: null },
+    });
+
+    if (existincome) {
+      throw new Error('El visitante ya tiene un ingreso activo');
+    }
+
+    return true;
+  })
   .isLength({min: 1}).withMessage('El visitante es requerido'),
 
   check('idApartment').optional().isInt().withMessage('El apartamento es requerido')
@@ -39,11 +63,41 @@ const postGuestIncomeValidations = [
   check('personAllowsAccess').isString().withMessage('La persona que permite el acceso es requerida')
   .notEmpty().withMessage('La persona que permite el acceso es requerida')
   .isLength({min: 3}).withMessage('La persona que permite el acceso es requerida'),
+  check('idPakingSpace').optional().isInt().withMessage('El espacio de parqueo es requerido')
+  .custom(async (value) =>{
+    if (value < 1) {
+      throw new Error('El espacio de parqueo es requerido');
+    }
+    const parkingSpace = await ParkingSpacesModel.findOne({where: {idParkingSpace: value}});
+    if (parkingSpace.parkingType == 'Private'){
+      throw new Error('El espacio de parqueo es privado');
+    }
+      
+    if (parkingSpace.status == 'Inactive'){
+      throw new Error('El espacio de parqueo esta ocupado');
+    }
+    return true;
+  })
 ];
 
 const putGuestIncomeValidations = [
   check('idGuest_income').isInt().withMessage('El ingreso de visitante es requerido')
   .notEmpty().withMessage('El ingreso de visitante es requerido'),
+  check('idParkingSpace').optional().isInt().withMessage('El espacio de parqueo es requerido')
+  .custom(async (value) =>{
+    if (value < 1) {
+      throw new Error('El espacio de parqueo es requerido');
+    }
+    const parkingSpace = await ParkingSpacesModel.findOne({where: {idParkingSpace: value}});
+    if (parkingSpace.parkingType == 'Private'){
+      throw new Error('El espacio de parqueo es privado');
+    }
+      
+    if (parkingSpace.status !== 'Inactive'){
+      throw new Error('El espacio de parqueo ya esta disponible');
+    }
+    return true;
+  }),
   check('departureDate').custom((value) => {
     if (isNaN(Date.parse(value))) {
       throw new Error(`La fecha de salida debe ser valida, recibido: ${value}`);
@@ -63,37 +117,3 @@ module.exports = {
   postGuestIncomeValidations,
   putGuestIncomeValidations
 };
-
-// const {check, validationResult} = require('express-validator');
-
-
-// const validateResult = (req, res, next) => {
-//     const errors = validationResult(req);
-//     if(!errors.isEmpty()){
-//         return res.status(400).json({errors: errors.array()});
-//     }
-//     next();
-// };
-
-// const postValidationGuestIncome = [
-//     check('idVisitor', 'Visitor is required or its value is invalid').not().isEmpty().isInt(),
-//     check('idApartment', 'Apartment is required or its value is invalid').not().isEmpty().isInt(),
-//     check('startingDate', 'Starting date is required or its value is invalid').not().isEmpty().isISO8601(),
-//     check('personAllowsAccess', 'Personal allows access is required or its value is invalid').not().isEmpty().isString().isLength({min: 3, max: 50}),
-//     ( req, res, next ) => {
-//         validateResult(req, res, next);
-//     }
-// ];
-
-// const putValidationGuestIncome = [
-//     check('idGuest_income', 'Guest income is required or its value is invalid').not().isEmpty().isInt(),
-//     check('departureDate', 'Departure date is required or its value is invalid').not().isEmpty().isISO8601(),
-//     ( req, res, next ) => {
-//         validateResult(req, res, next);
-//     }
-// ];
-
-// module.exports = {
-//     postValidationGuestIncome,
-//     putValidationGuestIncome,
-// };
