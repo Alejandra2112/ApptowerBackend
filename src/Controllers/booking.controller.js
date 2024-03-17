@@ -4,6 +4,8 @@ const Booking = require('../Models/booking.model');
 const UserModel = require('../Models/users.model');
 const SpacesModel = require('../Models/spaces.model');
 const ResidentModel = require('../Models/resident.model');
+const ApartmentModel = require('../Models/apartment.model');
+const Notification = require('../Models/notification.model');
 
 const getBooking = async (req, res = response) => {
     try {
@@ -125,8 +127,43 @@ const postBooking = async (req, res) => {
     try {
         const newBooking = await Booking.create(body);
 
+
+        // Notification funtion
+
+        const userLogged = await UserModel.findByPk(body.idResident);
+
+        let notification;
+
+        const spaces = await SpacesModel.findByPk(body.idSpace)
+
+        const resident = await ResidentModel.findOne({
+            where: { idResident: body.idResident },
+            include: [{
+                model: UserModel,
+                as: "user"
+            }],
+        })
+
+        console.log(resident, 'resident')
+
+        let message = `
+        Se registro una nueva reserva a nombre de ${resident.user.name} ${resident.user.lastname}
+        ${spaces ? ` al ${spaces.spaceType} ${spaces.spaceName} el dia ${newBooking.StartDateBooking} y esta ${newBooking.status}` : ``}`
+
+        if (body.idResident && userLogged) {
+            notification = await Notification.create({
+                iduser: body.idUserLogged,
+                type: 'success',
+                content: {
+                    message: message,
+                    information: { userLogged, booking: newBooking, resident: resident }
+                },
+                datetime: new Date()
+            });
+        }
+
         res.status(201).json({
-            message: 'Reserva Registrada Exitosamente',
+            message: message,
             bookingId: newBooking.idbooking,
             bookingDetails: newBooking,
         });
@@ -175,11 +212,46 @@ const putBooking = async (req, res) => {
 
         const updatedBooking = await Booking.findOne({ where: { idbooking: idbooking } });
 
+
+        // Notification funtion
+
+        const userLogged = await UserModel.findByPk(req.body.idResident);
+
+        let notification;
+
+        const spaces = await SpacesModel.findByPk(req.body.idSpace)
+
+        const resident = await ResidentModel.findOne({
+            where: { idResident: req.body.idResident },
+            include: [{
+                model: UserModel,
+                as: "user"
+            }],
+        })
+
+
+        let message = `
+        Se modifico el estado de la reserva ${resident.user.name} ${resident.user.lastname}
+        ${spaces ? ` de ${spaces.spaceType} ${spaces.spaceName} ahora esta: ${updatedBooking.status}` : ``}`
+
+        if (body.idResident && userLogged) {
+            notification = await Notification.create({
+                iduser: body.idUserLogged,
+                type: updatedBooking.status == 'Cancelado' ? `danger` : 'warning' ,
+                content: {
+                    message: message,
+                    information: { userLogged, booking: updatedBooking, resident: resident }
+                },
+                datetime: new Date()
+            });
+        }
+
         res.json({
             message: 'Reserva modificada exitosamente.',
             updatedRows: updatedRows,
             updatedBooking: updatedBooking,
         });
+        
     } catch (error) {
         res.status(500).json({
             error: 'Error al modificar reserva: ' + error.message,
@@ -193,4 +265,4 @@ module.exports = {
     putBooking,
     getOneBookingbySpaces,
     getOneBooking
-        }
+}
