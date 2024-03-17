@@ -6,6 +6,8 @@ const SpacesModel = require('../Models/spaces.model');
 const ResidentModel = require('../Models/resident.model');
 const ApartmentModel = require('../Models/apartment.model');
 const Notification = require('../Models/notification.model');
+const Mails = require('../Helpers/Mails');
+const { GmailTransporter } = require('../Helpers/emailConfig');
 
 const getBooking = async (req, res = response) => {
     try {
@@ -116,7 +118,7 @@ const postBooking = async (req, res) => {
         body.StartDateBooking = startDate.toISOString().split('T')[0];
     }
 
-    console.log(body, 'datos de una reserva realizada');
+    // console.log(body, 'datos de una reserva realizada');
 
     if (!body.idSpace || !body.idResident || !body.StartDateBooking || !body.StartTimeBooking || !body.EndTimeBooking || !body.amountPeople) {
         return res.status(400).json({
@@ -130,7 +132,6 @@ const postBooking = async (req, res) => {
 
         // Notification funtion
 
-        const userLogged = await UserModel.findByPk(body.idResident);
 
         let notification;
 
@@ -144,11 +145,15 @@ const postBooking = async (req, res) => {
             }],
         })
 
-        console.log(resident, 'resident')
+        const userLogged = await UserModel.findByPk(resident.iduser);
+
+        // console.log(resident, 'resident')
+
+        const StartDateBooking = new Date(newBooking?.StartDateBooking).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
 
         let message = `
-        Se registro una nueva reserva a nombre de ${resident.user.name} ${resident.user.lastname}
-        ${spaces ? ` al ${spaces.spaceType} ${spaces.spaceName} el dia ${newBooking.StartDateBooking} y esta ${newBooking.status}` : ``}`
+        Se registro una nueva reserva al ${spaces.spaceName.toLowerCase()}
+        ${spaces ? ` programada el dia ${StartDateBooking}, estado: ${newBooking.status}` : ``}`
 
         if (body.idResident && userLogged) {
             notification = await Notification.create({
@@ -159,6 +164,22 @@ const postBooking = async (req, res) => {
                     information: { userLogged, booking: newBooking, resident: resident }
                 },
                 datetime: new Date()
+            });
+        }
+
+        // Email funtion
+
+        if (userLogged) {
+            const mailToSend = Mails.bookingConfirmation(userLogged.name, userLogged.lastname, userLogged.email, newBooking, spaces);
+
+            GmailTransporter.sendMail(mailToSend, (error, info) => {
+                if (error) {
+                    console.error('Error al enviar el correo:', error);
+                    res.status(500).json({ message: 'Error al enviar el correo' });
+                } else {
+                    console.log('Correo enviado:', info.response);
+                    res.json({ message: 'Correo con código de recuperación enviado' });
+                }
             });
         }
 
@@ -212,7 +233,6 @@ const putBooking = async (req, res) => {
 
         const updatedBooking = await Booking.findOne({ where: { idbooking: idbooking } });
 
-
         // Notification funtion
 
         const userLogged = await UserModel.findByPk(req.body.idResident);
@@ -230,14 +250,12 @@ const putBooking = async (req, res) => {
         })
 
 
-        let message = `
-        Se modifico el estado de la reserva ${resident.user.name} ${resident.user.lastname}
-        ${spaces ? ` de ${spaces.spaceType} ${spaces.spaceName} ahora esta: ${updatedBooking.status}` : ``}`
+        let message = `Se modifico cronograma de reserva de la zona comun ${spaces.spaceName}`
 
-        if (body.idResident && userLogged) {
+        if (req.body.idResident && userLogged) {
             notification = await Notification.create({
                 iduser: body.idUserLogged,
-                type: updatedBooking.status == 'Cancelado' ? `danger` : 'warning' ,
+                type: updatedBooking.status == 'Cancelado' ? `danger` : 'success',
                 content: {
                     message: message,
                     information: { userLogged, booking: updatedBooking, resident: resident }
@@ -246,12 +264,29 @@ const putBooking = async (req, res) => {
             });
         }
 
+
+        // Email funtion
+
+        if (userLogged) {
+            const mailToSend = Mails.bookingConfirmation(userLogged.name, userLogged.lastname, userLogged.email, updatedBooking, spaces);
+
+            GmailTransporter.sendMail(mailToSend, (error, info) => {
+                if (error) {
+                    console.error('Error al enviar el correo:', error);
+                    res.status(500).json({ message: 'Error al enviar el correo' });
+                } else {
+                    console.log('Correo enviado:', info.response);
+                    res.json({ message: 'Correo con código de recuperación enviado' });
+                }
+            });
+        }
+
         res.json({
             message: 'Reserva modificada exitosamente.',
             updatedRows: updatedRows,
             updatedBooking: updatedBooking,
         });
-        
+
     } catch (error) {
         res.status(500).json({
             error: 'Error al modificar reserva: ' + error.message,
@@ -261,7 +296,7 @@ const putBooking = async (req, res) => {
 
 
 const putStateBooking = async (req, res) => {
-    const { idbooking } = req.body;
+    const { idbooking, idUserLogged } = req.body;
     const updateData = req.body;
 
     if (!idbooking) {
@@ -282,6 +317,56 @@ const putStateBooking = async (req, res) => {
         }
 
         const updatedBooking = await Booking.findOne({ where: { idbooking: idbooking } });
+
+        // Notification funtion
+
+        const userLogged = await UserModel.findByPk(idUserLogged);
+
+        let notification;
+
+        const spaces = await SpacesModel.findByPk(updatedBooking.idSpace)
+
+        const resident = await ResidentModel.findOne({
+            where: { idResident: updatedBooking.idResident },
+            include: [{
+                model: UserModel,
+                as: "user"
+            }],
+        })
+
+        const StartDateBooking = new Date(updatedBooking?.StartDateBooking).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
+
+        let message = `
+        Se ${updatedBooking.status == 'Cancelado' ? 'cancelo' : 'aprobo'} la reserva de ${spaces.spaceName} 
+        programada el dia ${StartDateBooking} estado: ${updatedBooking.status}`
+
+        if (idUserLogged && userLogged) {
+            notification = await Notification.create({
+                iduser: idUserLogged,
+                type: updatedBooking.status == 'Cancelado' ? `danger` : 'warning',
+                content: {
+                    message: message,
+                    information: { userLogged, booking: updatedBooking, resident: resident }
+                },
+                datetime: new Date()
+            });
+        }
+
+        // Email funtion
+
+        if (userLogged) {
+            const mailToSend = Mails.bookingStatus(userLogged.name, userLogged.lastName, userLogged.email, updatedBooking, spaces);
+
+            GmailTransporter.sendMail(mailToSend, (error, info) => {
+                if (error) {
+                    console.error('Error al enviar el correo:', error);
+                    res.status(500).json({ message: 'Error al enviar el correo' });
+                } else {
+                    console.log('Correo enviado:', info.response);
+                    res.json({ message: 'Correo con código de recuperación enviado' });
+                }
+            });
+        }
 
         res.json({
             message: 'Estado de reserva modificado exitosamente.',
