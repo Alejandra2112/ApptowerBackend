@@ -52,7 +52,8 @@ const ApartmentModel = sequelize.define('Apartments', {
 
     {
         timestamps: false,
-    }
+    },
+
 );
 
 ApartmentModel.belongsTo(TowerModel, {
@@ -80,7 +81,6 @@ ApartmentModel.belongsToMany(
     foreignKey: 'idApartment',
     otherKey: 'idOwner'
 });
-
 
 
 // ApartmentModel.belongsToMany(

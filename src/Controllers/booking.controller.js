@@ -187,10 +187,47 @@ const putBooking = async (req, res) => {
     }
 };
 
+
+const putStateBooking = async (req, res) => {
+    const { idbooking } = req.body;
+    const updateData = req.body;
+
+    if (!idbooking) {
+        return res.status(400).json({
+            error: 'ID de reserva no proporcionado.',
+        });
+    }
+
+    try {
+        const [updatedRows] = await Booking.update(updateData, {
+            where: { idbooking: idbooking },
+        });
+
+        if (updatedRows === 0) {
+            return res.status(404).json({
+                error: 'No se encontró una reserva con ese ID.',
+            });
+        }
+
+        const updatedBooking = await Booking.findOne({ where: { idbooking: idbooking } });
+
+        res.json({
+            message: 'Estado de reserva modificado exitosamente.',
+            updatedRows: updatedRows,
+            updatedBooking: updatedBooking,
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: 'Error al modificar estado de reserva: ' + error.message,
+        });
+    }
+}
+
 module.exports = {
     getBooking,
     postBooking,
     putBooking,
     getOneBookingbySpaces,
-    getOneBooking
-        }
+    getOneBooking,
+    putStateBooking
+}

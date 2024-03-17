@@ -19,8 +19,8 @@ const bookingValidationPost = [
             const space = await SpacesModel.findByPk(req.body.idSpace);
             if (space) {
                 const bookingStartTime = moment(StartTimeBooking, 'HH:mm');
-                const spaceStartHour = moment(space.schedule.startHour, 'HH:mm');
-                const spaceEndHour = moment(space.schedule.endHour, 'HH:mm');
+                const spaceStartHour = moment(space.openingTime, 'HH:mm');
+                const spaceEndHour = moment(space.closingTime, 'HH:mm');
 
                 if (bookingStartTime.isBefore(spaceStartHour)) {
                     throw new Error('Hora inicio de la reserva es antes de la hora de apertura del espacio.');
@@ -39,7 +39,7 @@ const bookingValidationPost = [
             const space = await SpacesModel.findByPk(req.body.idSpace);
             const bookingStartTime = moment(req.body.StartTimeBooking, 'HH:mm');
             const bookingEndTime = moment(EndTimeBooking, 'HH:mm');
-            const spaceEndHour = moment(space.schedule.endHour, 'HH:mm');
+            const spaceEndHour = moment(space.closingTime, 'HH:mm');
 
             if (bookingEndTime.diff(bookingStartTime, 'minutes') < 60) {
                 throw new Error('La reserva debe ser de al menos una hora.');
@@ -98,8 +98,8 @@ const bookingValidationPut = [
             const bookingStartTime = moment(StartTimeBooking, 'HH:mm');
             const bookingEndTime = moment(req.body.EndTimeBooking, 'HH:mm');
             if (space) {
-                const spaceStartHour = moment(space.schedule.startHour, 'HH:mm');
-                const spaceEndHour = moment(space.schedule.endHour, 'HH:mm');
+                const spaceStartHour = moment(space.openingTime, 'HH:mm');
+                const spaceEndHour = moment(space.closingTime, 'HH:mm');
 
                 if (bookingStartTime.isBefore(spaceStartHour)) {
                     throw new Error('Hora inicio de la reserva es antes de la hora de apertura del espacio.');
@@ -139,7 +139,7 @@ const bookingValidationPut = [
         .bail()
         .custom(async (EndTimeBooking, { req }) => {
             const space = await SpacesModel.findByPk(req.body.idSpace);
-            const spaceEndHour = moment(space.schedule.endHour, 'HH:mm');
+            const spaceEndHour = moment(space.closingTime, 'HH:mm');
             const bookingStartTime = moment(req.body.StartTimeBooking, 'HH:mm');
             const bookingEndTime = moment(EndTimeBooking, 'HH:mm');
 
