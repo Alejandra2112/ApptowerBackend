@@ -58,23 +58,10 @@ const getGuestIncomeOne = async (req, res = response) => {
   try {
     const { idGuest_income } = req.params;
 
-    const parkingGuestIncome = await GuestIncomeParking.findOne({
-      where: { idGuest_income: idGuest_income },
-      include: [{ model: ParkingSpacesModel, as: "asociatedParkingSpace" }],
-    });
-
     const guestIncome = await GuestIncome.findOne({
       where: { idGuest_income: idGuest_income },
       include: [
         { model: Visitors, as: "asociatedVisitor" },
-        { model: ApartmentModel, as: "asociatedApartment" },
-      ],
-    });
-
-    const guestIncomeVehicle = await GuestIncomeParking.findOne({
-      where: { idGuest_income: idGuest_income },
-      include: [
-        { model: ParkingSpacesModel, as: "asociatedParkingSpace" }, // Adjusted alias
       ],
     });
 
@@ -84,9 +71,41 @@ const getGuestIncomeOne = async (req, res = response) => {
         .json({ error: "No se encontró un ingreso con ese ID" });
     }
 
+    const guestIncomeApartment = await GuestIncomeToApartments.findOne({
+      where: { idGuest_income: idGuest_income },
+      include: [
+        {
+          model: ApartmentModel,
+          as: "asociatedApartment",
+          attributes: ["idApartment", "apartmentName"],
+        },
+      ],
+    });
+
+    const parkingGuestIncome = await GuestIncomeParking.findOne({
+      where: { idGuest_income: idGuest_income },
+      include: [{ model: ParkingSpacesModel, as: "asociatedParkingSpace" }],
+    });
+
+    const guestIncomeResponse = {
+      ...guestIncome.toJSON(),
+      asociatedVisitor: guestIncome.asociatedVisitor,
+    };
+    
+    if (parkingGuestIncome) {
+      guestIncomeResponse.asociatedParkingSpace = parkingGuestIncome.asociatedParkingSpace;
+    }
+    
+    if (guestIncomeApartment) {
+      guestIncomeResponse.asociatedApartment = guestIncomeApartment.asociatedApartment;
+    }
+    
+
+
+
+
     res.json({
-      guestIncome,
-      guestIncomeVehicle: guestIncomeVehicle ? guestIncomeVehicle : null,
+      guestIncome: guestIncomeResponse,
     });
   } catch (error) {
     console.error("Error al obtener ingreso:", error);
@@ -141,8 +160,8 @@ const getGuestIncomeByApartment = async (req, res = response) => {
 
 const postGuestIncome = async (req, res) => {
   try {
-
-    const { idApartment, idParkingSpace, isGuestIncomeVehicle, ...body } = req.body;
+    const { idApartment, idParkingSpace, isGuestIncomeVehicle, ...body } =
+      req.body;
 
     let guestIncomeApartment;
     let guestIncomeParking;
@@ -150,34 +169,7 @@ const postGuestIncome = async (req, res) => {
 
     let parkingSpace;
 
-    const visitor = await Visitors.findOne({
-      where: { idVisitor: body.idVisitor },
-    });
-
-    if (!visitor) {
-      return res.status(404).json({
-        error: "No se encontró un visitante con ese ID",
-      });
-    }
-
-    if (visitor.access == false) {
-      return res.status(400).json({
-        error: "El visitante no tiene acceso",
-      });
-    }
-
-    const existincome = await GuestIncome.findOne({
-      where: { idVisitor: body.idVisitor, departureDate: null },
-    });
-
-    if (existincome) {
-      return res.status(400).json({
-        error: "El visitante ya tiene un ingreso activo",
-      });
-
-    } else {
-      createdGuestIncome = await GuestIncome.create(body);
-    }
+    createdGuestIncome = await GuestIncome.create(body);
 
     if (idApartment) {
       guestIncomeApartment = await GuestIncomeToApartments.create({
@@ -211,54 +203,72 @@ const postGuestIncome = async (req, res) => {
         );
       }
     }
-
+    const visitor = await Visitors.findByPk(createdGuestIncome.idVisitor);
 
     // Notification funtion
 
     const userLogged = await UserModel.findByPk(body.idUserLogged);
 
     let notification;
+    let apartment
+    let residents = []
 
     // Buscar al visitante y al apartamento asociado
-    const apartment = await ApartmentModel.findByPk(guestIncomeApartment.idApartment);
 
-    const residents = await ApartmentResidentModel.findAll({
-      where: { idApartment: apartment.idApartment },
-      include: [
-        {
-          model: ResidentModel,
-          as: 'resident',
-          include: [
-            {
-              model: UserModel,
-              as: 'user', 
-            },
-          ],
-        },
-      ],
-    })
+    if (idApartment){
+      apartment = await ApartmentModel.findByPk(
+        guestIncomeApartment.idApartment
+      );
+      const residents = await ApartmentResidentModel.findAll({
+        where: { idApartment: apartment.idApartment },
+        include: [
+          {
+            model: ResidentModel,
+            as: "resident",
+            include: [
+              {
+                model: UserModel,
+                as: "user",
+              },
+            ],
+          },
+        ],
+      });
+    }
 
-    console.log(residents, 'residents')
+
+    
+
+    console.log(residents, "residents");
 
     let message = `
     Se registra el ingreso de ${visitor.name} ${visitor.lastname}
     ${apartment ? `al apartamento ${apartment.apartmentName}` : `al conjunto`}
-    ${parkingSpace ? `ocupará el parqueadero 
-    ${parkingSpace.parkingType == 'Public' ? 'publico' : 'privado'} ${parkingSpace.parkingName}` : ''}
-    `
+    ${
+      parkingSpace
+        ? `ocupará el parqueadero 
+    ${parkingSpace.parkingType == "Public" ? "publico" : "privado"} ${
+            parkingSpace.parkingName
+          }`
+        : ""
+    }
+    `;
 
     if (body.idUserLogged && userLogged) {
       notification = await Notification.create({
         iduser: body.idUserLogged,
-        type: 'success',
+        type: "success",
         content: {
           message: message,
-          information: { userLogged, guest_income: createdGuestIncome, resident: residents }
+          information: {
+            userLogged,
+            guest_income: createdGuestIncome,
+            resident: residents,
+          },
         },
-        datetime: new Date()
+        datetime: new Date(),
       });
     }
-
 
     res.json({
       guestIncome: createdGuestIncome,
@@ -281,49 +291,6 @@ const postGuestIncome = async (req, res) => {
     });
   }
 };
-
-// const postGuestIncome = async (req, res) => {
-
-//     try {
-
-//         const body = req.body;
-
-//         const createdGuestIncome = await GuestIncome.create(body);
-
-//         const userLogged = await UserModel.findByPk(body.idUserLogged);
-
-//         let notification;
-
-//         // Buscar al visitante y al apartamento asociado
-//         const visitor = await Visitors.findByPk(createdGuestIncome.idVisitor);
-//         const apartment = await ApartmentModel.findByPk(createdGuestIncome.idApartment);
-
-//         if (body.idUserLogged && userLogged) {
-//             notification = await Notification.create({
-//                 iduser: body.idUserLogged,
-//                 type: 'success',
-//                 content: {
-//                     // Crear un mensaje de notificación con información del visitante y del apartamento
-//                     message: `Se registró el ingreso de ${visitor.name} ${visitor.lastname}
-//                     ${apartment ? `al apartamento ${apartment.apartmentName}` : ''} `,
-//                     information: { userLogged, guest_income: createdGuestIncome }
-
-//                 },
-//                 datetime: new Date()
-//             });
-//         }
-//         res.json({
-//             guestIncome: createdGuestIncome,
-//             message: notification.content.message,
-//         });
-//     } catch (e) {
-//         res.status(500).json({
-//             error: e.message
-//         })
-
-//     }
-
-// };
 
 const putGuestIncome = async (req, res = response) => {
   const body = req.body;
