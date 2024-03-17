@@ -1,5 +1,183 @@
 module.exports = {
 
+    bookingStatus: (name, lastName, email, booking, space) => {
+
+        const StartDateBooking = new Date(booking?.StartDateBooking).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
+
+        return {
+            from: 'domuscomplex.solutions@gmail.com',
+            to: email,
+            subject: `Confirmación de aprobación de reserva`,
+            html: ` <html>
+        <head>
+            <style>
+            body {
+                font-family: 'Arial', sans-serif;
+                background-color: #f4f4f4;
+                margin: 0;
+                padding: 0;
+                text-align: center;
+            }
+            .container {
+                max-width: 600px;
+                margin: 20px auto;
+                padding: 20px;
+                background-color: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.1);
+            }
+                h1 {
+                    color: #007bff;
+                    margin-bottom: 20px;
+                    font-size: 24px;
+                }
+                p {
+                    line-height: 1.6;
+                    margin-bottom: 20px;
+                    color: #666;
+                    font-size: 16px;
+                    text-align: left;
+                }
+                .footer {
+                    color: #777;
+                    font-size: 14px;
+                    text-align: center;
+                    margin-top: 20px;
+                }
+                .logo {
+                    margin-top: -110px;
+                }
+                img {
+                    max-width: 100%;
+                    height: auto;
+                    margin-top: -110px;
+                }
+
+                .left-align {
+                    text-align: left;
+                }
+            
+                .no-bullet {
+                    list-style-type: none;
+                    padding-left: 0;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <p>Estimado/a ${name} ${lastName},</p>
+                <p>Le escribimos para informarle sobre un cambio en el estado 
+                de la reserva de la zona comun ${space.spaceName}.</p>
+                
+                <ul class="left-align no-bullet">
+                    <p>Estado de la Reserva: <a href="http://localhost:5173/#/admin/booking/details/${booking?.idbooking}">${booking.status}</a></p>
+                    <p>${booking.status == 'Cancelado' ? 'Queremos informarle que la reserva ha sido cancelada'
+                    : 'Nos complace informarle que la reserva ha sido aprobada. Esperamos darle la bienvenida y asegurarle una experiencia satisfactoria.'}
+                    
+                </ul>
+
+                <p>Si tiene alguna pregunta o necesita más información, no dude en ponerse en contacto con nosotros. 
+                Estamos aquí para ayudarle en cualquier momento. Gracias por su comprensión y cooperación.</p>
+
+                <p>Si tiene alguna pregunta o necesita asistencia, no dude en ponerse en contacto con administración.</p>
+                <p class="footer">Gracias por confiar en nosotros,<br />Equipo Domus Complex</p>
+                <img class="logo" src="https://res.cloudinary.com/ddptpzasb/image/upload/v1709731660/DomusLogo/jxqemopqnvnnrri02vgm.png" alt="Logo-Domus-Complex" border="0">
+            </div>
+        </body>
+    </html>`
+        }
+    },
+
+    bookingConfirmation: (name, lastName, email, booking, space) => {
+
+        const StartDateBooking = new Date(booking?.StartDateBooking).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
+
+        return {
+            from: 'domuscomplex.solutions@gmail.com',
+            to: email,
+            subject: `Confirmación de Nueva Reserva al Pendiente de Aprobación`,
+            html: ` <html>
+        <head>
+            <style>
+            body {
+                font-family: 'Arial', sans-serif;
+                background-color: #f4f4f4;
+                margin: 0;
+                padding: 0;
+                text-align: center;
+            }
+            .container {
+                max-width: 600px;
+                margin: 20px auto;
+                padding: 20px;
+                background-color: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.1);
+            }
+                h1 {
+                    color: #007bff;
+                    margin-bottom: 20px;
+                    font-size: 24px;
+                }
+                p {
+                    line-height: 1.6;
+                    margin-bottom: 20px;
+                    color: #666;
+                    font-size: 16px;
+                    text-align: left;
+                }
+                .footer {
+                    color: #777;
+                    font-size: 14px;
+                    text-align: center;
+                    margin-top: 20px;
+                }
+                .logo {
+                    margin-top: -110px;
+                }
+                img {
+                    max-width: 100%;
+                    height: auto;
+                    margin-top: -110px;
+                }
+
+                .left-align {
+                    text-align: left;
+                }
+            
+                .no-bullet {
+                    list-style-type: none;
+                    padding-left: 0;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <p>Estimado/a ${name} ${lastName},</p>
+                <p>Es un placer informarle que se ha creado una nueva reserva para el 
+                espacio ${space.spaceName}. Sin embargo, le escribimos para notificarle 
+                que esta reserva está pendiente de aprobación por parte del administrador.
+                Apreciamos su pronta atención a este asunto y le mantendremos informado/a 
+                una vez que la reserva haya sido confirmada por el administrador.
+                
+                Gracias por su comprensión y cooperación.</p>
+                
+                <ul class="left-align no-bullet">
+                    <p>Fecha de reserva: ${StartDateBooking}</p>
+                    <p>De: ${booking.StartTimeBooking} a ${booking.EndTimeBooking}</p>
+                    <p>Para: ${booking.amountPeople} personas</p>
+                    <p>Estado: <a href="http://localhost:5173/#/admin/booking/details/${booking?.idbooking}">${booking.status}</a></p>
+                </ul>
+
+                <p>Si tiene alguna pregunta o necesita asistencia, no dude en ponerse en contacto con administración.</p>
+                <p class="footer">Gracias por confiar en nosotros,<br />Equipo Domus Complex</p>
+                <img class="logo" src="https://res.cloudinary.com/ddptpzasb/image/upload/v1709731660/DomusLogo/jxqemopqnvnnrri02vgm.png" alt="Logo-Domus-Complex" border="0">
+            </div>
+        </body>
+    </html>`
+        }
+    },
+
     payFineEmail: (name, lastName, email, fine) => {
 
         const incidentDate = new Date(fine?.incidentDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -71,9 +249,9 @@ module.exports = {
                  Queremos expresar nuestro agradecimiento por su pronta atención a este asunto.</p>
                 
                 <ul class="left-align no-bullet">
-                    <li>Fecha del incidente: ${incidentDate}</li>
-                    <li>Fecha limite de pago: ${paymentDate}</li>
-                    <li>Estado: <a href="http://localhost:5173/#/admin/fines/details/${fine?.idFines}">${fine.state}</a></li>
+                    <p>Fecha del incidente: ${incidentDate}</p>
+                    <p>Fecha limite de pago: ${paymentDate}</p>
+                    <p>Estado: <a href="http://localhost:5173/#/admin/fines/details/${fine?.idFines}">${fine.state}</a></p>
                 </ul>
 
                 <p>Si tiene alguna pregunta o necesita asistencia, no dude en ponerse en contacto con administración.</p>
@@ -160,8 +338,8 @@ module.exports = {
                  Le agradecemos su colaboración y paciencia mientras completamos esta revisión. Si tiene alguna pregunta adicional, no dude en comunicarse con nosotros.</p>
                  
                  <ul class="left-align no-bullet">
-                    <li><a href="http://localhost:5173/#/admin/fines/details/${fine?.idFines}">Multa de referencia </a></li>
-                    <li>Estado: ${fine.state}</li>
+                    <p><a href="http://localhost:5173/#/admin/fines/details/${fine?.idFines}">Multa de referencia </a></p>
+                    <p>Estado: ${fine.state}</p>
                 </ul>
                  
 
@@ -246,26 +424,26 @@ module.exports = {
                 apartamento ${apartment.apartmentName} por motivo de ${fine?.fineType}. A continuación, se detallan los datos de la multa:</p>
                 <ul class="left-align no-bullet">
 
-                    <li>De: Administración</li>
-                    <li>Para: <a href="http://localhost:5173/#/admin/apartments/details/${fine?.idApartment}">Inquilinos apartamento ${apartment.apartmentName}</a></li>
+                    <p>De: Administración</p>
+                    <p>Para: <a href="http://localhost:5173/#/admin/apartments/details/${fine?.idApartment}">Inquilinos apartamento ${apartment.apartmentName}</a></p>
                     </br>
-                    <li>Motivo: ${fine?.fineType} <p>${fine?.details}</p></li>
+                    <p>Motivo: ${fine?.fineType} <p>${fine?.details}</p></p>
                     </br>
-                    <li>Fecha de incidente: ${incidentDate}</li>
-                    <li>Fecha limite de pago: ${paymentDate}</li>
+                    <p>Fecha de incidente: ${incidentDate}</p>
+                    <p>Fecha limite de pago: ${paymentDate}</p>
                     </br>
-                    <li>Monto: ${fine?.amount}</li>
+                    <p>Monto: ${fine?.amount}</p>
                     </br>
-                    <li>Estado de pago: ${fine?.state}</li>
+                    <p>Estado de pago: ${fine?.state}</p>
                     </br>
-                    <li>Evidencias de la multa:</li>
+                    <p>Evidencias de la multa:</p>
                     <ul>
                         ${fine?.evidenceFiles?.map((evidence, index) => `</br><li><a href="${evidence}">Evidencia N°${index + 1} </a></li>`).join('')}
                     </ul>
                     </br>
-                    <li>Link para agregar comprobante de pago</li>
+                    <p>Link para agregar comprobante de pago</p>
                     </br>
-                    <li><a href="http://localhost:5173/#/admin/fines/details/${fine?.idFines}">Agregar comprobante de pago</a></li>
+                    <p><a href="http://localhost:5173/#/admin/fines/details/${fine?.idFines}">Agregar comprobante de pago</a></p>
 
                 </ul>
                 <p>Por favor, asegúrese de revisar y resolver esta situación lo antes posible.</p>

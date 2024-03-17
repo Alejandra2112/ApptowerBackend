@@ -1,5 +1,7 @@
 const { check } = require('express-validator');
 
+
+
 const postFinesValidations = [
   check('iduser').isInt().withMessage('el id del usuario es requerido')
   .notEmpty().withMessage('El id del usuario es requerido')
@@ -12,6 +14,12 @@ const postFinesValidations = [
   .custom((value) => {
     if (isNaN(Date.parse(value))) {
       throw new Error(`La fecha de pago debe ser valida, recibido: ${value}`);
+    }
+    const paymentDate = new Date(value);
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+    if (paymentDate > currentDate) {
+      throw new Error(`La fecha de pago no puede ser anterior al día actual`);
     }
     return true;
   })
@@ -32,6 +40,13 @@ const postFinesValidations = [
   })
   .notEmpty().withMessage('Se requiere la fecha de pago')
   .isLength({min: 1}).withMessage('Se requiere la fecha de pago'),
+  check('evidenceFiles').custom((value, {req}) => {
+    if (!req.files || req.files.length === 0) {
+      console.log("archivos", req.files);
+      throw new Error(`Se requiere al menos un archivo de evidencia`);
+    }
+    return true;
+  }),
 
   check('amount').isNumeric().withMessage('Se requiere el monto de la multa')
   .isDecimal().withMessage('El monto debe ser un número decimal')
@@ -50,14 +65,20 @@ const postFinesValidations = [
 const putFinesValidations = [
   check('idfines').isInt().withMessage('Se requiere el id de la multa')
   .notEmpty().withMessage('Se requiere el id de la multa'),
-  check('state').isString().withMessage('Se requiere el estado de la multa')
+  check('state').isString().withMessage('Valor invalido para el estado')
   .notEmpty().withMessage('Se requiere el estado de la multa')
-  .matches(/^(Pendiente|Pagada|Por revisar)$/).withMessage('Estado invalido, debe ser Pendiente, Pagada o Por revisar')
+  .matches(/^(Pendiente|Pagada|Por revisar)$/).withMessage('Estado invalido, debe ser Pendiente, Pagada o Por revisar'),
+  check('paymentproof').optional().custom((value, {req}) => {
+    if (!req.files && req.files.length > 1) {
+      throw new Error(`Se requiere un comprobante de pago`);
+    }
+    return true;
+  }),
 ];
 
 module.exports = {
   postFinesValidations,
-  putFinesValidations
+  putFinesValidations,
 };
 
 
