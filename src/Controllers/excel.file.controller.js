@@ -17,95 +17,158 @@ const fs = require('fs');
 
 const XlsxPopulate = require('xlsx-populate');
 const UserModel = require("../Models/users.model");
+const Vehicle = require("../Models/vehicle.model");
+const EnterpriseSecurity = require("../Models/enterprice.security.model");
+const GuestIncomeToApartments = require("../Models/guest.income.to.apartments.model");
+const Visitors = require("../Models/visitors.model");
 
 
 const getExcelFile = async (req, res = response) => {
     try {
 
-        // Logica de excel
-
-        const users = await UserModel.findAll()
-
-        const towers = await TowerModel.findAll()
-
-        const apartments = await ApartmentModel.findAll()
-        const apartmentOwners = await ApartmentOwnerModel.findAll()
-        const apartmentResidents = await ApartmentResidentModel.findAll()
-        const assignedParkingSpaces = await AssignedParking.findAll()
-
-        const spaces = await SpacesModel.findAll()
-
-        const owners = await OwnersModel.findAll()
-        const residents = await ResidentModel.findAll()
-
-        const parkingSpaces = await ParkingSpacesModel.findAll()
+        const body = req.body
 
 
-        const bookings = await Booking.findAll()
+        console.log(body, 'excel body')
 
-        const enterpriceSecurity = await Booking.findAll()
-        const guardShiftters = await guardShifts.findAll()
-
-        const fines = await Fines.findAll()
-        const guestIncome = await Guest_income.findAll()
-        const guestIncomeParking = await GuestIncomeParking.findAll()
-
-        const notifications = await Notification.findAll()
-
-
-        // Crear un nuevo libro de Excel
         const workbook = await XlsxPopulate.fromBlankAsync();
 
-        // Función para agregar una hoja al libro y escribir los datos
         const addSheetWithData = async (sheetName, data) => {
-            console.log(data, 'dataValues')
-            const sheet = workbook.addSheet(sheetName);
-            const columnHeaders = Object.keys(data[0].dataValues);
-            columnHeaders.forEach((header, index) => {
-                console.log(header, 'header')
-                sheet.cell(1, index + 1).value(header);
-            });
-            data.forEach((row, rowIndex) => {
-                console.log(row.dataValues, 'row')
-                Object.values(row.dataValues).forEach((value, colIndex) => {
-                    sheet.cell(rowIndex + 2, colIndex + 1).value(value);
+            if (data && data.length > 0) {
+                const sheet = workbook.addSheet(sheetName);
+                const columnHeaders = Object.keys(data[0].dataValues);
+                columnHeaders.forEach((header, index) => {
+                    sheet.cell(1, index + 1).value(header);
                 });
-            });
+                data.forEach((row, rowIndex) => {
+                    Object.values(row.dataValues).forEach((value, colIndex) => {
+                        sheet.cell(rowIndex + 2, colIndex + 1).value(value);
+                    });
+                });
+            } else {
+                console.log(`No se encontraron datos para la hoja "${sheetName}".`);
+            }
         };
 
-        // Agregar una hoja para cada modelo
-        await addSheetWithData('Usuarios', users);
-
-        await addSheetWithData('Bloques', towers);
-        await addSheetWithData('Apartamentos', apartments);
-        await addSheetWithData('Propietarios de Apartamentos', apartmentOwners);
-        await addSheetWithData('Residentes de Apartamentos', apartmentResidents);
-        await addSheetWithData('Espacios de Parqueo Asignados', assignedParkingSpaces);
-
-        await addSheetWithData('Espacios', spaces);
-        await addSheetWithData('Propietarios', owners);
-        await addSheetWithData('Residentes', residents);
-        await addSheetWithData('Parqueaderos', parkingSpaces);
-        await addSheetWithData('Reservas', bookings);
-        await addSheetWithData('Empresas de seguridad', enterpriceSecurity);
-
-        await addSheetWithData('Turnos de Guardia', guardShiftters);
-        await addSheetWithData('Multas', fines);
-        await addSheetWithData('Ingresos de Invitados', guestIncome);
-        await addSheetWithData('Ingresos de vehiculos', guestIncomeParking);
-        await addSheetWithData('Notificaciones', notifications);
+        // Logica de excel
 
 
-        // Asegúrate de hacer lo mismo para todos tus modelos
 
-        // Guardar el libro como un archivo Excel
-        const fileName = 'datos.xlsx';
+        if (body.table == 'apartments') {
+
+            const towers = await TowerModel.findAll()
+            await addSheetWithData('Bloques', towers);
+
+            const apartments = await ApartmentModel.findAll()
+            await addSheetWithData('Apartamentos', apartments);
+
+            const apartmentOwners = await ApartmentOwnerModel.findAll()
+            await addSheetWithData('Propietarios de Apartamentos', apartmentOwners);
+
+            const apartmentResidents = await ApartmentResidentModel.findAll()
+            await addSheetWithData('Residentes de Apartamentos', apartmentResidents);
+
+            const assignedParkingSpaces = await AssignedParking.findAll()
+            await addSheetWithData('Espacios de Parqueo Asignados', assignedParkingSpaces);
+
+            const vehicles = await Vehicle.findAll()
+            await addSheetWithData('Vehiculos', vehicles);
+
+        } else if (body.table == 'spaces') {
+
+            const spaces = await SpacesModel.findAll()
+            await addSheetWithData('Espacios', spaces);
+
+        } else if (body.table == 'owners') {
+
+            const owners = await OwnersModel.findAll()
+            await addSheetWithData('Propietarios', owners);
+
+        } else if (body.table == 'users') {
+
+            const users = await UserModel.findAll()
+            await addSheetWithData('Usuarios', users);
+
+
+        } else if (body.table == 'residents') {
+
+            const residents = await ResidentModel.findAll()
+            await addSheetWithData('Residentes', residents);
+
+
+        } else if (body.table == 'parkingSpaces') {
+
+            const parkingSpaces = await ParkingSpacesModel.findAll()
+            await addSheetWithData('Parqueaderos', parkingSpaces);
+
+
+        } else if (body.table == 'bookings') {
+
+            const bookings = await Booking.findAll()
+            await addSheetWithData('Reservas', bookings);
+
+        } else if (body.table == 'enterpriceSecurity' || body.table == 'guardShiftters') {
+
+            const enterpriceSecurity = await EnterpriseSecurity.findAll()
+            await addSheetWithData('Empresas de seguridad', enterpriceSecurity);
+
+            const guardShiftters = await guardShifts.findAll()
+            await addSheetWithData('Turnos de Guardia', guardShiftters);
+
+
+        } else if (body.table == 'fines') {
+
+            const fines = await Fines.findAll()
+            await addSheetWithData('Multas', fines);
+
+
+        } else if (body.table == 'visitors') {
+
+            const visitors = await Visitors.findAll()
+            await addSheetWithData('Visitantes', visitors);
+
+
+        } else if (body.table == 'guestIncome' || body.table == 'guestIncomesToApartments' || body.table == 'guestIncomeParking') {
+
+            const guestIncome = await Guest_income.findAll()
+            await addSheetWithData('Ingresos de Invitados', guestIncome);
+
+            const guestIncomesToApartments = await GuestIncomeToApartments.findAll()
+            await addSheetWithData('Ingresos a apartamentos', guestIncomesToApartments);
+
+            const guestIncomeParking = await GuestIncomeParking.findAll()
+            await addSheetWithData('Ingresos de vehiculos', guestIncomeParking);
+
+
+        } else {
+
+
+
+
+
+
+
+
+            const notifications = await Notification.findAll()
+            await addSheetWithData('Notificaciones', notifications);
+        }
+
+
+
+
+
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+
+        const fileName = `${year}-${month}-${day}.xlsx`;
         await workbook.toFileAsync(fileName);
 
         res.download(fileName, () => {
             fs.unlinkSync(fileName);
         });
-       
+
 
     } catch (error) {
         console.error('Error al generar excel:', error);

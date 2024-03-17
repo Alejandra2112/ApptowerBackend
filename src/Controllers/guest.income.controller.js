@@ -7,6 +7,8 @@ const ParkingSpacesModel = require("../Models/parking.spaces.model");
 const UserModel = require("../Models/users.model");
 const Notification = require("../Models/notification.model");
 const GuestIncomeToApartments = require("../Models/guest.income.to.apartments.model");
+const ApartmentResidentModel = require("../Models/apartment.residents.model");
+const ResidentModel = require("../Models/resident.model");
 
 const getGuestIncomeAll = async (req, res = response) => {
   try {
@@ -23,12 +25,11 @@ const getGuestIncomeAll = async (req, res = response) => {
       include: [
         {
           model: ApartmentModel,
-          as: 'asociatedApartment',
-          attributes: ['apartmentName'],
+          as: "asociatedApartment",
+          attributes: ["apartmentName"],
         },
       ],
     });
-
 
     //Se le adiciona a cada respuesta el apartamento asociado a ese ingreso
     const guestIncomeWithApartment = guestIncome.map((income) => {
@@ -103,7 +104,12 @@ const getGuestIncomeByApartment = async (req, res = response) => {
     const guestIncomeToApartment = await GuestIncomeToApartments.findAll({
       where: { idApartment: idApartment },
       include: [
-        { model: GuestIncome, as: "asociatedGuestIncome" },
+        {
+          model: GuestIncome,
+          as: "asociatedGuestIncome",
+          where: { departureDate: null },
+          include: [{ model: Visitors, as: "asociatedVisitor" }],
+        },
         { model: ApartmentModel, as: "asociatedApartment" },
       ],
     });
@@ -135,69 +141,68 @@ const getGuestIncomeByApartment = async (req, res = response) => {
 
 const postGuestIncome = async (req, res) => {
   try {
-    console.log(req.body, "Aqui el body");
-    const { idApartment, idParkingSpace, isGuestIncomeVehicle, ...body } =
-      req.body;
+
+    const { idApartment, idParkingSpace, isGuestIncomeVehicle, ...body } = req.body;
+
     let guestIncomeApartment;
     let guestIncomeParking;
     let createdGuestIncome;
 
-    // Consulta la existenca del visitante
+    let parkingSpace;
+
     const visitor = await Visitors.findOne({
       where: { idVisitor: body.idVisitor },
     });
-    // Verifica si el visitante tiene existe y si no, se devuelve el error
+
     if (!visitor) {
       return res.status(404).json({
         error: "No se encontró un visitante con ese ID",
       });
     }
-    // Verifica si el visitante tiene acceso
-    if (visitor.access==false) {
+
+    if (visitor.access == false) {
       return res.status(400).json({
         error: "El visitante no tiene acceso",
       });
     }
-    // Verifica si el visitante tiene un ingreso activo
+
     const existincome = await GuestIncome.findOne({
       where: { idVisitor: body.idVisitor, departureDate: null },
     });
-    // Si el visitante tiene un ingreso activo, se devuelve el error
+
     if (existincome) {
       return res.status(400).json({
         error: "El visitante ya tiene un ingreso activo",
       });
+
     } else {
-      // Si el visitante no tiene un ingreso activo, se crea el ingreso
       createdGuestIncome = await GuestIncome.create(body);
     }
-      // Si el ingreso es a un apartamento, se crea el ingreso al apartamento
+
     if (idApartment) {
       guestIncomeApartment = await GuestIncomeToApartments.create({
         idGuest_income: createdGuestIncome.idGuest_income,
         idApartment: idApartment,
       });
     }
-    // Si el ingreso es a un vehículo, se crea el ingreso al vehículo
+
     if (isGuestIncomeVehicle && idParkingSpace) {
       guestIncomeParking = await GuestIncomeParking.create({
         idGuest_income: createdGuestIncome.idGuest_income,
         idParkingSpace: idParkingSpace,
       });
-      // Se actualiza el estado del espacio de parqueo
-      const parkingSpace = await ParkingSpacesModel.findOne({
+
+      parkingSpace = await ParkingSpacesModel.findOne({
         where: { idParkingSpace: idParkingSpace },
       });
-      // Si el espacio de parqueo no existe, se devuelve el error
+
       if (!parkingSpace) {
         return res
           .status(404)
           .json({ error: "No se encontró un espacio de parqueo con ese ID" });
       } else if (parkingSpace.status == "Inactive") {
-        // Si el espacio de parqueo está inactivo, se devuelve el error
         throw new Error("El espacio de parqueo se encuentra inactivo");
       } else {
-        // Si el espacio de parqueo está activo, se actualiza el estado del espacio de parqueo
         await ParkingSpacesModel.update(
           { status: "Inactive" },
           {
@@ -207,11 +212,59 @@ const postGuestIncome = async (req, res) => {
       }
     }
 
+
+    // Notification funtion
+
+    const userLogged = await UserModel.findByPk(body.idUserLogged);
+
+    let notification;
+
+    // Buscar al visitante y al apartamento asociado
+    const apartment = await ApartmentModel.findByPk(guestIncomeApartment.idApartment);
+
+    const residents = await ApartmentResidentModel.findAll({
+      where: { idApartment: apartment.idApartment },
+      include: [
+        {
+          model: ResidentModel,
+          as: 'resident',
+          include: [
+            {
+              model: UserModel,
+              as: 'user', 
+            },
+          ],
+        },
+      ],
+    })
+
+    console.log(residents, 'residents')
+
+    let message = `
+    Se registra el ingreso de ${visitor.name} ${visitor.lastname}
+    ${apartment ? `al apartamento ${apartment.apartmentName}` : `al conjunto`}
+    ${parkingSpace ? `ocupará el parqueadero 
+    ${parkingSpace.parkingType == 'Public' ? 'publico' : 'privado'} ${parkingSpace.parkingName}` : ''}
+    `
+
+    if (body.idUserLogged && userLogged) {
+      notification = await Notification.create({
+        iduser: body.idUserLogged,
+        type: 'success',
+        content: {
+          message: message,
+          information: { userLogged, guest_income: createdGuestIncome, resident: residents }
+        },
+        datetime: new Date()
+      });
+    }
+
+
     res.json({
       guestIncome: createdGuestIncome,
       guestIncomeApartment: guestIncomeApartment,
       guestIncomeParking: guestIncomeParking,
-      message: "Ingreso registrado exitosamente",
+      message: notification.content.message,
     });
 
     // const userLogged = await UserModel.findByPk(body.idUserLogged);
@@ -296,7 +349,6 @@ const putGuestIncome = async (req, res = response) => {
       return res.status(400).json({
         error: "El ingreso ya ha sido cerrado",
       });
-
     }
     // Se consulta si hay un ingreso con parqueadero asociado
     const guestIncomeparking = await GuestIncomeParking.findOne({

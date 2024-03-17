@@ -35,8 +35,8 @@ route.get(
 route.post(
   "/",
   // validations.postFinesValidation,
-  postFinesValidations,
-  validator,
+  // postFinesValidations,
+  // validator,
 
   // checkPermissions(privilegesMap.post_fines, permissionMap.multas),
   postFines

@@ -64,16 +64,23 @@ ApartmentModel.belongsToMany(
   otherKey: 'idResident'
 });
 
-// Configuración de la asociación con Apartments
-ApartmentResidentModel.belongsTo(ApartmentModel, {
-  foreignKey: 'idApartment',
-  targetKey: 'idApartment',
-});
 
 ApartmentModel.hasMany(ApartmentResidentModel, {
   foreignKey: 'idApartment',
   sourceKey: 'idApartment',
 });
 
+// Configuración de la asociación con Apartments
+ApartmentResidentModel.belongsTo(ApartmentModel, {
+  foreignKey: 'idApartment',
+  targetKey: 'idApartment',
+  as: 'apartment'
+});
+
+ApartmentResidentModel.belongsTo(ResidentModel, {
+  foreignKey: 'idResident',
+  targetKey: 'idResident',
+  as: 'resident'
+});
 
 module.exports = ApartmentResidentModel;

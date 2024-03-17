@@ -5,6 +5,10 @@ const { response } = require('express');
 const { upload, updateFile } = require('../Helpers/uploads.helpers');
 const UserModel = require('../Models/users.model');
 const Notification = require('../Models/notification.model');
+const ApartmentResidentModel = require('../Models/apartment.residents.model');
+const ResidentModel = require('../Models/resident.model');
+const Mails = require('../Helpers/Mails');
+const { GmailTransporter } = require('../Helpers/emailConfig');
 
 const getFinesAll = async (req, res = response) => {
     try {
@@ -67,7 +71,7 @@ const getFinesByApartment = async (req, res = response) => {
         const { idApartment } = req.params;
 
         const fines = await Fines.findAll({
-            where: { idApartment: idApartment }, include: [{ model: ApartmentModel, as: 'apartment' },
+            where: { idApartment: idApartment, state: 'Por revisar' || 'Pendiente' }, include: [{ model: ApartmentModel, as: 'apartment' },
             { model: UsersModel, as: 'user' },]
         });
 
@@ -116,6 +120,23 @@ const postFines = async (req, res) => {
 
         let apartment = await ApartmentModel.findByPk(idApartment)
 
+        const residents = await ApartmentResidentModel.findAll({
+            where: { idApartment: idApartment, status: 'Active' },
+            include: [
+                {
+                    model: ResidentModel,
+                    as: 'resident',
+                    include: [
+                        {
+                            model: UserModel,
+                            as: 'user',
+                        },
+                    ],
+                },
+            ],
+        })
+
+        // Notification funtions
 
         if (iduser && userLogged) {
 
@@ -126,13 +147,44 @@ const postFines = async (req, res) => {
                 content: {
                     message: `Se multo al apartamento ${apartment.apartmentName}
                     por motivo de ${fine.fineType}`,
-                    information: { userLogged, fine }
+                    information: { userLogged, fine, resident: residents }
                 },
                 datetime: new Date(),
 
             })
 
         }
+
+        // Send email
+        let mailsToSend = [];
+
+        if (residents) {
+            mailsToSend = residents.map((resident) => {
+                return Mails.fineEmail(
+                    resident?.resident?.user?.name,
+                    resident?.resident?.user?.lastName,
+                    resident?.resident?.user?.email,
+                    fine, apartment
+                );
+            });
+        }
+
+        console.log(mailsToSend, 'mailsToSend');
+
+        mailsToSend.forEach((mail) => {
+            GmailTransporter.sendMail(mail, (error, info) => {
+                if (error) {
+                    console.error('Error al enviar el correo:', error);
+                    res.status(500).json({ message: 'Error al enviar el correo' });
+                } else {
+                    console.log('Correo enviado:', info.response);
+                    res.json({ message: 'Correo con código de recuperación enviado' });
+                }
+            });
+        });
+
+
+
 
         res.json({
 
@@ -162,11 +214,29 @@ const putFines = async (req, res = response) => {
 
         // Notification
 
+        console.log(idUserLogged)
+
         const userLogged = await UserModel.findByPk(idUserLogged)
 
         let notification;
 
         let apartment = await ApartmentModel.findByPk(fine.idApartment)
+
+        const residents = await ApartmentResidentModel.findAll({
+            where: { idApartment: fine.idApartment },
+            include: [
+                {
+                    model: ResidentModel,
+                    as: 'resident',
+                    include: [
+                        {
+                            model: UserModel,
+                            as: 'user',
+                        },
+                    ],
+                },
+            ],
+        })
 
 
         if (userLogged) {
@@ -178,13 +248,14 @@ const putFines = async (req, res = response) => {
                 content: {
                     message: `Se agrega comprobante de pago a una multa del apartamento ${apartment.apartmentName}
                 por motivo de ${fine.fineType}`,
-                    information: { userLogged, fine }
+                    information: { userLogged, fine, resident: [userLogged, residents] }
                 },
                 datetime: new Date(),
 
             })
 
         }
+
 
 
         let results;
@@ -201,10 +272,43 @@ const putFines = async (req, res = response) => {
                 paymentproof: newImg == "" ? req.files.paymentproof : newImg,
             }, { where: { idfines: idfines } });
 
+            // Send email
+
+            const admins = await UserModel.findAll({ where: { idrole: 1 } }) // Rol de administrador
+
+            console.log(admins, 'admins')
+
+            // Send email 
+            let mailsToSend = [];
+
+            if (admins) {
+                mailsToSend = admins?.map((admin) => {
+                    return Mails.proofFineEmail(
+                        admin?.name,
+                        admin?.lastName,
+                        admin?.email,
+                        fine
+                    );
+                });
+            }
+
+            console.log(mailsToSend, 'mailsToSend');
+
+            mailsToSend.forEach((mail) => {
+                GmailTransporter.sendMail(mail, (error, info) => {
+                    if (error) {
+                        console.error('Error al enviar el correo:', error);
+                        res.status(500).json({ message: 'Error al enviar el correo' });
+                    } else {
+                        console.log('Correo enviado:', info.response);
+                        res.json({ message: 'Correo con código de recuperación enviado' });
+                    }
+                });
+            });
 
 
             res.json({
-                message: notification.content.message,
+                message: 'jeje',
                 results,
             });
         } else {
@@ -212,8 +316,75 @@ const putFines = async (req, res = response) => {
                 state: state,
             }, { where: { idfines: idfines } });
 
+
+
+            // Send email to apartment residents
+
+            const userLogged = await UserModel.findByPk(req.body.idUserLogged)
+
+
+            console.log(userLogged, 'userLogged', req.body.idUserLogged)
+            const residents = await ApartmentResidentModel.findAll({
+                where: { idApartment: fine.idApartment, status: 'Active' },
+                include: [
+                    {
+                        model: ResidentModel,
+                        as: 'resident',
+                        include: [
+                            {
+                                model: UserModel,
+                                as: 'user',
+                            },
+                        ],
+                    },
+                ],
+            })
+
+            notification = await Notification.create({
+
+                iduser: req.idUserLogged,
+                type: 'info',
+                content: {
+                    message: `Se cambio el estado de la multa del apartamento ${apartment.apartmentName}
+                como ${fine.state}`,
+                    information: { userLogged, fine, resident: [userLogged, residents] }
+                },
+                datetime: new Date(),
+
+            })
+
+            let mailsToSend = [];
+
+            if (residents) {
+                mailsToSend = residents?.map((resident) => {
+                    return Mails.payFineEmail(
+
+                        resident?.resident?.user?.name,
+                        resident?.resident?.user?.lastName,
+                        resident?.resident?.user?.email,
+                        fine,
+
+                    );
+                });
+            }
+
+            console.log(mailsToSend, 'mailsToSend');
+
+            mailsToSend.forEach((mail) => {
+                GmailTransporter.sendMail(mail, (error, info) => {
+                    if (error) {
+                        console.error('Error al enviar el correo:', error);
+                        res.status(500).json({ message: 'Error al enviar el correo' });
+                    } else {
+                        console.log('Correo enviado:', info.response);
+                        res.json({ message: 'Correo con código de recuperación enviado' });
+                    }
+                });
+            });
+
+
             res.json({
-                message: 'Multa modificada exitosamente sin archivo.',
+                message: 'jeje',
                 results,
             });
         }
