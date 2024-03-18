@@ -34,15 +34,22 @@ const getPermissionFromRole = async (req, res) => {
 const getInformationUser = async (req, res) => {
     const user = req.user;
     const iduser = user.iduser;
+    const idrole = user.idrole;
 
     try {
         const user = await User.findByPk(iduser);
 
+        const nameRole = await Rols.findByPk(idrole, {
+            attributes: ['namerole']
+        })
+
+        console.log(nameRole, 'nameRole')
+
         if (!user) {
             return res.status(401).json({ message: 'Usuario no válido' });
         }
-
-        res.json({ user });
+        const roleName = nameRole ? nameRole.namerole.toLowerCase() : null;
+        res.json({ user, rolName: roleName });
     } catch (error) {
         console.error('Error al obtener información de usuario:', error);
         res.status(500).json({ message: 'Error' });
