@@ -3,14 +3,65 @@ const moment = require('moment');
 const SpacesModel = require('../Models/spaces.model');
 const BookingModel = require('../Models/booking.model')
 const { Op } = require('sequelize');
+const ResidentModel = require('../Models/resident.model');
+const UserModel = require('../Models/users.model');
 
 const bookingValidationPost = [
 
-    check('idSpace').isNumeric().withMessage('La zona común es requerido.'),
+    check('idSpace').isNumeric().withMessage('La zona común es requerido.')
+        .custom(async (value, { req }) => {
 
-    check('idResident').isNumeric().withMessage('El residente es requerido.'),
+            const space = await SpacesModel.findOne({ where: { idSpace: value, status: 'Inactive' } })
 
-    check('StartDateBooking').notEmpty().withMessage('La fecha de inicio de la reserva es requerida.'),
+            if (space) throw new Error('Hora inicio de la reserva es antes de la hora de apertura del espacio.');
+
+            return true
+        }),
+
+    check('idResident').isNumeric().withMessage('El residente es requerido.')
+        .custom(async (value, { req }) => {
+
+            const resident = await ResidentModel.findOne({
+                where: { idResident: value, status: 'Inactive' },
+                include: [{
+
+                    model: UserModel,
+                    as: 'user',
+                    where: { status: 'Inactive' }
+                }]
+            })
+
+            if (resident) throw new Error('El residente y el usuario del residente debe estar activo.');
+
+            return true
+        }),
+
+    check('StartDateBooking').notEmpty().withMessage('La fecha de inicio de la reserva es requerida.')
+        .custom(async (value, { req }) => {
+
+            const startDate = new Date(value);
+            const currentDate = new Date();
+
+            if (startDate.toDateString() === currentDate.toDateString()) {
+                throw new Error('La fecha de inicio de la reserva no puede ser para el mismo día.');
+            }
+
+            const nextDay = new Date(currentDate);
+            nextDay.setDate(currentDate.getDate() + 1);
+
+            if (startDate.toDateString() === nextDay.toDateString()) {
+                throw new Error('La fecha de inicio de la reserva no puede ser para el día siguiente.');
+            }
+
+            const oneMonthLater = new Date(currentDate);
+            oneMonthLater.setMonth(currentDate.getMonth() + 1);
+
+            if (startDate > oneMonthLater) {
+                throw new Error('La fecha de inicio de la reserva no puede ser superior a un mes.');
+            }
+
+            return true;
+        }),
 
     check('StartTimeBooking')
         .isTime().withMessage('Hora de inicio de la reserva es requerida.')
@@ -30,6 +81,25 @@ const bookingValidationPost = [
                     throw new Error('Hora inicio de la reserva es igual o después de la hora de cierre del espacio.');
                 }
             }
+        })
+        .custom(async (value, { req }) => {
+
+            const space = await SpacesModel.findByPk(req.body.idSpace)
+
+            const startTime = new Date(`01/01/2024 ${value}`); // Crear objeto Date con la fecha de reserva y hora de inicio
+            const endTime = new Date(`01/01/2024 ${req.body.EndTimeBooking}`); // Crear objeto Date con la fecha de reserva y hora de fin
+            const openingTime = new Date(`01/01/2024 ${space.openingTime}`); // Crear objeto Date con la hora de apertura del espacio
+            const closingTime = new Date(`01/01/2024 ${space.closingTime}`); // Crear objeto Date con la hora de cierre del espacio
+
+            const bookingDuration = endTime - startTime;
+
+            const spaceDuration = closingTime - openingTime;
+
+            if (bookingDuration > spaceDuration) {
+                throw new Error('El horario total de la reserva no puede ser mayor que el horario del espacio disponible.');
+            }
+
+            return true;
         }),
 
     check('EndTimeBooking')

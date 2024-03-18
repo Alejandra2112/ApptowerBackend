@@ -408,6 +408,8 @@ const ageValidation = [
 
 const userPersonalInfoValidationForPut = [
 
+
+
     check('docType')
         .optional({ nullable: true })
         .isString().withMessage('El tipo de documento debe ser una cadena de caracteres.')
@@ -518,6 +520,21 @@ const passwordValidationForPost = [
 ];
 
 
+const activeUsers = [check('iduser')
+
+    .notEmpty().withMessage('El ID del usuario es requerido.')
+    .custom(async (value, { req }) => {
+
+        const isUserActive = await UserModel.findOne({ where: { iduser: value, status: 'Inactivo' } })
+        if (isUserActive) {
+            throw new Error('El usuario debe estar activo para poder modificarlo.');
+        }
+        return true;
+    })
+];
+
+
+
 
 
 module.exports = {
@@ -526,6 +543,7 @@ module.exports = {
     passwordValidationForPost,
     userPersonalInfoValidationForPost,
     ageValidation,
+    activeUsers,
     userValidations,
 
 };

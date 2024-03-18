@@ -358,7 +358,7 @@ const putPersonalInformation = async (req, res = response) => {
         type: 'warning',
         content: {
           message: message,
-          information: { resident: user }
+          information: { userLogged: user, resident: user }
         },
         datetime: new Date(),
 

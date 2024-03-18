@@ -14,15 +14,15 @@ const residentsTypes = [
         value: "tenant",
         label: "Arrendatario"
     }
-]   
+]
 
 
 const residentTypeValidation = [
 
     check('residentType')
-        // .notEmpty().withMessage('El tipo de residente es obligatorio.')
-        // .isIn(residentsTypes.map(type => type.value)).withMessage('El tipo de residente no es válido.')
-        
+    // .notEmpty().withMessage('El tipo de residente es obligatorio.')
+    // .isIn(residentsTypes.map(type => type.value)).withMessage('El tipo de residente no es válido.')
+
 ];
 
 const residentStatusValidation = [
@@ -41,7 +41,7 @@ const residentStatusValidation = [
 
         })
 
-        .custom(async (value) => {
+        .custom(async (value, { req }) => {
 
             try {
 
@@ -60,7 +60,7 @@ const residentStatusValidation = [
                 // }
 
                 if (apartmentResident && apartmentResident.length > 0 || req.status == 'Inactive') {
-                    throw new Error('El residente tiene propiedades activas.');
+                    throw new Error('El residente tiene residencias activas.');
                 }
 
                 return true;
