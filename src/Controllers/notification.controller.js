@@ -57,12 +57,15 @@ const notifications = async (socket, io) => {
 
     });
 
-    // Notifications to residents 
+    // Notifications to residents
+
 
     const notificationsToResidents = updatedNotifications.filter((notification) => {
 
+
+
         const notificationsFilteredToResidents =
-            notification?.content?.information?.resident
+            notification?.content?.information?.resident || notification.content?.information?.userLogged
 
         return notificationsFilteredToResidents !== undefined && notificationsFilteredToResidents !== null;
 

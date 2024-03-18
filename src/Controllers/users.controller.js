@@ -259,7 +259,7 @@ const postUser = async (req, res) => {
         type: 'success',
         content: {
           message: `Se creo el usuario ${user.name} ${user.lastName} con el rol de ${roleData.namerole}`,
-          information: user
+          information: { resident: user }
         },
         datetime: new Date(),
 
@@ -358,7 +358,7 @@ const putPersonalInformation = async (req, res = response) => {
         type: 'warning',
         content: {
           message: message,
-          information: user
+          information: { resident: user }
         },
         datetime: new Date(),
 
