@@ -170,7 +170,7 @@ const postBooking = async (req, res) => {
         // Email funtion
 
         if (userLogged) {
-            const mailToSend = Mails.bookingConfirmation(userLogged.name, userLogged.lastname, userLogged.email, newBooking, spaces);
+            const mailToSend = Mails.bookingConfirmation(userLogged.name, userLogged.lastName, userLogged.email, newBooking, spaces);
 
             GmailTransporter.sendMail(mailToSend, (error, info) => {
                 if (error) {
