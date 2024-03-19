@@ -248,7 +248,7 @@ const putFines = async (req, res = response) => {
                 content: {
                     message: `Se agrega comprobante de pago a una multa del apartamento ${apartment.apartmentName}
                 por motivo de ${fine.fineType}`,
-                    information: { userLogged, fine, resident: [userLogged, residents] }
+                    information: { userLogged, fine, resident: residents }
                 },
                 datetime: new Date(),
 
@@ -347,7 +347,7 @@ const putFines = async (req, res = response) => {
                 content: {
                     message: `Se cambio el estado de la multa del apartamento ${apartment.apartmentName}
                 como ${fine.state}`,
-                    information: { userLogged, fine, resident: [userLogged, residents] }
+                    information: { userLogged, fine, resident: residents }
                 },
                 datetime: new Date(),
 
