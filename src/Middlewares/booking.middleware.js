@@ -167,6 +167,7 @@ const bookingValidationPut = [
             const space = await SpacesModel.findByPk(req.body.idSpace);
             const bookingStartTime = moment(StartTimeBooking, 'HH:mm');
             const bookingEndTime = moment(req.body.EndTimeBooking, 'HH:mm');
+
             if (space) {
                 const spaceStartHour = moment(space.openingTime, 'HH:mm');
                 const spaceEndHour = moment(space.closingTime, 'HH:mm');
@@ -213,6 +214,9 @@ const bookingValidationPut = [
             const bookingStartTime = moment(req.body.StartTimeBooking, 'HH:mm');
             const bookingEndTime = moment(EndTimeBooking, 'HH:mm');
 
+            const minTime = moment(space.minTime, 'HH:mm');
+            const maxTime = moment(space.maxTime, 'HH:mm');
+
             if (bookingEndTime.diff(bookingStartTime, 'minutes') < 60) {
                 throw new Error('La reserva debe ser de al menos una hora.');
             }
@@ -238,7 +242,17 @@ const bookingValidationPut = [
             if (existingBooking) {
                 throw new Error('La hora de fin de la reserva se superpone con otra reserva existente.');
             }
+
+            if (bookingEndTime.isAfter(maxTime)) {
+                throw new Error(`La hora de fin de la reserva no puede ser después de las ${maxTime.format('HH:mm')}.`);
+            }
+
+            if (bookingEndTime.isBefore(minTime)) {
+                throw new Error(`La hora de fin de la reserva no puede ser antes de las ${minTime.format('HH:mm')}.`);
+            }
         }),
+
+
 
 
     check('amountPeople').isNumeric().withMessage('La cantidad de personas debe ser un número.')

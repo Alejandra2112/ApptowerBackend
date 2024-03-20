@@ -5,7 +5,7 @@ module.exports = {
         const StartDateBooking = new Date(booking?.StartDateBooking).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
 
         return {
-            from: 'domuscomplex.solutions@gmail.com',
+            from: process.env.SYSTEM_EMAIL_ADDRESS,
             to: email,
             subject: `Confirmación de aprobación de reserva`,
             html: ` <html>
@@ -70,7 +70,7 @@ module.exports = {
                 de la reserva de la zona comun ${space.spaceName}.</p>
                 
                 <ul class="left-align no-bullet">
-                    <p>Estado de la Reserva: <a href="http://localhost:5173/#/admin/booking/details/${booking?.idbooking}">${booking.status}</a></p>
+                    <p>Estado de la Reserva: <a href="${process.env.FRONTEND_URL}/#/admin/booking/details/${booking?.idbooking}">${booking.status}</a></p>
                     <p>${booking.status == 'Cancelado' ? 'Queremos informarle que la reserva ha sido cancelada'
                     : 'Nos complace informarle que la reserva ha sido aprobada. Esperamos darle la bienvenida y asegurarle una experiencia satisfactoria.'}
                     
@@ -90,11 +90,12 @@ module.exports = {
 
     bookingConfirmation: (name, lastName, email, booking, space) => {
 
-        const StartDateBooking = new Date(booking?.StartDateBooking).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
+        const StartDateBooking = new Date(booking?.StartDateBooking).toISOString().split('T')[0];
 
         return {
-            from: 'domuscomplex.solutions@gmail.com',
+            from: process.env.SYSTEM_EMAIL_ADDRESS,
             to: email,
+            cc: process.env.SYSTEM_EMAIL_ADDRESS,
             subject: `Confirmación de Nueva Reserva al Pendiente de Aprobación`,
             html: ` <html>
         <head>
@@ -166,7 +167,7 @@ module.exports = {
                     <p>Fecha de reserva: ${StartDateBooking}</p>
                     <p>De: ${booking.StartTimeBooking} a ${booking.EndTimeBooking}</p>
                     <p>Para: ${booking.amountPeople} personas</p>
-                    <p>Estado: <a href="http://localhost:5173/#/admin/booking/details/${booking?.idbooking}">${booking.status}</a></p>
+                    <p>Estado: <a href="${process.env.FRONTEND_URL}/#/admin/booking/details/${booking?.idbooking}">${booking.status}</a></p>
                 </ul>
 
                 <p>Si tiene alguna pregunta o necesita asistencia, no dude en ponerse en contacto con administración.</p>
@@ -180,11 +181,11 @@ module.exports = {
 
     payFineEmail: (name, lastName, email, fine) => {
 
-        const incidentDate = new Date(fine?.incidentDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
-        const paymentDate = new Date(fine?.paymentDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+        const incidentDate = new Date(fine?.incidentDate).toISOString().split('T')[0];
+        const paymentDate = new Date(fine?.paymentDate).toISOString().split('T')[0];
 
         return {
-            from: 'domuscomplex.solutions@gmail.com',
+            from: process.env.SYSTEM_EMAIL_ADDRESS,
             to: email,
             subject: `Multa pagada exitosamente`,
             html: ` <html>
@@ -251,7 +252,7 @@ module.exports = {
                 <ul class="left-align no-bullet">
                     <p>Fecha del incidente: ${incidentDate}</p>
                     <p>Fecha limite de pago: ${paymentDate}</p>
-                    <p>Estado: <a href="http://localhost:5173/#/admin/fines/details/${fine?.idFines}">${fine.state}</a></p>
+                    <p>Estado: <a href="${process.env.FRONTEND_URL}/#/admin/fines/details/${fine?.idFines}">${fine.state}</a></p>
                 </ul>
 
                 <p>Si tiene alguna pregunta o necesita asistencia, no dude en ponerse en contacto con administración.</p>
@@ -265,11 +266,12 @@ module.exports = {
 
     proofFineEmail: (name, lastName, email, fine) => {
 
-        const incidentDate = new Date(fine?.incidentDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
-        const paymentDate = new Date(fine?.paymentDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+        const incidentDate = new Date(fine?.incidentDate).toISOString().split('T')[0];
+        const paymentDate = new Date(fine?.paymentDate).toISOString().split('T')[0];
 
         return {
-            from: 'domuscomplex.solutions@gmail.com',
+            from: process.env.SYSTEM_EMAIL_ADDRESS,
+            cc: process.env.SYSTEM_EMAIL_ADDRESS,
             to: email,
             subject: `Confirmación de recepción del comprobante de pago para multa`,
             html: ` <html>
@@ -338,7 +340,7 @@ module.exports = {
                  Le agradecemos su colaboración y paciencia mientras completamos esta revisión. Si tiene alguna pregunta adicional, no dude en comunicarse con nosotros.</p>
                  
                  <ul class="left-align no-bullet">
-                    <p><a href="http://localhost:5173/#/admin/fines/details/${fine?.idFines}">Multa de referencia </a></p>
+                    <p><a href="${process.env.FRONTEND_URL}/#/admin/fines/details/${fine?.idFines}">Multa de referencia </a></p>
                     <p>Estado: ${fine.state}</p>
                 </ul>
                  
@@ -354,11 +356,11 @@ module.exports = {
 
     fineEmail: (name, lastName, email, fine, apartment) => {
 
-        const incidentDate = new Date(fine?.incidentDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
-        const paymentDate = new Date(fine?.paymentDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
-
+       const incidentDate = new Date(fine?.incidentDate).toISOString().split('T')[0];
+        const paymentDate = new Date(fine?.paymentDate).toISOString().split('T')[0];
+        
         return {
-            from: 'domuscomplex.solutions@gmail.com',
+            from: process.env.SYSTEM_EMAIL_ADDRESS,
             to: email,
             subject: `Multa por ${fine?.fineType} el dia ${incidentDate}`,
             html: ` <html>
@@ -425,7 +427,7 @@ module.exports = {
                 <ul class="left-align no-bullet">
 
                     <p>De: Administración</p>
-                    <p>Para: <a href="http://localhost:5173/#/admin/apartments/details/${fine?.idApartment}">Inquilinos apartamento ${apartment.apartmentName}</a></p>
+                    <p>Para: <a href="${process.env.FRONTEND_URL}/#/admin/apartments/details/${fine?.idApartment}">Inquilinos apartamento ${apartment.apartmentName}</a></p>
                     </br>
                     <p>Motivo: ${fine?.fineType} <p>${fine?.details}</p></p>
                     </br>
@@ -443,7 +445,7 @@ module.exports = {
                     </br>
                     <p>Link para agregar comprobante de pago</p>
                     </br>
-                    <p><a href="http://localhost:5173/#/admin/fines/details/${fine?.idFines}">Agregar comprobante de pago</a></p>
+                    <p><a href="${process.env.FRONTEND_URL}/#/admin/fines/details/${fine?.idFines}">Agregar comprobante de pago</a></p>
 
                 </ul>
                 <p>Por favor, asegúrese de revisar y resolver esta situación lo antes posible.</p>
@@ -459,7 +461,7 @@ module.exports = {
 
     registerSuccessEmail: (name, lastName, email) => {
         return {
-            from: 'domuscomplex.solutions@gmail.com',
+            from: process.env.SYSTEM_EMAIL_ADDRESS,
             to: email,
             subject: 'Confirmación de registro exitoso',
             html: ` <html>
@@ -535,7 +537,7 @@ module.exports = {
 
     changedStatusEmail: (name, lastName, email, username) => {
         return {
-            from: 'domuscomplex.solutions@gmail.com',
+            from: process.env.SYSTEM_EMAIL_ADDRESS,
             to: email,
             subject: 'Mensaje de bienvenida',
             html: ` <html>
@@ -611,7 +613,7 @@ module.exports = {
 
     recorvedPasswordEmail: (recoveryCode, email) => {
         return {
-            from: 'apptower@outlook.com',
+            from: process.env.SYSTEM_EMAIL_ADDRESS,
             to: email,
             subject: 'Recuperación de contraseña',
             html: ` <html>
