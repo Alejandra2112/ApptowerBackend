@@ -6,7 +6,7 @@ const { apartmentValidationForPut, apartmentsVlidationForPost, idApartmentValida
 
 route.get('/:idApartment', getOneApartment);
 route.get('/', getAllApartment)
-route.post('/', idApartmentValidationsForPost, apartmentsVlidationForPost, validator, postApartment)
+route.post('/', apartmentsVlidationForPost, validator, postApartment)
 route.put('/', idApartmentValidationsForPost, apartmentValidationForPut, validator, putApartment)
 // route.delete('/', deleteSpace)
 
