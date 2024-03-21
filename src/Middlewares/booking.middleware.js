@@ -83,17 +83,21 @@ const bookingValidationPost = [
             }
         })
         .custom(async (value, { req }) => {
-
             const space = await SpacesModel.findByPk(req.body.idSpace)
 
-            const startTime = new Date(`01/01/2024 ${value}`); // Crear objeto Date con la fecha de reserva y hora de inicio
-            const endTime = new Date(`01/01/2024 ${req.body.EndTimeBooking}`); // Crear objeto Date con la fecha de reserva y hora de fin
-            const openingTime = new Date(`01/01/2024 ${space.openingTime}`); // Crear objeto Date con la hora de apertura del espacio
-            const closingTime = new Date(`01/01/2024 ${space.closingTime}`); // Crear objeto Date con la hora de cierre del espacio
+            const bookingStartTime = moment(value, 'HH:mm'); // Crear objeto moment con la hora de inicio
+            const bookingEndTime = moment(req.body.EndTimeBooking, 'HH:mm'); // Crear objeto moment con la hora de fin
+            const spaceOpeningTime = moment(space.openingTime, 'HH:mm'); // Crear objeto moment con la hora de apertura del espacio
+            const spaceClosingTime = moment(space.closingTime, 'HH:mm'); // Crear objeto moment con la hora de cierre del espacio
 
-            const bookingDuration = endTime - startTime;
+            const bookingDuration = moment.duration(bookingEndTime.diff(bookingStartTime)).asMinutes();
 
-            const spaceDuration = closingTime - openingTime;
+            let spaceDuration;
+            if (spaceClosingTime.isBefore(spaceOpeningTime)) {
+                spaceDuration = moment.duration(spaceClosingTime.add(1, 'days').diff(spaceOpeningTime)).asMinutes();
+            } else {
+                spaceDuration = moment.duration(spaceClosingTime.diff(spaceOpeningTime)).asMinutes();
+            }
 
             if (bookingDuration > spaceDuration) {
                 throw new Error('El horario total de la reserva no puede ser mayor que el horario del espacio disponible.');
