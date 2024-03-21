@@ -171,10 +171,11 @@ const postUser = async (req, res) => {
     const { idUserLogged, pdf, userImg, idEnterpriseSecurity, residentType, idApartment, ...userData } = req.body;
 
 
+    let passwordOrinignal = userData.password;
 
-    passwordOrinignal = userData.password;
-
-    passwordOrinignal = userData.name.charAt(0).toUpperCase() + userData.lastName.charAt(0).toLowerCase() + userData.document + '*';
+    if (!passwordOrinignal) {
+      passwordOrinignal = userData.name.charAt(0).toUpperCase() + userData.lastName.charAt(0).toLowerCase() + userData.document + '*';
+    }
 
     const salt = bcryptjs.genSaltSync();
     userData.password = bcryptjs.hashSync(passwordOrinignal, salt);
@@ -184,7 +185,6 @@ const postUser = async (req, res) => {
       userImg: imgUrl,
       password: userData.password,
       ...userData
-
     })
 
 
@@ -447,6 +447,8 @@ const putUser = async (req, res) => {
       status: status,
       ...update
     });
+
+    await Rols.update({ state: status }, { where: { idrole: idrole } });
 
 
     if (oldStatus === 'Inactivo' && user.status === 'Activo') {

@@ -254,7 +254,7 @@ const putBooking = async (req, res) => {
 
         if (req.body.idResident && userLogged) {
             notification = await Notification.create({
-                iduser: body.idUserLogged,
+                iduser: req.body.idUserLogged,
                 type: updatedBooking.status == 'Cancelado' ? `danger` : 'success',
                 content: {
                     message: message,

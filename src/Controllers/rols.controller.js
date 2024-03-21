@@ -5,6 +5,8 @@ const rolsPermissions = require('../Models/rolsPermissions.model');
 const Privileges = require('../Models/privileges.model');
 const { Sequelize } = require('sequelize');
 const UserModel = require('../Models/users.model');
+const Watchman = require('../Models/watchmans.model');
+const ResidentModel = require('../Models/resident.model');
 
 const getRols = async (req, res = response) => {
   try {
@@ -175,8 +177,14 @@ const putRols = async (req, res) => {
 
     const updatedStateUser = await UserModel.findAll({ where: { idrole } });
 
-    if (updatedStateUser) {
-      await UserModel.update({ status: others.state }, { where: { idrole } });
+    const state = others.state === 'Activo' ? 'Active' : 'Inactive';
+    if (updatedStateUser && updatedStateUser.length > 0) {
+      for (const user of updatedStateUser) {
+        await UserModel.update({ status: others.state }, { where: { iduser: user.iduser } });
+        await Watchman.update({ state: others.state }, { where: { iduser: user.iduser } });
+        await ResidentModel.update({ status: state }, { where: { iduser: user.iduser } });
+
+      }
     }
 
     return res.json({ message: 'Rol actualizado exitosamente' });

@@ -100,7 +100,7 @@ const getAllResidents = async (req, res = response) => {
 
         const residentList = await Promise.all(residents.map(async (resident) => {
             const apartmentResidents = await ApartmentResidentModel.findAll({
-                where: { idResident: resident.idResident,  status: 'Active' },
+                where: { idResident: resident.idResident, status: 'Active' },
             });
 
             const apartmentList = await Promise.all(apartmentResidents.map(async (apartment) => {
@@ -334,6 +334,17 @@ const putResident = async (req, res = response) => {
 
         const userLogged = await UserModel.findByPk(idUserLogged)
 
+
+        // update state role 
+        const user = await UserModel.findByPk(resident.iduser);
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const state = resident.status === 'Active' ? 'Activo' : 'Inactivo';
+        await UserModel.update({ status: state }, { where: { iduser: user.iduser } });
+        await Rols.update({ state: state }, { where: { idrole: user.idrole } });
+
         let notification;
         let apartment = await ApartmentModel.findByPk(idApartment)
 
@@ -400,6 +411,7 @@ const putResidentStatus = async (req, res = response) => {
         }
 
         const userLogged = await UserModel.findByPk(idUserLogged)
+
 
         let notification;
 
