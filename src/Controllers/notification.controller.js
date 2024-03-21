@@ -133,73 +133,82 @@ const notifications = async (socket, io) => {
 
 const dashboardInformation = async (socket, io) => {
 
-    // GuesIncome
+    try {
+        // GuesIncome
 
-    const guestIncome = await Guest_income.findAll();
+        const guestIncome = await Guest_income.findAll();
 
-    const inGuestIncome = await Guest_income.findAll({
+        const inGuestIncome = await Guest_income.findAll({
 
-        where: { departureDate: null }
-    });
+            where: { departureDate: null }
+        });
 
-    // Fines
+        // Fines
 
-    const fines = await Fines.findAll();
-    const pendingFines = await Fines.findAll({ where: { state: 'Pendiente' } });
-    const paidFines = await Fines.findAll({ where: { state: 'Pagada' } });
-    const finesToReview = await Fines.findAll({ where: { state: 'Por revisar' } });
+        const fines = await Fines.findAll();
+        const pendingFines = await Fines.findAll({ where: { state: 'Pendiente' } });
+        const paidFines = await Fines.findAll({ where: { state: 'Pagada' } });
+        const finesToReview = await Fines.findAll({ where: { state: 'Por revisar' } });
 
-    // Bookings
+        // Bookings
 
-    const bookings = await Booking.findAll();
-    const bookingsToReview = await Booking.findAll({ where: { status: 'Por revisar' } });
-    const bookingsApproved = await Booking.findAll({ where: { status: 'Aprobado' } });
-    const bookingsCancelled = await Booking.findAll({ where: { status: 'Cancelado' } });
+        const bookings = await Booking.findAll();
+        const bookingsToReview = await Booking.findAll({ where: { status: 'Por revisar' } });
+        const bookingsApproved = await Booking.findAll({ where: { status: 'Aprobado' } });
+        const bookingsCancelled = await Booking.findAll({ where: { status: 'Cancelado' } });
 
-    // Apartments
+        // Apartments
 
-    const apartments = await ApartmentModel.findAll();
-    const apartmentsActives = await ApartmentModel.findAll({ where: { status: 'Active' } });
-    const apartmentsInActives = await ApartmentModel.findAll({ where: { status: 'Inactive' } });
+        const apartments = await ApartmentModel.findAll();
+        const apartmentsActives = await ApartmentModel.findAll({ where: { status: 'Active' } });
+        const apartmentsInActives = await ApartmentModel.findAll({ where: { status: 'Inactive' } });
 
-    // Parking Spaces
+        // Parking Spaces
 
-    const parkingSpaces = await ParkingSpacesModel.findAll();
+        const parkingSpaces = await ParkingSpacesModel.findAll();
 
-    const parkingSpacesPrivate = await ParkingSpacesModel.findAll({ where: { parkingType: 'Private' } });
-    const parkingSpacesPrivateActive = await ParkingSpacesModel.findAll({ where: { parkingType: 'Private', status: 'Active' } });
-    const parkingSpacesPrivateInactive = await ParkingSpacesModel.findAll({ where: { parkingType: 'Private', status: 'Inactive' } });
+        const parkingSpacesPrivate = await ParkingSpacesModel.findAll({ where: { parkingType: 'Private' } });
+        const parkingSpacesPrivateActive = await ParkingSpacesModel.findAll({ where: { parkingType: 'Private', status: 'Active' } });
+        const parkingSpacesPrivateInactive = await ParkingSpacesModel.findAll({ where: { parkingType: 'Private', status: 'Inactive' } });
 
-    const parkingSpacesPublic = await ParkingSpacesModel.findAll({ where: { parkingType: 'Public' } });
-    const parkingSpacesPublicActive = await ParkingSpacesModel.findAll({ where: { parkingType: 'Public', status: 'Active' } });
-    const parkingSpacesPublicInactive = await ParkingSpacesModel.findAll({ where: { parkingType: 'Public', status: 'Inactive' } });
-
-
-    const notifications = await Notification.findAll();
-    const notificationsSees = await Notification.findAll({ where: { seen: true } });
-    const notificationsNoSees = await Notification.findAll({ where: { seen: false } });
-
-    const users = await UserModel.findAll()
-    const usersActives = await UserModel.findAll({ where: { status: 'Activo' } })
-    const usersInactives = await UserModel.findAll({ where: { status: 'Inactivo' } })
+        const parkingSpacesPublic = await ParkingSpacesModel.findAll({ where: { parkingType: 'Public' } });
+        const parkingSpacesPublicActive = await ParkingSpacesModel.findAll({ where: { parkingType: 'Public', status: 'Active' } });
+        const parkingSpacesPublicInactive = await ParkingSpacesModel.findAll({ where: { parkingType: 'Public', status: 'Inactive' } });
 
 
-    const data = {
-        guestIncomes: { guestIncome, inGuestIncome },
-        fines: { fines, pendingFines, paidFines, finesToReview },
-        bookings: { bookings, bookingsToReview, bookingsApproved, bookingsCancelled },
-        apartments: { apartments, apartmentsActives, apartmentsInActives },
-        parkingSpacesPrivate: { parkingSpacesPrivate, parkingSpacesPrivateActive, parkingSpacesPrivateInactive },
-        parkingSpacesPublic: { parkingSpacesPublic, parkingSpacesPublicActive, parkingSpacesPublicInactive },
-        notifications: { notifications, notificationsSees, notificationsNoSees },
-        users: { users, usersActives, usersInactives }
-    };
+        const notifications = await Notification.findAll();
+        const notificationsSees = await Notification.findAll({ where: { seen: true } });
+        const notificationsNoSees = await Notification.findAll({ where: { seen: false } });
 
-    io.emit('dashboard-information', data);
-    socket.on('dashboard-information', data => {
+        const users = await UserModel.findAll()
+        const usersActives = await UserModel.findAll({ where: { status: 'Activo' } })
+        const usersInactives = await UserModel.findAll({ where: { status: 'Inactivo' } })
 
-        // console.log('data from dashboard', data)
-    });
+
+        const data = {
+            guestIncomes: { guestIncome, inGuestIncome },
+            fines: { fines, pendingFines, paidFines, finesToReview },
+            bookings: { bookings, bookingsToReview, bookingsApproved, bookingsCancelled },
+            apartments: { apartments, apartmentsActives, apartmentsInActives },
+            parkingSpacesPrivate: { parkingSpacesPrivate, parkingSpacesPrivateActive, parkingSpacesPrivateInactive },
+            parkingSpacesPublic: { parkingSpacesPublic, parkingSpacesPublicActive, parkingSpacesPublicInactive },
+            notifications: { notifications, notificationsSees, notificationsNoSees },
+            users: { users, usersActives, usersInactives }
+        };
+
+        io.emit('dashboard-information', data);
+        socket.on('dashboard-information', data => {
+
+            // console.log('data from dashboard', data)
+        });
+
+    }
+    catch (error) {
+        res.status(500).json({
+            error: 'Error al obtener notificaciones',
+        });
+    }
+
 
 
 };
