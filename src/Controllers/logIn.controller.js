@@ -84,7 +84,7 @@ const logIn = async (req, res) => {
 
     res.json({
       message: 'Inicio de sesión exitoso',
-      token
+      token,
     });
   } catch (error) {
     console.error('Error al iniciar sesión:', error);
