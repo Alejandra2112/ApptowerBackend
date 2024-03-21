@@ -3,6 +3,7 @@ const { check } = require('express-validator');
 const TowerModel = require('../Models/tower.model');
 const ApartmentModel = require('../Models/apartment.model');
 const ApartmentOwnerModel = require('../Models/apartment.owners.model');
+const ApartmentResidentModel = require('../Models/apartment.residents.model');
 
 const idApartmentValidationsForPost = [
 
@@ -167,13 +168,15 @@ const apartmentValidationForPut = [
 
             const body = req.body
 
-            const apartmentResidents = await ApartmentOwnerModel.findAll({
+            const apartmentResidents = await ApartmentResidentModel.findAll({
 
                 where: { idApartment: body.idApartment, status: 'Active' }
 
             })
 
-            if (apartmentResidents && value == 'Inactive') {
+            console.log(body, apartmentResidents, 'data')
+
+            if (apartmentResidents.length !== 0) {
                 throw new Error(`No puedes desactivar un apartamento que tiene residencias activas.`);
             }
             return true;
