@@ -71,7 +71,7 @@ const getFinesByApartment = async (req, res = response) => {
         const { idApartment } = req.params;
 
         const fines = await Fines.findAll({
-            where: { idApartment: idApartment, state: 'Por revisar' || 'Pendiente' }, include: [{ model: ApartmentModel, as: 'apartment' },
+            where: { idApartment: idApartment }, include: [{ model: ApartmentModel, as: 'apartment' },
             { model: UsersModel, as: 'user' },]
         });
 

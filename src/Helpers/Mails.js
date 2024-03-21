@@ -70,7 +70,7 @@ module.exports = {
                 de la reserva de la zona comun ${space.spaceName}.</p>
                 
                 <ul class="left-align no-bullet">
-                    <p>Estado de la Reserva: <a href="${process.env.FRONTEND_URL}/#/admin/booking/details/${booking?.idbooking}">${booking.status}</a></p>
+                    <p>Estado de la Reserva: <a href="https://apptower-bf480.web.app/#/admin/booking/details/${booking?.idbooking}">${booking.status}</a></p>
                     <p>${booking.status == 'Cancelado' ? 'Queremos informarle que la reserva ha sido cancelada'
                     : 'Nos complace informarle que la reserva ha sido aprobada. Esperamos darle la bienvenida y asegurarle una experiencia satisfactoria.'}
                     
@@ -167,7 +167,7 @@ module.exports = {
                     <p>Fecha de reserva: ${StartDateBooking}</p>
                     <p>De: ${booking.StartTimeBooking} a ${booking.EndTimeBooking}</p>
                     <p>Para: ${booking.amountPeople} personas</p>
-                    <p>Estado: <a href="${process.env.FRONTEND_URL}/#/admin/booking/details/${booking?.idbooking}">${booking.status}</a></p>
+                    <p>Estado: <a href="https://apptower-bf480.web.app/#/admin/booking/details/${booking?.idbooking}">${booking.status}</a></p>
                 </ul>
 
                 <p>Si tiene alguna pregunta o necesita asistencia, no dude en ponerse en contacto con administración.</p>
@@ -252,7 +252,7 @@ module.exports = {
                 <ul class="left-align no-bullet">
                     <p>Fecha del incidente: ${incidentDate}</p>
                     <p>Fecha limite de pago: ${paymentDate}</p>
-                    <p>Estado: <a href="${process.env.FRONTEND_URL}/#/admin/fines/details/${fine?.idFines}">${fine.state}</a></p>
+                    <p>Estado: <a href="https://apptower-bf480.web.app/#/admin/fines/details/${fine?.idFines}">${fine.state}</a></p>
                 </ul>
 
                 <p>Si tiene alguna pregunta o necesita asistencia, no dude en ponerse en contacto con administración.</p>
@@ -340,7 +340,7 @@ module.exports = {
                  Le agradecemos su colaboración y paciencia mientras completamos esta revisión. Si tiene alguna pregunta adicional, no dude en comunicarse con nosotros.</p>
                  
                  <ul class="left-align no-bullet">
-                    <p><a href="${process.env.FRONTEND_URL}/#/admin/fines/details/${fine?.idFines}">Multa de referencia </a></p>
+                    <p><a href="https://apptower-bf480.web.app/#/admin/fines/details/${fine?.idFines}">Multa de referencia </a></p>
                     <p>Estado: ${fine.state}</p>
                 </ul>
                  
@@ -427,7 +427,7 @@ module.exports = {
                 <ul class="left-align no-bullet">
 
                     <p>De: Administración</p>
-                    <p>Para: <a href="${process.env.FRONTEND_URL}/#/admin/apartments/details/${fine?.idApartment}">Inquilinos apartamento ${apartment.apartmentName}</a></p>
+                    <p>Para: <a href="https://apptower-bf480.web.app/#/admin/apartments/details/${fine?.idApartment}">Inquilinos apartamento ${apartment.apartmentName}</a></p>
                     </br>
                     <p>Motivo: ${fine?.fineType} <p>${fine?.details}</p></p>
                     </br>
@@ -445,7 +445,7 @@ module.exports = {
                     </br>
                     <p>Link para agregar comprobante de pago</p>
                     </br>
-                    <p><a href="${process.env.FRONTEND_URL}/#/admin/fines/details/${fine?.idFines}">Agregar comprobante de pago</a></p>
+                    <p><a href="https://apptower-bf480.web.app/#/admin/fines/details/${fine?.idFines}">Agregar comprobante de pago</a></p>
 
                 </ul>
                 <p>Por favor, asegúrese de revisar y resolver esta situación lo antes posible.</p>
