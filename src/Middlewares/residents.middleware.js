@@ -58,10 +58,14 @@ const residentStatusValidation = [
                 //         throw new Error('El residente tiene residencia activas.');
                 //     }
                 // }
+                if (apartmentResident && req.status == 'Active') {
+                    return true;
+                }
 
-                if (apartmentResident && apartmentResident.length > 0 || req.status == 'Inactive') {
+                if (apartmentResident && apartmentResident.length > 0 && req.status == 'Inactive') {
                     throw new Error('El residente tiene residencias activas.');
                 }
+
 
                 return true;
             } catch (error) {
