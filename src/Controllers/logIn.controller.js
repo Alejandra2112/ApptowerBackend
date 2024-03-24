@@ -77,11 +77,10 @@ const logIn = async (req, res) => {
       expiresIn: '365d',
     });
 
-    const isProduction = process.env.NODE_ENV === 'production';
+    res.cookie('token', token, { httpOnly: false, secure: true, sameSite: 'none' });
+    res.cookie('user', JSON.stringify(userPayload), { httpOnly: false, secure: true, sameSite: 'none' });
+    res.cookie('permisosAndPrivileges', JSON.stringify(RolePrivilegesPayload), { httpOnly: false, secure: true, sameSite: 'none' });
 
-    res.cookie('token', token, { httpOnly: false, secure: isProduction, sameSite: 'none' });
-    res.cookie('user', JSON.stringify(userPayload), { httpOnly: false, secure: isProduction, sameSite: 'none' });
-    res.cookie('permisosAndPrivileges', JSON.stringify(RolePrivilegesPayload), { httpOnly: false, secure: isProduction, sameSite: 'none' });
 
     res.json({
       message: 'Inicio de sesión exitoso',
