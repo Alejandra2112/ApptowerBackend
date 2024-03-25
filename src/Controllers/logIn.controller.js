@@ -77,15 +77,13 @@ const logIn = async (req, res) => {
       expiresIn: '365d',
     });
 
-    res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'none' });
-    res.cookie('user', JSON.stringify(userPayload), { httpOnly: true, secure: true, sameSite: 'none' });
-    res.cookie('permisosAndPrivileges', JSON.stringify(RolePrivilegesPayload), { httpOnly: true, secure: true, sameSite: 'none' });
+    res.cookie('token', token, {  secure: true, sameSite: 'none' });
+    res.cookie('user', JSON.stringify(userPayload), {  secure: true, sameSite: 'none' });
+    res.cookie('permisosAndPrivileges', JSON.stringify(RolePrivilegesPayload), {  secure: true, sameSite: 'none' });
 
     res.json({
       message: 'Inicio de sesión exitoso',
       token,
-      user: userPayload,
-      PermissionsAndPrivileges: RolePrivilegesPayload
     });
   } catch (error) {
     console.error('Error al iniciar sesión:', error);
