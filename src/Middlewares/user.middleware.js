@@ -502,12 +502,15 @@ const userPersonalInfoValidationForPut = [
 const passwordValidationForPost = [
 
     check('password')
+        .notEmpty().withMessage('La contraseña es requerida.')
         .isLength({ min: 8, max: 12 }).withMessage('La contraseña debe tener entre 8 y 12 caracteres.')
-        .not().matches(/\s/).withMessage('La contraseña no debe contener espacios.'),
+        .not().matches(/\s/).withMessage('La contraseña no debe contener espacios.')
+        .bail(),
     // .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,12}$/)
     // .withMessage('La contraseña debe contener mayúsculas, minúsculas, números y símbolos.'),
 
     check('passwordConfirm')
+        .notEmpty().withMessage('La contraseña es requerida.')
         .isLength({ min: 8, max: 12 }).withMessage('La contraseña debe tener entre 8 y 12 caracteres.')
         .not().matches(/\s/).withMessage('La contraseña no debe contener espacios.')
         .custom((value, { req }) => {
@@ -517,7 +520,33 @@ const passwordValidationForPost = [
                 return true;
             }
         })
+        .bail(),
 ];
+
+const passwordValidationReset = [
+
+    check('newPassword')
+        .notEmpty().withMessage('La contraseña es requerida.')
+        .isLength({ min: 8, max: 12 }).withMessage('La contraseña debe tener entre 8 y 12 caracteres.')
+        .not().matches(/\s/).withMessage('La contraseña no debe contener espacios.')
+        .bail(),
+    // .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,12}$/)
+    // .withMessage('La contraseña debe contener mayúsculas, minúsculas, números y símbolos.'),
+
+    check('confirmPassword')
+        .notEmpty().withMessage('La contraseña es requerida.')
+        .isLength({ min: 8, max: 12 }).withMessage('La contraseña debe tener entre 8 y 12 caracteres.')
+        .not().matches(/\s/).withMessage('La contraseña no debe contener espacios.')
+        .custom((value, { req }) => {
+            if (value !== req.body.newPassword) {
+                throw new Error('Las contraseñas no coinciden.');
+            } else {
+                return true;
+            }
+        })
+        .bail(),
+];
+
 
 
 const activeUsers = [check('iduser')
@@ -545,6 +574,7 @@ module.exports = {
     ageValidation,
     activeUsers,
     userValidations,
+    passwordValidationReset
 
 };
 

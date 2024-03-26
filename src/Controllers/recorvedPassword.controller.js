@@ -24,11 +24,6 @@ const postEmailUser = async (req, res = response) => {
 
     const user = await UserModel.findOne({ where: { email: email } });
 
-
-    if (!user) {
-        return res.status(400).json({ message: 'El correo electrónico no está registrado' });
-    }
-
     function generateSixDigitCode() {
         return Math.floor(Math.random() * 900000) + 100000;
     }
@@ -84,9 +79,7 @@ const verifyCode = async (req, res = response) => {
 
         if (recoveryRecord) {
             return res.json({ message: 'Código correcto' });
-        } else {
-            return res.status(400).json({ message: 'Código incorrecto o ha expirado' });
-        }
+        } 
     } catch (error) {
         console.error('Error al verificar el código en la base de dato:', error);
         return res.status(500).json({ message: 'Error al verificar el código en la base de datos' });

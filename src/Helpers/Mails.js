@@ -356,9 +356,9 @@ module.exports = {
 
     fineEmail: (name, lastName, email, fine, apartment) => {
 
-       const incidentDate = new Date(fine?.incidentDate).toISOString().split('T')[0];
+        const incidentDate = new Date(fine?.incidentDate).toISOString().split('T')[0];
         const paymentDate = new Date(fine?.paymentDate).toISOString().split('T')[0];
-        
+
         return {
             from: process.env.SYSTEM_EMAIL_ADDRESS,
             to: email,
@@ -619,34 +619,46 @@ module.exports = {
             html: ` <html>
             <head>
                 <style>
-                    body {
-                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                        background-color: #f9f9f9;
-                        margin: 0;
-                        padding: 0;
-                        text-align: center;
-                    }
-                    .container {
-                        max-width: 600px;
-                        margin: 10px auto;
-                        padding: 20px;
-                        background-color: #ffffff;
-                        border-radius: 8px;
-                        box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.1);
-                    }
-
-                    a {
-                        color: #007bff;
-                        text-decoration: none;
-                    }
+                body {
+                    font-family: 'Arial', sans-serif;
+                    background-color: #f4f4f4;
+                    margin: 0;
+                    padding: 0;
+                    text-align: center;
+                }
+                .container {
+                    max-width: 600px;
+                    margin: 20px auto;
+                    padding: 20px;
+                    background-color: #ffffff;
+                    border-radius: 8px;
+                    box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.1);
+                }
                     h1 {
                         color: #007bff;
                         margin-bottom: 20px;
+                        font-size: 24px;
                     }
                     p {
                         line-height: 1.6;
                         margin-bottom: 20px;
-                        color: #333;
+                        color: #666;
+                        font-size: 16px;
+                        text-align: left;
+                    }
+                    .footer {
+                        color: #777;
+                        font-size: 14px;
+                        text-align: center;
+                        margin-top: 20px;
+                    }
+                    .logo {
+                        margin-top: -110px;
+                    }
+                    img {
+                        max-width: 100%;
+                        height: auto;
+                        margin-top: -110px;
                     }
                     .code {
                         font-size: 25px;
@@ -654,34 +666,19 @@ module.exports = {
                         font-weight: bold;
                         color: #007bff;
                     }
-                    .button {
-                        display: inline-block;
-                        padding: 15px 30px;
-                        margin-bottom: 10px;
-                        background-color: rgb(176, 196, 222);
-                        color: #007bff;
-                        text-decoration: none;
-                        border-radius: 5px;
-                        transition: background-color 0.3s ease;
-                    }
-                    .button:hover {
-                        background-color: rgb(173, 216, 230);
-                    }
-                    .footer {
-                        color: #777;
-                        font-size: 14px;
-                    }
                 </style>
             </head>
             <body>
                 <div class="container">
-                    <h1>Recuperación de contraseña</h1>
-                    <p>Hola,</p>
-                    <p>Recibimos una solicitud para restablecer tu contraseña.</p>
-                    <p>Tu código de recuperación es: <span class="code">${recoveryCode}</span></p>
-                    <p>Utiliza este código para recuperar tu contraseña. Si no solicitaste esto, puedes ignorar este mensaje.</p>
-                    <p class="footer">Gracias por confiar en nosotros,<br />Equipo Apptower</p>
-                </div>
+                <h1>Recuperación de contraseña</h1>
+                <p>Estimado/a Usuario.</p>
+                <p>Recibimos una solicitud para restablecer tu contraseña.</p>
+                <p>Tu código de recuperación es: <span class="code">${recoveryCode}</span></p>
+                <p>Utiliza este código para recuperar tu contraseña. Si no solicitaste esto, puedes ignorar este mensaje.</p>
+                
+               <p class="footer">Gracias por confiar en nosotros,<br />Equipo Domus Complex</p>
+                <img class="logo" src="https://res.cloudinary.com/ddptpzasb/image/upload/v1709731660/DomusLogo/jxqemopqnvnnrri02vgm.png" alt="Logo-Domus-Complex" border="0">
+            </div>
             </body>
             </html>`,
         }

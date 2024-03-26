@@ -20,7 +20,6 @@ const roleBasedValidation = async (req, res, next) => {
 
         const roleName = role.dataValues.namerole.toLowerCase();
 
-        // Agrega el nombre del rol al objeto req
         req.roleName = roleName;
 
         next();
