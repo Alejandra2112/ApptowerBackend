@@ -97,14 +97,20 @@ const postFines = async (req, res) => {
 
 
     try {
-        const images = req.files?.evidenceFiles;
+        const images = req?.files?.evidenceFiles;
+        console.log("Esto es lo que se envia body2", images)
         console.log("Tamaño", images ? images.length : 0); // Maneja el caso de un solo archivo
+        if (images == undefined) {
+            return res.status(400).json({ message: 'No se subió ninguna imagen' });
+        }
         const imagesArray = Array.isArray(images) ? images : [images];
         const imagesUrl = await Promise.all(imagesArray.map(async (file) => await upload(file, ['pdf', 'jpg', 'jpeg', 'png'], 'Evidences')))
         console.log(imagesUrl);
 
+        
 
-        const { iduser, idApartment, videnceFiles, ...finesAtributes } = req.body;
+
+        const { iduser, idApartment, evidenceFiles, ...finesAtributes } = req.body;
         const fine = await Fines.create({
             evidenceFiles: imagesUrl,
             idApartment: idApartment,

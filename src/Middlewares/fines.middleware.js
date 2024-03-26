@@ -40,9 +40,8 @@ const postFinesValidations = [
   })
   .notEmpty().withMessage('Se requiere la fecha de pago')
   .isLength({min: 1}).withMessage('Se requiere la fecha de pago'),
-  check('evidenceFiles').custom((value, {req}) => {
-    if (!req.files || req.files.length === 0) {
-      console.log("archivos", req.files);
+  check('evidenceFiles').custom((value, { req }) => {
+    if (!req.files || !req.files.hasOwnProperty('evidenceFiles') || req.files.evidenceFiles.length === 0) {
       throw new Error(`Se requiere al menos un archivo de evidencia`);
     }
     return true;
