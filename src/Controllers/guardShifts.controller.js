@@ -57,8 +57,31 @@ const postShifts = async (req, res) => {
     mensaje = e.message;
   }
   res.json({
-    shifts: mensaje,
+    message: mensaje,
   });
+};
+
+
+const putShifts = async (req, res = response) => {
+  const { idshifts } = req.params;
+  const { body } = req;
+
+  try {
+    await Shifts.update(body, {
+      where: {
+        idshifts: idshifts,
+      },
+    });
+
+    res.json({
+      message: 'Turno actualizado correctamente',
+    });
+  } catch (error) {
+    console.error('Error al actualizar:', error);
+    res.status(500).json({
+      error: 'Error al actualizar',
+    });
+  }
 };
 
 
@@ -92,7 +115,8 @@ module.exports = {
   getShifts,
   deleteShifts,
   postShifts,
-  getAllShifts
+  getAllShifts,
+  putShifts
 }
 
 

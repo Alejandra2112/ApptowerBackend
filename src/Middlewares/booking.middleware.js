@@ -106,6 +106,42 @@ const bookingValidationPost = [
             return true;
         }),
 
+    // //este 
+    // .custom(async (StartTimeBooking, { req }) => {
+    //     const moment = require('moment');
+    //     const bookingStartDate = moment(new Date(req.body.StartDateBooking)).format('YYYY-MM-DD');
+    //     const bookingStartTime = moment(`${bookingStartDate} ${StartTimeBooking}`, 'YYYY-MM-DD HH:mm');
+    //     const bookingEndTime = moment(`${bookingStartDate} ${req.body.EndTimeBooking}`, 'YYYY-MM-DD HH:mm');
+
+    //     const existingBookings = await BookingModel.findAll({
+    //         where: {
+    //             idSpace: req.body.idSpace,
+    //             [Op.or]: [
+    //                 {
+    //                     [Op.and]: [
+    //                         {
+    //                             StartTimeBooking: {
+    //                                 [Op.lte]: bookingEndTime.format('HH:mm:ss')
+    //                             }
+    //                         },
+    //                         {
+    //                             EndTimeBooking: {
+    //                                 [Op.gte]: bookingStartTime.format('HH:mm:ss')
+    //                             }
+    //                         }
+    //                     ]
+    //                 }
+    //             ]
+    //         }
+    //     });
+
+    //     if (existingBookings && existingBookings.length > 0) {
+    //         throw new Error('Ya existe una reserva para este espacio en el mismo horario.');
+    //     }
+
+    //     return true;
+    // }),
+
     check('EndTimeBooking')
         .isTime().withMessage('Hora fin de la reserva es requerida.')
         .bail()
@@ -148,31 +184,40 @@ const bookingValidationPut = [
 
     check('idResident').isNumeric().withMessage('El residente es requerido'),
 
-    check('StartDateBooking')
-        .notEmpty().withMessage('La fecha de inicio de la reserva es requerida.')
-        .bail()
-        .custom(async (StartDateBooking, { req }) => {
-            const existingBooking = await BookingModel.findOne({
-                where: {
-                    idSpace: req.body.idSpace,
-                    StartDateBooking: StartDateBooking,
-                    idbooking: { [Op.ne]: req.body.idbooking }
-                }
-            });
-            if (existingBooking) {
-                throw new Error('La fecha seleccionada ya está ocupada.');
+    check('StartDateBooking').notEmpty().withMessage('La fecha de inicio de la reserva es requerida.')
+        .custom(async (value, { req }) => {
+
+            const startDate = new Date(value);
+            const currentDate = new Date();
+
+            if (startDate.toDateString() === currentDate.toDateString()) {
+                throw new Error('La fecha de inicio de la reserva no puede ser para el mismo día.');
             }
+
+            const nextDay = new Date(currentDate);
+            nextDay.setDate(currentDate.getDate() + 1);
+
+            if (startDate.toDateString() === nextDay.toDateString()) {
+                throw new Error('La fecha de inicio de la reserva no puede ser para el día siguiente.');
+            }
+
+            const oneMonthLater = new Date(currentDate);
+            oneMonthLater.setMonth(currentDate.getMonth() + 1);
+
+            if (startDate > oneMonthLater) {
+                throw new Error('La fecha de inicio de la reserva no puede ser superior a un mes.');
+            }
+
+            return true;
         }),
 
     check('StartTimeBooking')
-        .notEmpty().withMessage('Hora de inicio de la reserva es requerida.')
+        .isTime().withMessage('Hora de inicio de la reserva es requerida.')
         .bail()
         .custom(async (StartTimeBooking, { req }) => {
             const space = await SpacesModel.findByPk(req.body.idSpace);
-            const bookingStartTime = moment(StartTimeBooking, 'HH:mm');
-            const bookingEndTime = moment(req.body.EndTimeBooking, 'HH:mm');
-
             if (space) {
+                const bookingStartTime = moment(StartTimeBooking, 'HH:mm');
                 const spaceStartHour = moment(space.openingTime, 'HH:mm');
                 const spaceEndHour = moment(space.closingTime, 'HH:mm');
 
@@ -184,42 +229,75 @@ const bookingValidationPut = [
                     throw new Error('Hora inicio de la reserva es igual o después de la hora de cierre del espacio.');
                 }
             }
+        })
+        .custom(async (value, { req }) => {
+            const space = await SpacesModel.findByPk(req.body.idSpace)
 
-            const existingBooking = await BookingModel.findOne({
-                where: {
-                    idSpace: req.body.idSpace,
-                    StartDateBooking: req.body.StartDateBooking,
-                    [Op.or]: [
-                        {
-                            StartTimeBooking: {
-                                [Op.between]: [bookingStartTime.format('HH:mm'), bookingEndTime.format('HH:mm')]
-                            }
-                        },
-                        {
-                            EndTimeBooking: {
-                                [Op.between]: [bookingStartTime.format('HH:mm'), bookingEndTime.format('HH:mm')]
-                            }
-                        }
-                    ],
-                    idbooking: { [Op.ne]: req.body.idbooking }
-                }
-            });
-            if (existingBooking) {
-                throw new Error('La hora de inicio de la reserva se superpone con otra reserva existente.');
+            const bookingStartTime = moment(value, 'HH:mm'); // Crear objeto moment con la hora de inicio
+            const bookingEndTime = moment(req.body.EndTimeBooking, 'HH:mm'); // Crear objeto moment con la hora de fin
+            const spaceOpeningTime = moment(space.openingTime, 'HH:mm'); // Crear objeto moment con la hora de apertura del espacio
+            const spaceClosingTime = moment(space.closingTime, 'HH:mm'); // Crear objeto moment con la hora de cierre del espacio
+
+            const bookingDuration = moment.duration(bookingEndTime.diff(bookingStartTime)).asMinutes();
+
+            let spaceDuration;
+            if (spaceClosingTime.isBefore(spaceOpeningTime)) {
+                spaceDuration = moment.duration(spaceClosingTime.add(1, 'days').diff(spaceOpeningTime)).asMinutes();
+            } else {
+                spaceDuration = moment.duration(spaceClosingTime.diff(spaceOpeningTime)).asMinutes();
             }
+
+            if (bookingDuration > spaceDuration) {
+                throw new Error('El horario total de la reserva no puede ser mayor que el horario del espacio disponible.');
+            }
+
+            return true;
         }),
 
+    // //este 
+    // .custom(async (StartTimeBooking, { req }) => {
+    //     const moment = require('moment');
+    //     const bookingStartDate = moment(new Date(req.body.StartDateBooking)).format('YYYY-MM-DD');
+    //     const bookingStartTime = moment(`${bookingStartDate} ${StartTimeBooking}`, 'YYYY-MM-DD HH:mm');
+    //     const bookingEndTime = moment(`${bookingStartDate} ${req.body.EndTimeBooking}`, 'YYYY-MM-DD HH:mm');
+
+    //     const existingBookings = await BookingModel.findAll({
+    //         where: {
+    //             idSpace: req.body.idSpace,
+    //             [Op.or]: [
+    //                 {
+    //                     [Op.and]: [
+    //                         {
+    //                             StartTimeBooking: {
+    //                                 [Op.lte]: bookingEndTime.format('HH:mm:ss')
+    //                             }
+    //                         },
+    //                         {
+    //                             EndTimeBooking: {
+    //                                 [Op.gte]: bookingStartTime.format('HH:mm:ss')
+    //                             }
+    //                         }
+    //                     ]
+    //                 }
+    //             ]
+    //         }
+    //     });
+
+    //     if (existingBookings && existingBookings.length > 0) {
+    //         throw new Error('Ya existe una reserva para este espacio en el mismo horario.');
+    //     }
+
+    //     return true;
+    // }),
+
     check('EndTimeBooking')
-        .notEmpty().withMessage('Hora fin de la reserva es requerida.')
+        .isTime().withMessage('Hora fin de la reserva es requerida.')
         .bail()
         .custom(async (EndTimeBooking, { req }) => {
             const space = await SpacesModel.findByPk(req.body.idSpace);
-            const spaceEndHour = moment(space.closingTime, 'HH:mm');
             const bookingStartTime = moment(req.body.StartTimeBooking, 'HH:mm');
             const bookingEndTime = moment(EndTimeBooking, 'HH:mm');
-
-            const minTime = moment(space.minTime, 'HH:mm');
-            const maxTime = moment(space.maxTime, 'HH:mm');
+            const spaceEndHour = moment(space.closingTime, 'HH:mm');
 
             if (bookingEndTime.diff(bookingStartTime, 'minutes') < 60) {
                 throw new Error('La reserva debe ser de al menos una hora.');
@@ -231,28 +309,6 @@ const bookingValidationPut = [
 
             if (bookingEndTime.isAfter(spaceEndHour)) {
                 throw new Error('Hora fin de la reserva es después de la hora de cierre del espacio.');
-            }
-
-            const existingBooking = await BookingModel.findOne({
-                where: {
-                    idSpace: req.body.idSpace,
-                    StartDateBooking: req.body.StartDateBooking,
-                    EndTimeBooking: {
-                        [Op.between]: [bookingStartTime.format('HH:mm'), bookingEndTime.format('HH:mm')]
-                    },
-                    idbooking: { [Op.ne]: req.body.idbooking }
-                }
-            });
-            if (existingBooking) {
-                throw new Error('La hora de fin de la reserva se superpone con otra reserva existente.');
-            }
-
-            if (bookingEndTime.isAfter(maxTime)) {
-                throw new Error(`La hora de fin de la reserva no puede ser después de las ${maxTime.format('HH:mm')}.`);
-            }
-
-            if (bookingEndTime.isBefore(minTime)) {
-                throw new Error(`La hora de fin de la reserva no puede ser antes de las ${minTime.format('HH:mm')}.`);
             }
         }),
 

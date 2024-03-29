@@ -111,6 +111,7 @@ const putEnterpriseSecurity = async (req, res) => {
 
 
         res.json({
+            message: 'Empresa actualizada correctamente',
             enterpriseSecurity,
         });
     } catch (error) {
