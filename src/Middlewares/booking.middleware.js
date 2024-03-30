@@ -212,9 +212,10 @@ const bookingValidationPut = [
         }),
 
     check('StartTimeBooking')
-        .isTime().withMessage('Hora de inicio de la reserva es requerida.')
-        .bail()
+        // .isTime().withMessage('Hora de inicio de la reserva es requerida.')
+        // .bail()
         .custom(async (StartTimeBooking, { req }) => {
+            console.log("StartTimeBooking", StartTimeBooking)
             const space = await SpacesModel.findByPk(req.body.idSpace);
             if (space) {
                 const bookingStartTime = moment(StartTimeBooking, 'HH:mm');
@@ -291,8 +292,8 @@ const bookingValidationPut = [
     // }),
 
     check('EndTimeBooking')
-        .isTime().withMessage('Hora fin de la reserva es requerida.')
-        .bail()
+        // .isTime().withMessage('Hora fin de la reserva es requerida.')
+        // .bail()
         .custom(async (EndTimeBooking, { req }) => {
             const space = await SpacesModel.findByPk(req.body.idSpace);
             const bookingStartTime = moment(req.body.StartTimeBooking, 'HH:mm');

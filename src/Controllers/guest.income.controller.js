@@ -118,6 +118,7 @@ const getGuestIncomeOne = async (req, res = response) => {
 
 const getGuestIncomeByApartment = async (req, res = response) => {
   try {
+    let msg = "";
     const { idApartment } = req.params;
 
     const guestIncomeToApartment = await GuestIncomeToApartments.findAll({
@@ -142,13 +143,12 @@ const getGuestIncomeByApartment = async (req, res = response) => {
     // });
 
     if (guestIncomeToApartment.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "No se encontraron ingresos para ese apartamento" });
+      msg = "No se encontraron ingresos para ese apartamento";
     }
 
     res.json({
       guestIncomeToApartment: guestIncomeToApartment,
+      message: msg,
     });
   } catch (error) {
     console.error("Error al obtener ingresos por apartamento:", error);
