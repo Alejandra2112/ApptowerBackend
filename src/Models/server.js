@@ -109,7 +109,7 @@ class Servers {
       resave: false,
       saveUninitialized: true,
       cookie: {
-        secure: true,
+        secure: false,
         sameSite: 'none'
       }
     }));
