@@ -77,19 +77,14 @@ const logIn = async (req, res) => {
       expiresIn: '365d',
     });
 
-    const cookieDomain = process.env.COOKIE_DOMAIN || 'localhost';
-
-    const isSecure = process.env.NODE_ENV === 'production';
-
-    res.cookie('token', token, { domain: cookieDomain, path: '/', secure: isSecure, httpOnly: true, sameSite: 'none' });
-    res.cookie('user', JSON.stringify(userPayload), { domain: cookieDomain, path: '/', secure: isSecure, httpOnly: true, sameSite: 'none' });
-    res.cookie('permisosAndPrivileges', JSON.stringify(RolePrivilegesPayload), { domain: cookieDomain, path: '/', secure: isSecure, httpOnly: true, sameSite: 'none' });
+    res.cookie('token', token, { httpOnly: false, secure: false, sameSite: 'none' });
+    res.cookie('user', encodeURIComponent(JSON.stringify(userPayload)), { httpOnly: false, secure: false, sameSite: 'none' });
+    res.cookie('permisosAndPrivileges', encodeURIComponent(JSON.stringify(RolePrivilegesPayload)), { httpOnly: false, secure: false, sameSite: 'none' });
 
     res.json({
-      message: 'Inicio de sesión exitoso', 
-      user: userPayload,
-      PermissionsAndPrivileges: encodeURIComponent(JSON.stringify(RolePrivilegesPayload)),
-      token
+      message: 'Inicio de sesión exitoso',
+      user: encodeURIComponent(JSON.stringify(userPayload)),
+      PermissionsAndPrivileges: encodeURIComponent(JSON.stringify(RolePrivilegesPayload))
     });
   } catch (error) {
     console.error('Error al iniciar sesión:', error);
