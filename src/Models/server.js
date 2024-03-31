@@ -89,10 +89,11 @@ class Servers {
     this.app.use((req, res, next) => {
 
       const origin = req.headers.origin;
-      res.setHeader('Access-Control-Allow-Origin', origin || 'https://apptower-bf480.web.app' || '*');
+      res.setHeader('Access-Control-Allow-Origin', origin || '*');
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
       res.setHeader('Access-Control-Allow-Credentials', 'true');
+
 
 
       if (req.method === 'OPTIONS') {
@@ -102,12 +103,14 @@ class Servers {
       next();
     });
 
+    this.app.set('trust proxy', 1);
+    this.app.use(cookieParser());
     this.app.use(session({
       secret: 'somesecret',
       resave: false,
       saveUninitialized: true,
       cookie: {
-        secure: true,
+        secure: false,
         sameSite: 'none'
       }
     }));
