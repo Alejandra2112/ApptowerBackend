@@ -77,9 +77,9 @@ const logIn = async (req, res) => {
       expiresIn: '365d',
     });
 
-    res.cookie('token', token, { httpOnly: false, secure: false, sameSite: 'none' });
-    res.cookie('user', JSON.stringify(userPayload), { httpOnly: false, secure: false, sameSite: 'none' });
-    res.cookie('permisosAndPrivileges', JSON.stringify(RolePrivilegesPayload), { httpOnly: false, secure: false, sameSite: 'none' });
+    res.cookie('token', token, { httpOnly: false, secure: true, sameSite: 'none' });
+    res.cookie('user', JSON.stringify(userPayload), { httpOnly: false, secure: true, sameSite: 'none' });
+    res.cookie('permisosAndPrivileges', JSON.stringify(RolePrivilegesPayload), { httpOnly: false, secure: true, sameSite: 'none' });
 
 
     res.json({
@@ -87,6 +87,7 @@ const logIn = async (req, res) => {
       user: JSON.stringify(userPayload),
       permisosAndPrivileges: RolePrivilegesPayload
     });
+
   } catch (error) {
     console.error('Error al iniciar sesión:', error);
     res.status(500).json({ message: 'Error' });
