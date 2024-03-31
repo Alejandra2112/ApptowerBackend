@@ -3,13 +3,13 @@ const sequelize = require('../Database/config');
 const fileUpload = require('express-fileupload')
 const http = require('http');
 const cookieParser = require('cookie-parser');
-const session = require('express-session');
+const cors = require('cors');
 
 const { Server } = require('socket.io');
 const { notifications, dashboardInformation } = require('../Controllers/notification.controller');
 const { putPersonalInformation } = require('../Controllers/users.controller');
 
-
+const frontendUrl = 'https://apptower-bf480.web.app/#/';
 class Servers {
   constructor() {
     this.app = express();
@@ -86,6 +86,11 @@ class Servers {
   middlewares() {
     this.app.use(cookieParser());
 
+    app.use(cors({
+      origin: frontendUrl,
+      credentials: true,
+    }));
+
     this.app.use((req, res, next) => {
 
       const origin = req.headers.origin;
@@ -94,6 +99,7 @@ class Servers {
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
       res.setHeader('Access-Control-Allow-Credentials', 'true');
 
+    
 
       if (req.method === 'OPTIONS') {
         return res.status(200).end();
@@ -101,15 +107,7 @@ class Servers {
 
       next();
     });
-    this.app.use(session({
-      secret: 'somesecret',
-      resave: false,
-      saveUninitialized: true,
-      cookie: {
-        secure: false,
-        sameSite: 'none'
-      }
-    }));
+
 
     this.app.use(express.json());
 

@@ -77,14 +77,13 @@ const logIn = async (req, res) => {
       expiresIn: '365d',
     });
 
-    res.cookie('token', token, { httpOnly: false, secure: false, sameSite: 'none' });
-    res.cookie('user', JSON.stringify(userPayload), { httpOnly: false, secure: false, sameSite: 'none' });
-    res.cookie('permisosAndPrivileges', JSON.stringify(RolePrivilegesPayload), { httpOnly: false, secure: false, sameSite: 'none' });
+    const cookieDomain = process.env.COOKIE_DOMAIN || 'localhost';
 
-
+    res.cookie('token', token, { domain: cookieDomain, path: '/', secure: true, httpOnly: true, sameSite: 'none' });
+    res.cookie('user', JSON.stringify(userPayload), { domain: cookieDomain, path: '/', secure: true, httpOnly: true, sameSite: 'none' });
+    res.cookie('permisosAndPrivileges', JSON.stringify(RolePrivilegesPayload), { domain: cookieDomain, path: '/', secure: true, httpOnly: true, sameSite: 'none' });
     res.json({
       message: 'Inicio de sesión exitoso',
-      token,
     });
   } catch (error) {
     console.error('Error al iniciar sesión:', error);
