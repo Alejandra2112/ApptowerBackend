@@ -86,7 +86,8 @@ class Servers {
   middlewares() {
     this.app.use(cookieParser());
 
-    app.use(cors({
+
+    this.app.use(cors({
       origin: frontendUrl,
       credentials: true,
     }));
@@ -99,7 +100,7 @@ class Servers {
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
       res.setHeader('Access-Control-Allow-Credentials', 'true');
 
-    
+
 
       if (req.method === 'OPTIONS') {
         return res.status(200).end();
