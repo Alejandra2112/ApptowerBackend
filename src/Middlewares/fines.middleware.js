@@ -15,11 +15,11 @@ const postFinesValidations = [
     if (isNaN(Date.parse(value))) {
       throw new Error(`La fecha de pago debe ser valida, recibido: ${value}`);
     }
-    const paymentDate = new Date(value);
+    const incidentDate = new Date(value);
     const currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0);
-    if (paymentDate > currentDate) {
-      throw new Error(`La fecha de pago no puede ser anterior al día actual`);
+    if (incidentDate > currentDate) {
+      throw new Error(`La fecha de pago no puede ser mayor al día actual`);
     }
     return true;
   })
@@ -41,7 +41,7 @@ const postFinesValidations = [
   .notEmpty().withMessage('Se requiere la fecha de pago')
   .isLength({min: 1}).withMessage('Se requiere la fecha de pago'),
   check('evidenceFiles').custom((value, { req }) => {
-    if (!req.files || !req.files.hasOwnProperty('evidenceFiles') || req.files.evidenceFiles.length === 0) {
+    if (!req.files || req.files.evidenceFiles.length === 0) {
       throw new Error(`Se requiere al menos un archivo de evidencia`);
     }
     return true;
@@ -57,8 +57,8 @@ const postFinesValidations = [
   .notEmpty().withMessage('Se requiere el estado de la multa')
   .matches(/^(Pendiente|Pagada|Por revisar)$/).withMessage('Estado invalido, debe ser Pendiente, Pagada o Por pagar'),
   check('details').isString().withMessage('Se requiere una descripcion de incidente')
-  .notEmpty().withMessage('Se requiere una descripcion de incidente')
-  .isLength({min: 3, max: 500}).withMessage('Debe tener entre 3 y 500 caracteres'),
+  .notEmpty().withMessage('Se requieren los detalles de incidente')
+  .isLength({min: 50, max: 500}).withMessage('Debe tener entre 50 y 500 caracteres'),
 ];
 
 const putFinesValidations = [
