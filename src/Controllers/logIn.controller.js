@@ -86,7 +86,9 @@ const logIn = async (req, res) => {
     res.cookie('permisosAndPrivileges', JSON.stringify(RolePrivilegesPayload), { domain: cookieDomain, path: '/', secure: isSecure, httpOnly: true, sameSite: 'none' });
 
     res.json({
-      message: 'Inicio de sesión exitoso'
+      message: 'Inicio de sesión exitoso', 
+      user: userPayload,
+      PermissionsAndPrivileges: RolePrivilegesPayload
     });
   } catch (error) {
     console.error('Error al iniciar sesión:', error);
