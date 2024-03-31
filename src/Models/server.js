@@ -9,7 +9,7 @@ const { Server } = require('socket.io');
 const { notifications, dashboardInformation } = require('../Controllers/notification.controller');
 const { putPersonalInformation } = require('../Controllers/users.controller');
 
-const frontendUrl = 'https://apptower-bf480.web.app/#/';
+const frontendUrl = 'https://apptower-bf480.web.app';
 class Servers {
   constructor() {
     this.app = express();
@@ -89,6 +89,7 @@ class Servers {
 
     this.app.use(cors({
       origin: frontendUrl,
+      methods: ["GET", "POST", "PUT", "DELETE"],
       credentials: true,
     }));
 
