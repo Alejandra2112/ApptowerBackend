@@ -103,12 +103,8 @@ class Servers {
       next();
     });
 
-    this.app.set('trust proxy', 1);
     this.app.use(cookieParser());
     this.app.use(session({
-      secret: 'somesecret',
-      resave: false,
-      saveUninitialized: true,
       cookie: {
         secure: false,
         sameSite: 'none'
