@@ -84,7 +84,7 @@ const logIn = async (req, res) => {
     res.json({
       message: 'Inicio de sesión exitoso',
       user: encodeURIComponent(JSON.stringify(userPayload)),
-      PermissionsAndPrivileges: encodeURIComponent(JSON.stringify(RolePrivilegesPayload)),
+      permisosAndPrivileges: encodeURIComponent(JSON.stringify(RolePrivilegesPayload)),
       token
     });
   } catch (error) {
