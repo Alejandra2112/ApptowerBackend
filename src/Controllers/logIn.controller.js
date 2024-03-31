@@ -88,7 +88,8 @@ const logIn = async (req, res) => {
     res.json({
       message: 'Inicio de sesión exitoso', 
       user: userPayload,
-      PermissionsAndPrivileges: RolePrivilegesPayload
+      PermissionsAndPrivileges: RolePrivilegesPayload,
+      token
     });
   } catch (error) {
     console.error('Error al iniciar sesión:', error);
