@@ -74,7 +74,7 @@ const logIn = async (req, res) => {
 
 
     const token = jwt.sign(tokenPayload, process.env.MISECRETKEY, {
-      expiresIn: '365d',
+      expiresIn: '45m',
     });
 
     res.json({
