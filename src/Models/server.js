@@ -88,8 +88,8 @@ class Servers {
 
     this.app.use((req, res, next) => {
 
-      const origin = req.headers.origin;
-      res.setHeader('Access-Control-Allow-Origin', origin || '*');
+      const origin = 'https://domus-complex-proyect.web.app'
+      res.setHeader('Access-Control-Allow-Origin', origin);
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
       res.setHeader('Access-Control-Allow-Credentials', 'true');
