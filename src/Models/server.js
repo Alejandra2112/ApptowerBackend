@@ -89,12 +89,11 @@ class Servers {
     this.app.use((req, res, next) => {
 
       const origin = 'https://domus-complex-proyect.web.app'
-      res.setHeader('Access-Control-Allow-Origin', origin);
+      const originLocal = 'http://localhost:5173'
+      res.setHeader('Access-Control-Allow-Origin', origin || originLocal);
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
       res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-
 
       if (req.method === 'OPTIONS') {
         return res.status(200).end();
@@ -102,18 +101,6 @@ class Servers {
 
       next();
     });
-
-    this.app.set('trust proxy', 1);
-    this.app.use(cookieParser());
-    this.app.use(session({
-      secret: 'somesecret',
-      resave: false,
-      saveUninitialized: true,
-      cookie: {
-        secure: false,
-        sameSite: 'none'
-      }
-    }));
 
     this.app.use(express.json());
 
