@@ -106,41 +106,6 @@ const bookingValidationPost = [
             return true;
         }),
 
-    // //este 
-    // .custom(async (StartTimeBooking, { req }) => {
-    //     const moment = require('moment');
-    //     const bookingStartDate = moment(new Date(req.body.StartDateBooking)).format('YYYY-MM-DD');
-    //     const bookingStartTime = moment(`${bookingStartDate} ${StartTimeBooking}`, 'YYYY-MM-DD HH:mm');
-    //     const bookingEndTime = moment(`${bookingStartDate} ${req.body.EndTimeBooking}`, 'YYYY-MM-DD HH:mm');
-
-    //     const existingBookings = await BookingModel.findAll({
-    //         where: {
-    //             idSpace: req.body.idSpace,
-    //             [Op.or]: [
-    //                 {
-    //                     [Op.and]: [
-    //                         {
-    //                             StartTimeBooking: {
-    //                                 [Op.lte]: bookingEndTime.format('HH:mm:ss')
-    //                             }
-    //                         },
-    //                         {
-    //                             EndTimeBooking: {
-    //                                 [Op.gte]: bookingStartTime.format('HH:mm:ss')
-    //                             }
-    //                         }
-    //                     ]
-    //                 }
-    //             ]
-    //         }
-    //     });
-
-    //     if (existingBookings && existingBookings.length > 0) {
-    //         throw new Error('Ya existe una reserva para este espacio en el mismo horario.');
-    //     }
-
-    //     return true;
-    // }),
 
     check('EndTimeBooking')
         .isTime().withMessage('Hora fin de la reserva es requerida.')

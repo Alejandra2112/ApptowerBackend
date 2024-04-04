@@ -25,7 +25,7 @@ const getEnterpriceNIT = async (req, res = response) => {
         const enterprice = await EnterpriseSecurity.findOne({ where: { NIT: NIT } });
 
         if (enterprice) {
-            return res.status(409).json({ message: 'Ya existe un usuario con este documento.' });
+            return res.status(409).json({ message: 'Ya existe un NIT con este documento.' });
         }
 
         res.status(200).json({
