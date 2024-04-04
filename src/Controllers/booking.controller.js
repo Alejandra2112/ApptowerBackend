@@ -351,10 +351,14 @@ const putStateBooking = async (req, res) => {
                 datetime: new Date()
             });
 
-            // Email funtion
+        }
 
-            const mailToSend = Mails.bookingStatus(userLogged.name, userLogged.lastName, userLogged.email, updatedBooking, spaces);
+        // Email funtion
 
+
+        if (resident) {
+            const mailToSend = Mails.bookingStatus(resident?.user?.name, resident?.user?.lastName, resident?.user?.email, updatedBooking, spaces);
+            console.log(mailToSend, 'mailToSend')
             GmailTransporter.sendMail(mailToSend, (error, info) => {
                 if (error) {
                     console.error('Error al enviar el correo:', error);

@@ -2,8 +2,6 @@ module.exports = {
 
     bookingStatus: (name, lastName, email, booking, space) => {
 
-        const StartDateBooking = new Date(booking?.StartDateBooking).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
-
         return {
             from: process.env.SYSTEM_EMAIL_ADDRESS,
             to: email,
@@ -74,8 +72,9 @@ module.exports = {
                     <p>${booking.status == 'Cancelado' ? 'Queremos informarle que la reserva ha sido cancelada'
                     : `Nos complace informarle que la reserva ha sido aprobada. Esperamos darle la bienvenida y asegurarle una experiencia satisfactoria 
 
-                        Tenga en cuenta las siguientes normas y reglas del espacio: 
-                        ${space.rules}
+                        <li>Tenga en cuenta las siguientes normas y reglas del espacio: 
+                        <p>${space.rules}</p>
+                        </li>
                     `}
                     
                 </ul>
