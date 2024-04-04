@@ -51,20 +51,22 @@ const idApartmentValidationsForPut = [
             else throw new Error('El apartamento selecionado no esta en el sistema.');
 
         })
-        .custom(async (value, { req }) => {
+        // .custom(async (value, { req }) => {
 
-            const body = req.body;
+        //     const body = req.body;
 
-            const apartment = await ApartmentModel.findOne({
-                where: { idApartment: value, status: 'Active' }
-            });
+        //     const apartment = await ApartmentModel.findOne({
+        //         where: { idApartment: value, status: 'Active' }
+        //     });
 
-            if (apartment) {
-                return true;
-            } else {
-                throw new Error('El apartamento debe estar activo.');
-            }
-        }),
+        //     if (!apartment && body.status == 'Active') { return true; }
+
+        //     if (apartment) {
+        //         return true;
+        //     } else {
+        //         throw new Error('El apartamento debe estar activo.');
+        //     }
+        // }),
 ]
 
 
@@ -174,11 +176,15 @@ const apartmentValidationForPut = [
 
             })
 
+
+
             console.log(body, apartmentResidents, 'data')
 
             if (apartmentResidents.length !== 0) {
                 throw new Error(`No puedes desactivar un apartamento que tiene residencias activas.`);
             }
+
+
             return true;
 
         }),

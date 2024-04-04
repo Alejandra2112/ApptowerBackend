@@ -350,13 +350,15 @@ const putStateBooking = async (req, res) => {
                 },
                 datetime: new Date()
             });
+
         }
 
         // Email funtion
 
-        if (userLogged) {
-            const mailToSend = Mails.bookingStatus(userLogged.name, userLogged.lastName, userLogged.email, updatedBooking, spaces);
 
+        if (resident) {
+            const mailToSend = Mails.bookingStatus(resident?.user?.name, resident?.user?.lastName, resident?.user?.email, updatedBooking, spaces);
+            console.log(mailToSend, 'mailToSend')
             GmailTransporter.sendMail(mailToSend, (error, info) => {
                 if (error) {
                     console.error('Error al enviar el correo:', error);
@@ -367,6 +369,7 @@ const putStateBooking = async (req, res) => {
                 }
             });
         }
+
 
         res.json({
             message: 'Estado de reserva modificado exitosamente.',
