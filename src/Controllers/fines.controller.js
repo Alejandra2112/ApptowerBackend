@@ -9,6 +9,7 @@ const ApartmentResidentModel = require('../Models/apartment.residents.model');
 const ResidentModel = require('../Models/resident.model');
 const Mails = require('../Helpers/Mails');
 const { GmailTransporter } = require('../Helpers/emailConfig');
+const { Op } = require('sequelize');
 
 const getFinesAll = async (req, res = response) => {
     try {
@@ -71,12 +72,18 @@ const getFinesByApartment = async (req, res = response) => {
         const { idApartment } = req.params;
 
         const fines = await Fines.findAll({
-            where: { idApartment: idApartment }, include: [{ model: ApartmentModel, as: 'apartment' },
-            { model: UsersModel, as: 'user' },]
+            where: { 
+                idApartment: idApartment,
+                state: { [Op.ne]: 'Pagada' } // selecciona donde el estado no sea "Pagada"
+            }, 
+            include: [
+                { model: ApartmentModel, as: 'apartment' },
+                { model: UsersModel, as: 'user' }
+            ]
         });
 
-        if (!fines) {
-            return res.status(404).json({ error: 'No se encontró una multa con ese ID' });
+        if (fines.length === 0) { // Cambiado de !fines a fines.length === 0 para verificar si no hay multas
+            return res.status(404).json({ error: 'No se encontró una multa sin pagar con ese ID de apartamento' });
         }
 
         res.json({
@@ -88,9 +95,8 @@ const getFinesByApartment = async (req, res = response) => {
             error: 'Error al obtener multa',
         });
     }
-
-
 }
+
 
 const postFines = async (req, res) => {
     let message = '';

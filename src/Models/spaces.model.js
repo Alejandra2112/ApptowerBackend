@@ -73,6 +73,13 @@ const SpacesModel = sequelize.define('Spaces', {
         allowNull: true,
     },
 
+    rules: {
+        type: DataTypes.STRING, // O el tipo de datos apropiado según lo que representen las reglas
+        field: 'rules',
+        allowNull: true,
+    },
+
+
 
 
     status: {

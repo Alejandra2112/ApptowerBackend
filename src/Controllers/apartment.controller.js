@@ -6,6 +6,8 @@ const TowerModel = require('../Models/tower.model');
 const Guest_income = require('../Models/guest.income.model');
 const Vehicle = require('../Models/vehicle.model');
 const Fines = require('../Models/fines.model');
+const { Op } = require('sequelize');
+
 
 const getOneApartment = async (req, res = response) => {
     try {
@@ -64,7 +66,10 @@ const getAllApartment = async (req, res = response) => {
             // })
 
             const fines = await Fines.findAll({
-                where: { idApartment: apartment.idApartment, state: 'Pendiente' },
+                where: { 
+                    idApartment: apartment.idApartment,
+                    state: { [Op.ne]: 'Pagada' } // selecciona donde el estado no sea "Pagada"
+                }, 
 
             })
 
@@ -119,8 +124,8 @@ const postApartment = async (req, res) => {
 
                     idTower: idTower,
                     apartmentName:
-                        (apartmentNumber < 10) ? `${parseInt(rangeStart) + floor}0${isUniqueTower == 'true' ? apartmentNumber : parseInt(lastApartmentNumber)  + apartmentNumber}`
-                            : `${parseInt(rangeStart) + floor}${isUniqueTower == 'true'? apartmentNumber : parseInt(lastApartmentNumber) + apartmentNumber}`,
+                        (apartmentNumber < 10) ? `${parseInt(rangeStart) + floor}0${isUniqueTower == 'false' ? apartmentNumber : parseInt(lastApartmentNumber)  + apartmentNumber}`
+                            : `${parseInt(rangeStart) + floor}${isUniqueTower == 'false'? apartmentNumber : parseInt(lastApartmentNumber) + apartmentNumber}`,
                     ...others
 
                 });

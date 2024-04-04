@@ -204,9 +204,7 @@ const dashboardInformation = async (socket, io) => {
 
     }
     catch (error) {
-        res.status(500).json({
-            error: 'Error al obtener notificaciones',
-        });
+        console.error(error)
     }
 
 
