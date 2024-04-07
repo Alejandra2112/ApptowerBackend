@@ -343,7 +343,10 @@ const putResident = async (req, res = response) => {
 
         const state = resident.status === 'Active' ? 'Activo' : 'Inactivo';
         await UserModel.update({ status: state }, { where: { iduser: user.iduser } });
-        await Rols.update({ state: state }, { where: { idrole: user.idrole } });
+
+        if (state === 'Activo') {
+            await Rols.update({ state: state }, { where: { idrole: user.idrole } });
+        }
 
         let notification;
         let apartment = await ApartmentModel.findByPk(idApartment)

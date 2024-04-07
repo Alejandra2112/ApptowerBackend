@@ -448,28 +448,16 @@ const putUser = async (req, res) => {
       ...update
     });
 
-    await Rols.update({ state: status }, { where: { idrole: idrole } });
-
+    if (status === 'Activo') {
+      await Rols.update({ state: status }, { where: { idrole: idrole } });
+    }
 
     if (oldStatus === 'Inactivo' && user.status === 'Activo') {
       if (!user.email) {
         console.error('Error: No se ha definido el correo electrónico del usuario.');
         return res.status(500).json({ error: 'No se ha definido el correo electrónico del usuario.' });
       }
-      // const mailOptions = Mails.changedStatusEmail(user.name, user.lastName, user.email);
-
-      // GmailTransporter.sendMail(mailOptions, (error, info) => {
-      //   if (error) {
-      //     console.error('Error al enviar el correo:', error);
-      //     res.status(500).json({ message: 'Error al enviar el correo' });
-      //   } else {
-      //     console.log('Correo enviado:', info.response);
-      //     res.json({ message: 'Correo con código de recuperación enviado' });
-      //   }
-      // });
     }
-
-
 
     const role = await Rols.findOne({ where: { idrole: idrole } });
     const roleName = role ? role.namerole.toLowerCase() : null;
@@ -500,7 +488,10 @@ const putUser = async (req, res) => {
     if (roleName && roleName.includes('residente')) {
       resident = await ResidentModel.findOne({ where: { iduser: user.iduser } });
       if (resident) {
-        await resident.update({ residentType: residentType });
+        await resident.update({
+          residentType: residentType,
+          status: status === 'Activo' ? 'Active' : 'Inactive'
+        });
       } else {
         resident = await ResidentModel.create({
           iduser: user.iduser,
